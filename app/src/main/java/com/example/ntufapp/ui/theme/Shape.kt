@@ -1,4 +1,4 @@
-package com.example.ui.theme
+package com.example.ntufapp.ui.theme
 
 /*
  * Copyright (C) 2023 The Android Open Source Project

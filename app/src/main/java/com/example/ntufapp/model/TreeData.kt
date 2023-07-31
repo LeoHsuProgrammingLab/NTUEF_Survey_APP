@@ -1,4 +1,4 @@
-package com.example.model
+package com.example.ntufapp.model
 
 data class TreeData(
     var SiteNum: String,

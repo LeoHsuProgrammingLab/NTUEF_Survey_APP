@@ -1,4 +1,4 @@
-package com.example.ui
+package com.example.ntufapp.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -13,6 +13,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -48,7 +49,7 @@ fun TextBox (
                 textValue.value = textFieldValue.value
             },
             readOnly = readOnly,
-            keyboardOptions = KeyboardOptions(keyboardType = keyboardTypeInput),
+            keyboardOptions = KeyboardOptions(keyboardType = keyboardTypeInput, imeAction = ImeAction.Done),
             modifier = Modifier
                 .padding(start = 5.dp, end = 25.dp)
                 .size(width = 120.dp, height = 50.dp)

@@ -1,4 +1,4 @@
-package com.example.viewModel
+package com.example.ntufapp.viewModel
 
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf

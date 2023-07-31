@@ -1,4 +1,4 @@
-package com.example.ntufapp
+package com.example.ntufapp.layout
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -10,44 +10,36 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.model.TreeData
-import com.example.ui.NTUFTopBar
-import com.example.ui.TextBox
-import com.example.ui.theme.NTUFAPPTheme
-import com.example.ui.treeStateMenu
-import com.example.viewModel.TreeViewModel
+import com.example.ntufapp.model.TreeData
+import com.example.ntufapp.ui.NTUFTopBar
+import com.example.ntufapp.ui.TextBox
+import com.example.ntufapp.ui.theme.NTUFAPPTheme
+import com.example.ntufapp.ui.treeStateMenu
+import com.example.ntufapp.viewModel.TreeViewModel
 
 //ref: https://www.youtube.com/watch?v=8XJfLaAOxD0&ab_channel=AndroidDevelopers
 // live-edit for compose
 
-class MainActivity : AppCompatActivity() {
+class SurveyScreen : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             NTUFAPPTheme(darkTheme = true){
                 Surface(modifier = Modifier.fillMaxSize()){
-                    NTUFApp()
+
                 }
             }
         }

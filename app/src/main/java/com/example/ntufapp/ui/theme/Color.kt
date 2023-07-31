@@ -1,4 +1,4 @@
-package com.example.ui.theme
+package com.example.ntufapp.ui.theme
 import androidx.compose.ui.graphics.Color
 
 val md_theme_light_primary = Color(0xFF006C4C)

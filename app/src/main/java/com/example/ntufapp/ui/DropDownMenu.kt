@@ -1,5 +1,6 @@
-package com.example.ui
+package com.example.ntufapp.ui
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -19,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ntufapp.ntufappInfo.Companion.tag
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,10 +38,6 @@ fun treeStateMenu(label: String, treeState: MutableState<String>): MutableState<
         mutableStateOf(false)
     }
     val squirrelInfItems = listOf("早期", "中期", "晚期")
-
-    fun getTreeState(): String {
-        return selectedOption.value
-    }
 
     Row(modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
         Box(

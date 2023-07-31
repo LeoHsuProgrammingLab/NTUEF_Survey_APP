@@ -1,11 +1,11 @@
-package com.example.viewModel
+package com.example.ntufapp.viewModel
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
-import com.example.model.TreeHeight
+import com.example.ntufapp.model.TreeHeight
 
 
 class TreeViewModel: ViewModel() {
