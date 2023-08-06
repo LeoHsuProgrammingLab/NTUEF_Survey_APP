@@ -1,23 +1,17 @@
 package com.example.ntufapp.model
 
-data class TreeData(
-    var SiteNum: String,
-    var PlotNum: String,
-    var SampleNum: String,
-    var DBH: Double,
-    var State: String,
-    var Species: String,
-    var HeightInfo: TreeHeight
+data class Tree(
+    var SiteNum: String = "", // redundant
+    var PlotNum: Int = -1, // redundant
+    var SampleNum: Int = -1,
+    var Species: String = "", // 2
+    var HtSurveyor: MutableList<String> = mutableListOf(), // 3
+    var Date: String = "", // redundant
+    var DBH: Double = 0.0,
+    var State: String = "",
+    var VisHeight: Double = 0.0,
+    var MeasHeight: Double = 0.0,
+    var ForkHeight: Double = 0.0,
 ) {
-
-}
-
-data class TreeHeight(
-    var Surveyor: String,
-    var Date: String,
-    var VisHeight: Double,
-    var MeasHeight: Double,
-    var ForkHeight: Double,
-){
 
 }

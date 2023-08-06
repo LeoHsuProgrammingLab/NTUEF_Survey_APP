@@ -1,3 +1,9 @@
 <resources>
-    <string name="app_name">NTUFAPP</string>
+    <string name="app_name">NTUEFAPP</string>
+    <string name="start_screen">start</string>
+    <string name="resurvey">ReSurvey</string>
+    <string name="new_survey">NewSurvey</string>
+    <string name="display_result">Result_Display</string>
+    <string name="visualization">visualization</string>
+    <string name="add">"新增"</string>
 </resources>

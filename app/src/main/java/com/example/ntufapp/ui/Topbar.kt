@@ -16,6 +16,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
@@ -23,15 +24,17 @@ import com.example.ntufapp.ui.theme.md_theme_light_primary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NTUFTopBar() {
+fun NTUEFTopBar() {
     CenterAlignedTopAppBar(
         title = {
             Text("臺大實驗林調查APP",
                 fontSize = 40.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.clip(
-                MaterialTheme.shapes.small),
-                style = MaterialTheme.typography.displayMedium
+                    MaterialTheme.shapes.small
+                ),
+                style = MaterialTheme.typography.displayMedium,
+                color = Color.White
             )
         },
         navigationIcon = {

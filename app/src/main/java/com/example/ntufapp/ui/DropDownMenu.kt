@@ -1,234 +1,231 @@
 package com.example.ntufapp.ui
 
-import android.util.Log
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ntufapp.ntufappInfo.Companion.tag
+import com.example.ntufapp.R
+import com.example.ntufapp.ui.theme.md_theme_light_primary
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun treeStateMenu(label: String, treeState: MutableState<String>): MutableState<String> {
-    val dropdownExpanded = remember {
-        mutableStateOf(false)
-    }
-    val dropdownItems = listOf("正常", "風倒", "風折", "枯立", "中空")
+fun SurveyorAddDeleteMenu() {
+    val optionText = remember { mutableStateOf("") }
+    val options = remember { mutableStateOf(mutableListOf<String>()) }
 
-    val selectedOption = remember() {
-        mutableStateOf(dropdownItems[0])
-    }
+    options.value = mutableListOf("John", "Leo", "Alex")
 
-    val squirrelInfExpanded = remember {
-        mutableStateOf(false)
-    }
-    val squirrelInfItems = listOf("早期", "中期", "晚期")
-
-    Row(modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
-        Box(
-            modifier = Modifier.size(width = 100.dp, height = 100.dp),
-            contentAlignment = Alignment.TopStart
+    Surface(color = Color.White) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         ) {
-            Text(label, modifier = Modifier.padding(end = 0.dp), textAlign = TextAlign.Start, fontSize = 20.sp)
-        }
-
-        ExposedDropdownMenuBox(
-            expanded = dropdownExpanded.value,
-            onExpandedChange = {
-                dropdownExpanded.value = !dropdownExpanded.value
-                squirrelInfExpanded.value = false
-            }
-        ) {
-            OutlinedTextField(
-                value = selectedOption.value,
-                onValueChange = {
-                    treeState.value = it
-                },
-                readOnly = true,
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(
-                        expanded = dropdownExpanded.value
-                    )
-                },
-
-//                colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                modifier = Modifier
-                    .padding(start = 5.dp, end = 16.dp)
-                    .size(width = 150.dp, height = 50.dp)
-                    .menuAnchor()//https://stackoverflow.com/questions/67111020/exposed-drop-down-menu-for-jetpack-compose
-            )
-
-            ExposedDropdownMenu(
-                expanded = dropdownExpanded.value,
-                onDismissRequest = { dropdownExpanded.value = false }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                dropdownItems.forEach { item ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(item)
-                        },
-                        onClick = {
-                            selectedOption.value = item
-                            dropdownExpanded.value = false
-                        }
-                    )
-                }
-                DropdownMenuItem(
-                    text = {
-                        Text("鼠害")
-                    },
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(
-                            expanded = squirrelInfExpanded.value
-                        )
-                    },
-                    onClick = {
-                        selectedOption.value = "鼠害"
-                        squirrelInfExpanded.value = true
-                        dropdownExpanded.value = false
-                    }
+                OutlinedTextField(
+                    value = optionText.value,
+                    onValueChange = { optionText.value = it },
+                    textStyle = TextStyle.Default.copy(color = md_theme_light_primary),
+                    modifier = Modifier.weight(1f)
                 )
+
+                Button(
+                    onClick = {
+                        options.value.add(optionText.value)
+                        optionText.value = "新增"
+                        optionText.value = ""
+                    },
+                    modifier = Modifier.padding(start = 8.dp)
+                ) {
+                    Text("新增選項")
+                }
             }
 
-            ExposedDropdownMenu(
-                expanded = squirrelInfExpanded.value,
-                onDismissRequest = {squirrelInfExpanded.value = false}
-            ) {
-                squirrelInfItems.forEach {item ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(item)
-                        },
-                        onClick = {
-                            selectedOption.value = "鼠害: $item"
-                            squirrelInfExpanded.value = false
-                        }
+            Spacer(modifier = Modifier.height(16.dp))
+
+            options.value.forEachIndexed { index, option ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    BasicTextField(
+                        value = TextFieldValue(option),
+                        onValueChange = {},
+                        textStyle = TextStyle.Default.copy(color = md_theme_light_primary),
+                        enabled = false,
+                        modifier = Modifier.weight(1f)
                     )
+
+                    Button(
+                        onClick = {
+                            options.value.removeAt(index)
+                            optionText.value = "新成員"
+                            optionText.value = ""
+                        },
+                        modifier = Modifier.padding(start = 8.dp)
+                    ) {
+                        Text("刪除")
+                    }
                 }
+
+                Spacer(modifier = Modifier.height(8.dp))
             }
         }
     }
-
-    return selectedOption
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun treeSpeciesMenu(label: String): MutableState<String> {
-    val dropdownExpanded = remember {
-        mutableStateOf(false)
+fun HeightSurveyorMenu() {
+
+}
+@Composable
+fun SpeciesMenu() {
+
+}
+
+fun filterOptions(options: List<String>, query: String): List<String> {
+    return options.filter { it.contains(query, ignoreCase = true) }.ifEmpty {
+        listOf("查無此資料")
     }
-    val dropdownItems = listOf("正常", "風倒", "風折", "枯立", "中空")
-//    selectedOption.value =
-    val selectedOption = remember {
-        mutableStateOf(dropdownItems[0])
+}
+@Composable
+fun DropDowItems(
+    items: List<String>,
+    onOptionSelected: (String) -> Unit
+) {
+    LazyColumn(
+        modifier = Modifier
+            .padding(5.dp)
+            .width(150.dp)
+            .height(50.dp)
+    ) {
+//        items.forEach { item ->
+//            DropdownMenuItem(
+//                onClick = {
+//                    onOptionSelected(item)
+//                },
+//                text = {Text(item)}
+//            )
+//        }
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
+@Composable
+fun SearchDropdownMenu(
+    items: List<String>,
+    onItemSelected: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    label: String? = null,
+    leadingIcon: ImageVector? = null
+) {
+    var expanded = remember { mutableStateOf(false) }
+    var searchText = remember { mutableStateOf("") }
+    val filteredItems = remember{
+        mutableStateOf(items)
     }
 
-    val squirrelInfExpanded = remember {
-        mutableStateOf(false)
-    }
-    val squirrelInfItems = listOf("早期", "中期", "晚期")
+    val keyboardController = LocalSoftwareKeyboardController.current
 
-    fun getTreeState(): String {
-        return selectedOption.value
-    }
-
-    Row(modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
-        Box(
-            modifier = Modifier.size(width = 100.dp, height = 100.dp),
-            contentAlignment = Alignment.TopStart
-        ) {
-            Text(label, modifier = Modifier.padding(end = 0.dp), textAlign = TextAlign.Start, fontSize = 20.sp)
-        }
-
-        ExposedDropdownMenuBox(
-            expanded = dropdownExpanded.value,
-            onExpandedChange = {
-                dropdownExpanded.value = !dropdownExpanded.value
-                squirrelInfExpanded.value = false
+    OutlinedTextField(
+        value = searchText.value,
+        onValueChange = { searchText.value = it },
+        label = { label?.let { Text(it) } },
+        trailingIcon = {
+            IconButton(onClick = { expanded.value = !expanded.value }) {
+                Icon(Icons.Default.ArrowDropDown, contentDescription = "Dropdown Icon")
             }
+        },
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Done
+        ),
+
+        keyboardActions = KeyboardActions(
+            onDone = {
+                expanded.value = false
+                keyboardController?.hide()
+            }
+        ),
+        singleLine = true,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+    )
+
+    if (expanded.value) {
+        DropdownMenu(
+            expanded = expanded.value,
+            onDismissRequest = { expanded.value = false },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
         ) {
-            OutlinedTextField(
-                value = selectedOption.value,
-                onValueChange = {},
-                readOnly = true,
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(
-                        expanded = dropdownExpanded.value
-                    )
-                },
-
-//                colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                modifier = Modifier
-                    .padding(start = 5.dp, end = 16.dp)
-                    .size(width = 150.dp, height = 50.dp)
-                    .menuAnchor()//https://stackoverflow.com/questions/67111020/exposed-drop-down-menu-for-jetpack-compose
-            )
-
-            ExposedDropdownMenu(
-                expanded = dropdownExpanded.value,
-                onDismissRequest = { dropdownExpanded.value = false }
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(vertical = 4.dp)
             ) {
-                dropdownItems.forEach { item ->
+                itemsIndexed(filteredItems.value) { id, item ->
                     DropdownMenuItem(
-                        text = {
-                            Text(item)
-                        },
+                        text = {Text(text = item)},
                         onClick = {
-                            selectedOption.value = item
-                            dropdownExpanded.value = false
+                            onItemSelected(item)
+                            expanded.value = false
                         }
                     )
                 }
-                DropdownMenuItem(
-                    text = {
-                        Text("鼠害")
-                    },
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(
-                            expanded = squirrelInfExpanded.value
-                        )
-                    },
-                    onClick = {
-                        selectedOption.value = "鼠害"
-                        squirrelInfExpanded.value = true
-                        dropdownExpanded.value = false
-                    }
-                )
-            }
-
-            ExposedDropdownMenu(
-                expanded = squirrelInfExpanded.value,
-                onDismissRequest = {squirrelInfExpanded.value = false}
-            ) {
-                squirrelInfItems.forEach {item ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(item)
-                        },
-                        onClick = {
-                            selectedOption.value = "鼠害: $item"
-                            squirrelInfExpanded.value = false
-                        }
-                    )
-                }
             }
         }
     }
-    return selectedOption
 }

@@ -1,5 +1,6 @@
 package com.example.ntufapp.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -13,11 +14,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ntufapp.layout.showMessage
 
 @Composable
 fun TextBox (
@@ -26,7 +29,6 @@ fun TextBox (
     readOnly: Boolean = false,
     keyboardTypeInput: KeyboardType = KeyboardType.Number,
     boxAlign: Alignment = Alignment.TopStart,
-    textValue: MutableState<String>
 ){
     val textFieldValue = remember {
         mutableStateOf(defaultValue)
@@ -46,7 +48,6 @@ fun TextBox (
             value = textFieldValue.value,
             onValueChange = {
                 textFieldValue.value = it
-                textValue.value = textFieldValue.value
             },
             readOnly = readOnly,
             keyboardOptions = KeyboardOptions(keyboardType = keyboardTypeInput, imeAction = ImeAction.Done),
