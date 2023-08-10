@@ -105,9 +105,15 @@ fun PlotOptionsScreen(
             if(showUploadData.value) {
                 ConfirmDialogue(
                     metaData = oldPlotData.value,
-                    onDismiss = { showUploadData.value = false },
-                    onCancelClick = {showUploadData.value = false},
-                    onNextButtonClick = {onNextButtonClick(oldPlotData.value)}
+                    onDismiss = {
+                        showUploadData.value = false
+                    },
+                    onCancelClick = {
+                        showUploadData.value = false
+                    },
+                    onNextButtonClick = {
+                        onNextButtonClick(oldPlotData.value)
+                    }
                 )
             }
 

@@ -27,6 +27,34 @@ object DataSource {
         "柳杉",
         "紅檜",
         "台灣杉",
-        "扁柏"
+        "扁柏",
+        "光臘樹",
+        "楓香",
+        "榔榆",
+        "紅豆杉"
+    )
+
+    val TreeMultiConditionList = listOf(
+        "風折",
+        "中空",
+        "斷尾",
+        "分岔",
+        "傾斜",
+        "葉部病害",
+        "蟲害",
+        "頂枯",
+        "附生植物"
+    )
+
+    val TreeSingleConditionList = listOf(
+        "正常", // single
+        "風倒(死亡)", // single
+        "枯立(死亡)", // single
+    )
+
+    val SquirrelConditionList = listOf(
+        "鼠害早期",
+        "鼠害中期",
+        "鼠害晚期"
     )
 }

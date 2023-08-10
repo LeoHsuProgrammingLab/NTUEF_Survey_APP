@@ -45,12 +45,6 @@ fun TreeStateMenu(label: String, dropdownItems: List<String>) {
     val squirrelInfItems = listOf("早期", "中期", "晚期")
 
     Row(modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
-//        Box(
-//            modifier = Modifier.size(width = 100.dp, height = 100.dp),
-//            contentAlignment = Alignment.TopStart
-//        ) {
-//            Text(label, modifier = Modifier.padding(end = 0.dp), textAlign = TextAlign.Start, fontSize = 20.sp)
-//        }
 
         ExposedDropdownMenuBox(
             expanded = dropdownExpanded.value,

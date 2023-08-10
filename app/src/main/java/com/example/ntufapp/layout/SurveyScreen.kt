@@ -2,8 +2,10 @@ package com.example.ntufapp.layout
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -13,6 +15,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -20,13 +24,17 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -34,8 +42,14 @@ import androidx.compose.ui.unit.sp
 import com.example.ntufapp.data.DataSource
 import com.example.ntufapp.model.PlotData
 import com.example.ntufapp.model.Tree
+import com.example.ntufapp.ui.CheckAddButton
+import com.example.ntufapp.ui.ChipsTreeCondition
+import com.example.ntufapp.ui.MetaDateView
+import com.example.ntufapp.ui.PlotTreeView
 import com.example.ntufapp.ui.SearchableDropdownMenu
 import com.example.ntufapp.ui.TreeStateMenu
+import com.example.ntufapp.ui.theme.InputBlock
+import com.example.ntufapp.ui.theme.SurveyProgress
 
 //ref: https://www.youtube.com/watch?v=8XJfLaAOxD0&ab_channel=AndroidDevelopers
 // live-edit for compose
@@ -47,6 +61,7 @@ fun ReSurveyScreen(
     oldPlotData: PlotData,
     newPlotData: PlotData
 ) {
+    val contextNow = LocalContext.current
     // Save the final return data
     val newPlotDataState = remember {
         mutableStateOf(newPlotData)
@@ -64,97 +79,70 @@ fun ReSurveyScreen(
         mutableStateOf(treeNumList)
     }
 
-    //
-
-    Column(modifier = Modifier.padding(10.dp)) {
+    Column(
+        modifier = Modifier
+            .padding(10.dp)
+            .fillMaxWidth()
+    ) {
         MetaDateView(newPlotData = newPlotDataState.value)
-        SearchableDropdownMenu(totalTreesState.value, "請選擇樣樹")
-        SearchableDropdownMenu(DataSource.SpeciesList, newPlotDataState.value.searchTree(1).Species)
+        Box(
+            modifier = Modifier
+                .padding(5.dp)
+                .fillMaxWidth()
+                .height(400.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .height(390.dp)
+            ) {
+                val curTreeNum = remember {
+                    mutableStateOf("1")
+                }
 
+                Row {
+                    Column() {
+                        PlotTreeView(curTreeNum = curTreeNum, totalTreesState = totalTreesState.value, newPlotData = newPlotDataState)
+                        ChipsTreeCondition(
+                            newPlotData = newPlotDataState.value,
+                            curTreeNum = curTreeNum,
+                            onAdd = {
+                                newPlotDataState.value.searchTree(curTreeNum.value.toInt())?.State = it
+                            }
+                        )
+                    }
+
+                    InputBlock(
+                        onAddDBH = {
+                            newPlotDataState.value.searchTree(curTreeNum.value.toInt())?.DBH = it
+                            showMessage(contextNow, "DBH = ${newPlotDataState.value.searchTree(curTreeNum.value.toInt())?.DBH}")
+                        },
+                        onAddVisHeight = {
+                            newPlotDataState.value.searchTree(curTreeNum.value.toInt())?.VisHeight = it
+                            showMessage(contextNow, "DBH = ${newPlotDataState.value.searchTree(curTreeNum.value.toInt())?.VisHeight}")
+                        },
+                        onAddHeight = {
+                            newPlotDataState.value.searchTree(curTreeNum.value.toInt())?.MeasHeight = it
+                        },
+                        onAddForkHeight = {
+                            newPlotDataState.value.searchTree(curTreeNum.value.toInt())?.ForkHeight = it
+                        }
+                    )
+
+                    // first deal with the state of the PlotTrees in PlotData
+                    // second pass the state into the SurveyProgress()
+                    // Display the PlotTrees in the SurveyProgress()
+                    // Inside InputBlock,
+                    // pass four mutableState of the DBH, Ht, VisHt, ForkHt to change the value
+                    // Then pass four mutableState into the SurveyProgress
+                    // Think about the difference between directly changing the newPlotDataState and set a mutableState, then eventually assign to newPlotDataState
+                    SurveyProgress(newPlotDataState)
+                }
+            }
+        }
         Column(modifier = Modifier
             .fillMaxHeight()
             .fillMaxWidth(), verticalArrangement = Arrangement.Bottom){
             CheckAddButton()
-        }
-    }
-}
-
-@Composable
-fun CheckAddButton(){
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.Bottom,
-        horizontalArrangement = Arrangement.End
-    ) {
-        OutlinedButton(
-            onClick = { /* Handle second button click */ },
-            modifier = Modifier.padding(end = 16.dp)//.clip(MaterialTheme.shapes.small)
-        ) {
-            Text("完成此次調查", fontSize = 20.sp)
-        }
-
-        OutlinedButton(
-            onClick = {
-                //Todo
-            },
-            modifier = Modifier.padding(end = 16.dp)
-        ) {
-            Text("修改前一筆", fontSize = 20.sp)
-        }
-
-        OutlinedButton(
-            onClick = { /* Handle second button click */ },
-            modifier = Modifier.padding(end = 16.dp)
-        ) {
-            Text("新增", fontSize = 20.sp)
-        }
-    }
-}
-
-@Composable
-fun MetaDateView(newPlotData: PlotData) {
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .padding(16.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly
-    ) {
-        MetaDataCol(info1 = Pair("調查日期", newPlotData.Date), info2 = Pair("營林區", newPlotData.ManageUnit), info3 = Pair("林班地", newPlotData.SubUnit))
-        MetaDataCol(info1 = Pair("樣區名稱", newPlotData.PlotName), info2 = Pair("樣區編號", newPlotData.PlotNum.toString()), info3 = Pair("樣區型態", newPlotData.PlotType))
-        MetaDataCol(info1 = Pair("樣區面積", newPlotData.PlotArea.toString()), info2 = Pair("TWD97_X", newPlotData.TWD97_X.toString()), info3 = Pair("TWD97_Y", newPlotData.TWD97_Y.toString()))
-        MetaDataCol(info1 = Pair("海拔", newPlotData.Altitude.toString()), info2 = Pair("坡度", newPlotData.Slope.toString()), info3 = Pair("坡向", newPlotData.aspect))
-        Column() {
-            TreeStateMenu("Test", DataSource.SurveyorList)
-        }
-    }
-
-    Row(modifier = Modifier.fillMaxWidth()) {
-        //TODO
-    }
-
-    Divider(modifier = Modifier.padding(vertical = 2.dp))
-}
-
-@Composable
-fun MetaDataCol(info1: Pair<String, String>, info2: Pair<String, String>, info3: Pair<String, String>) {
-    Column(
-        modifier = Modifier.padding(5.dp)
-    ) {
-        MetaDataRow(info = info1)
-        MetaDataRow(info = info2)
-        MetaDataRow(info = info3)
-    }
-}
-
-@Composable
-fun MetaDataRow(info: Pair<String, String>) {
-    Card(
-        modifier = Modifier
-            .padding(5.dp)
-            .width(250.dp)
-            .height(50.dp)
-    ) {
-        Row(modifier = Modifier.padding(10.dp)) {
-            Text(info.first + " : " + info.second, fontSize = 20.sp, fontWeight = FontWeight.W700, modifier = Modifier.padding(2.dp))
         }
     }
 }

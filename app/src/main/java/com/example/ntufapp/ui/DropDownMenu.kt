@@ -36,6 +36,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -56,6 +57,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ntufapp.R
 import com.example.ntufapp.ui.theme.md_theme_light_primary
+import androidx.compose.foundation.layout.Column
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun SurveyorAddDeleteMenu() {
@@ -140,27 +149,6 @@ fun filterOptions(options: List<String>, query: String): List<String> {
         listOf("查無此資料")
     }
 }
-@Composable
-fun DropDowItems(
-    items: List<String>,
-    onOptionSelected: (String) -> Unit
-) {
-    LazyColumn(
-        modifier = Modifier
-            .padding(5.dp)
-            .width(150.dp)
-            .height(50.dp)
-    ) {
-//        items.forEach { item ->
-//            DropdownMenuItem(
-//                onClick = {
-//                    onOptionSelected(item)
-//                },
-//                text = {Text(item)}
-//            )
-//        }
-    }
-}
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -228,4 +216,53 @@ fun SearchDropdownMenu(
             }
         }
     }
+}
+
+
+
+data class Tree(
+    val treeNumber: Int,
+    val treeHeight: Double
+)
+
+@Composable
+fun TreeForm() {
+    var treeNumber by remember { mutableStateOf("") }
+    var treeHeight by remember { mutableStateOf("") }
+    var selectedTree: Tree? by remember { mutableStateOf(null) }
+
+    Column {
+        TextField(
+            value = treeNumber,
+            onValueChange = { newTreeNumber ->
+                if(!newTreeNumber.isEmpty()){
+                    treeNumber = newTreeNumber
+                    selectedTree = getTreeByNumber(newTreeNumber.toInt())
+                }
+            },
+            label = { Text("Tree Number (1-10)") },
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
+        )
+
+        TextField(
+            value = selectedTree?.treeHeight?.toString() ?: "",
+            onValueChange = { newTreeHeight ->
+                treeHeight = newTreeHeight
+            },
+            label = { Text("Tree Height") },
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
+        )
+    }
+}
+
+fun getTreeByNumber(number: Int): Tree? {
+    val treeList = listOf(
+        Tree(1, 5.0),
+        Tree(2, 6.0),
+        Tree(3, 7.0),
+        Tree(4, 8.0),
+        Tree(5, 9.0),
+        // ... and so on
+    )
+    return treeList.find { it.treeNumber == number }
 }

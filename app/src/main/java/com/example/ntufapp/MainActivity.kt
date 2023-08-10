@@ -9,8 +9,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.example.ntufapp.data.DataSource
 import com.example.ntufapp.layout.showMessage
+import com.example.ntufapp.ui.ChipsTreeCondition
 import com.example.ntufapp.ui.SearchDropdownMenu
 import com.example.ntufapp.ui.SearchableDropdownMenu
+import com.example.ntufapp.ui.TreeForm
 import com.example.ntufapp.ui.TreeStateMenu
 import com.example.ntufapp.ui.theme.NTUFAPPTheme
 
@@ -21,8 +23,10 @@ class MainActivity: AppCompatActivity(){
             NTUFAPPTheme() {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     NTUEFApp()
+//                    ChipsTreeCondition()
 //                    SurveyorAddDeleteMenu()
 //                    TreeStateMenu("High", DataSource.SpeciesList)
+//                    TreeForm()
                 }
             }
         }

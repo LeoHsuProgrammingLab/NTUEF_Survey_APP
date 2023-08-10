@@ -58,8 +58,8 @@ fun NTUEFApp(
                     onNextButtonClick = {
                         navController.navigate(Screens.ResultDisplay.name)
                     },
-                    resultState.first,
-                    resultState.second
+                    resultState.first, // old plot data
+                    resultState.second //new plot data
                 )
             }
 

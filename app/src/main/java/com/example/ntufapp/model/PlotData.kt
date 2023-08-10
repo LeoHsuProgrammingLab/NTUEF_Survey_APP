@@ -22,20 +22,25 @@ data class PlotData(
     var aspect: String = "",
 
     var Surveyor: MutableList<String> = mutableListOf(), // 1
+    var HtSurveyor: MutableList<String> = mutableListOf(), // 3
     var PlotTrees: MutableList<Tree> = mutableListOf()
 ) {
    fun setToday() {
        val today: LocalDate = LocalDate.now()
        Date = today.toString()
    }
-    fun searchTree(treeNum: Int): Tree {
-        var target = Tree()
+    fun searchTree(treeNum: Int): Tree? {
         for(tree in PlotTrees) {
             if(tree.SampleNum == treeNum) {
-                target = tree
-                break
+                return tree
             }
         }
-        return target
+        return null
+    }
+
+    fun resetAllTrees() {
+        for (tree in PlotTrees) {
+            tree.reset()
+        }
     }
 }

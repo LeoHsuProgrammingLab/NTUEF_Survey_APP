@@ -21,6 +21,7 @@ class TreeViewModel: ViewModel() {
     }
 
     fun setNewData(newPlot: PlotData) {
+        newPlot.resetAllTrees()
         _resultState.update {currentState ->
             currentState.copy(
                 second = newPlot
