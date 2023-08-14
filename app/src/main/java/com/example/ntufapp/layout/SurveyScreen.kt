@@ -47,14 +47,11 @@ import com.example.ntufapp.ui.ChipsTreeCondition
 import com.example.ntufapp.ui.MetaDateView
 import com.example.ntufapp.ui.PlotTreeView
 import com.example.ntufapp.ui.SearchableDropdownMenu
-import com.example.ntufapp.ui.TreeStateMenu
-import com.example.ntufapp.ui.theme.InputBlock
-import com.example.ntufapp.ui.theme.SurveyProgress
+import com.example.ntufapp.ui.theme.InputProgressView
 
 //ref: https://www.youtube.com/watch?v=8XJfLaAOxD0&ab_channel=AndroidDevelopers
 // live-edit for compose
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReSurveyScreen(
     onNextButtonClick: (Int) -> Unit,
@@ -100,32 +97,12 @@ fun ReSurveyScreen(
                 }
 
                 Row {
-                    Column() {
-                        PlotTreeView(curTreeNum = curTreeNum, totalTreesState = totalTreesState.value, newPlotData = newPlotDataState)
-                        ChipsTreeCondition(
-                            newPlotData = newPlotDataState.value,
-                            curTreeNum = curTreeNum,
-                            onAdd = {
-                                newPlotDataState.value.searchTree(curTreeNum.value.toInt())?.State = it
-                            }
-                        )
-                    }
 
-                    InputBlock(
-                        onAddDBH = {
-                            newPlotDataState.value.searchTree(curTreeNum.value.toInt())?.DBH = it
-                            showMessage(contextNow, "DBH = ${newPlotDataState.value.searchTree(curTreeNum.value.toInt())?.DBH}")
-                        },
-                        onAddVisHeight = {
-                            newPlotDataState.value.searchTree(curTreeNum.value.toInt())?.VisHeight = it
-                            showMessage(contextNow, "DBH = ${newPlotDataState.value.searchTree(curTreeNum.value.toInt())?.VisHeight}")
-                        },
-                        onAddHeight = {
-                            newPlotDataState.value.searchTree(curTreeNum.value.toInt())?.MeasHeight = it
-                        },
-                        onAddForkHeight = {
-                            newPlotDataState.value.searchTree(curTreeNum.value.toInt())?.ForkHeight = it
-                        }
+                    PlotTreeView(curTreeNum = curTreeNum, totalTreesState = totalTreesState.value, newPlotData = newPlotDataState.value)
+
+                    InputProgressView(
+                        curTreeNum.value,
+                        newPlotDataState.value
                     )
 
                     // first deal with the state of the PlotTrees in PlotData
@@ -135,7 +112,8 @@ fun ReSurveyScreen(
                     // pass four mutableState of the DBH, Ht, VisHt, ForkHt to change the value
                     // Then pass four mutableState into the SurveyProgress
                     // Think about the difference between directly changing the newPlotDataState and set a mutableState, then eventually assign to newPlotDataState
-                    SurveyProgress(newPlotDataState)
+
+//                    SurveyProgress(newPlotDataState.value)
                 }
             }
         }

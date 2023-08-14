@@ -12,7 +12,6 @@ import com.example.ntufapp.layout.showMessage
 import com.example.ntufapp.ui.ChipsTreeCondition
 import com.example.ntufapp.ui.SearchDropdownMenu
 import com.example.ntufapp.ui.SearchableDropdownMenu
-import com.example.ntufapp.ui.TreeForm
 import com.example.ntufapp.ui.TreeStateMenu
 import com.example.ntufapp.ui.theme.NTUFAPPTheme
 
@@ -26,7 +25,6 @@ class MainActivity: AppCompatActivity(){
 //                    ChipsTreeCondition()
 //                    SurveyorAddDeleteMenu()
 //                    TreeStateMenu("High", DataSource.SpeciesList)
-//                    TreeForm()
                 }
             }
         }

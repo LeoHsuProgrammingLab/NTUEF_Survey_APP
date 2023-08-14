@@ -1,21 +1,13 @@
 package com.example.ntufapp.ui
 
-import android.widget.Toast
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.Chip
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -27,20 +19,21 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.ntufapp.data.DataSource
+import com.example.ntufapp.layout.showMessage
 import com.example.ntufapp.model.PlotData
+import com.example.ntufapp.model.Tree
 import com.example.ntufapp.ui.theme.md_theme_light_primary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChipsTreeCondition(
-    newPlotData: PlotData,
-    curTreeNum: MutableState<String>,
-    onAdd: (MutableList<String>) -> Unit
+fun ChipsTreeCondition(//https://semicolonspace.com/jetpack-compose-filterchip/
+    curTree: Tree
 ) {
+    val curContext = LocalContext.current
+
     val singleItemList = DataSource.TreeSingleConditionList
     val multiItemList = DataSource.TreeMultiConditionList
     val squirrelItemList = DataSource.SquirrelConditionList
@@ -52,6 +45,12 @@ fun ChipsTreeCondition(
             addAll(newPlotData.value.searchTree(curTreeNum.value.toInt())!!.State)
         } // initially, first item is selected*/
     }
+
+    val treeCondition = remember {
+        mutableStateOf("")
+    }
+
+    treeCondition.value = curTree.State.joinToString()
 
     val mod = Modifier.width(360.dp)
     Box(
@@ -144,7 +143,7 @@ fun ChipsTreeCondition(
 
             Row() {
                 TextField(
-                    value = newPlotData.searchTree(curTreeNum.value.toInt())!!.State.joinToString(),
+                    value = treeCondition.value,
                     onValueChange = {
                     },
                     readOnly = true,
@@ -157,7 +156,9 @@ fun ChipsTreeCondition(
                 Button(
                     modifier = Modifier.width(90.dp),
                     onClick = {
-                        onAdd(selectedItems)
+                        curTree.State = selectedItems
+                        treeCondition.value = curTree.State.joinToString()
+                        showMessage(curContext, "您已新增 樣樹${curTree.SampleNum} 之生長狀態\n${curTree.State.joinToString()}")
                     }
                 ) {
                     Text("新增")
@@ -165,6 +166,4 @@ fun ChipsTreeCondition(
             }
         }
     }
-
-
 }
