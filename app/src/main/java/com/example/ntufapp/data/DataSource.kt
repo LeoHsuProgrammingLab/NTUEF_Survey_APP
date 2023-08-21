@@ -31,7 +31,8 @@ object DataSource {
         "光臘樹",
         "楓香",
         "榔榆",
-        "紅豆杉"
+        "紅豆杉",
+        "二葉松"
     )
 
     val TreeMultiConditionList = listOf(
@@ -50,6 +51,7 @@ object DataSource {
         "正常", // single
         "風倒(死亡)", // single
         "枯立(死亡)", // single
+        "死亡", // single
     )
 
     val SquirrelConditionList = listOf(
