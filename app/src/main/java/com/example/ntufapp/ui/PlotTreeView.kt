@@ -4,9 +4,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -14,62 +16,159 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import com.example.ntufapp.data.DataSource.SpeciesList
 import com.example.ntufapp.model.PlotData
 import com.example.ntufapp.model.Tree
-import com.example.ntufapp.ui.theme.InputProgressView
+import com.example.ntufapp.ui.theme.Shapes
 
 @Composable
-fun PlotTreeView(curTreeNum: MutableState<String>, totalTreesState: MutableList<String>, newPlotData: PlotData) {
+fun PlotTreeView(
+    curTreeNum: MutableState<String>,
+    totalTreesState: MutableList<String>,
+    newPlotData: PlotData
+) {
     val curTree = remember {
         mutableStateOf(newPlotData.searchTree(curTreeNum.value.toInt()))
     }
 
-    Column() {
-        Row(
-            horizontalArrangement = Arrangement.Center,
+    Column {
+        Box(
+            modifier = Modifier.padding(10.dp)
         ) {
-            SearchableDropdownMenu(
-                totalTreesState,
-                label = "請選擇樣樹",
-                defaultString = "1",
-                onChoose = {
-                    curTreeNum.value = it
-                    curTree.value = newPlotData.searchTree(curTreeNum.value.toInt())
-                },
-                onAdd = {
-                    newPlotData.PlotTrees.add(Tree(SampleNum = it.toInt()))
-                    curTreeNum.value = it
-                }
-            )
-            Box(
-                modifier = Modifier.padding(10.dp)
-            ) {
-                Row(){
-                    TextField(
-                        value = curTree.value!!.Species,
-                        onValueChange = {
-                        },
-                        readOnly = true,
-                        label = { Text("樹種") },
-                        modifier = Modifier
-                            .width(150.dp)
-                            .padding(vertical = 10.dp)
-                    )
-                    Button(
-                        modifier = Modifier
-                            .width(90.dp)
-                            .padding(top = 15.dp, start = 3.dp),
-                        onClick = {/*TODO*/ }
-                    ) {
-                        Text("修改")
+            Row{
+                SearchableDropdownMenu(
+                    totalTreesState,
+                    label = "請選擇樣樹",
+                    defaultString = "1",
+                    onChoose = {
+                        curTreeNum.value = it
+                        curTree.value = newPlotData.searchTree(curTreeNum.value.toInt())
+                    },
+                    onAdd = {
+                        newPlotData.PlotTrees.add(Tree(SampleNum = it.toInt()))
+                        curTreeNum.value = it
                     }
-                }
+                )
+
+                TreeSpeciesWidget(curTree = curTree.value!!)
             }
         }
 
         ChipsTreeCondition(
             curTree = curTree.value!!,
         )
+    }
+}
+
+@Composable
+fun TreeSpeciesWidget(
+    curTree: Tree,
+) {
+    val showDialog = remember { mutableStateOf(false) }
+    val curTreeSpecies = remember {
+        mutableStateOf(curTree.Species)
+    }
+    curTreeSpecies.value = curTree.Species
+
+    Row(
+        modifier = Modifier
+            .padding(5.dp)
+    ){
+        TextField(
+            value = curTreeSpecies.value,
+            onValueChange = {},
+            readOnly = true,
+            label = {
+                Text(
+                    text = "樹種",
+                    style = TextStyle(
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+            },
+            modifier = Modifier
+                .width(150.dp)
+                .padding(vertical = 10.dp),
+            textStyle = TextStyle(fontSize = 18.sp),
+        )
+        Button(
+            modifier = Modifier
+                .width(90.dp)
+                .padding(top = 15.dp, start = 3.dp),
+            onClick = {
+                showDialog.value = true
+            }
+        ) {
+            Text("修改")
+        }
+
+        if (showDialog.value) {
+            FixSpeciesDialogue(
+                onDismiss = {showDialog.value = false},
+                onCancelClick = { showDialog.value = false},
+                onNextButtonClick = {
+                    showDialog.value = false
+                    curTreeSpecies.value = it
+                    curTree.Species = it
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun FixSpeciesDialogue(
+    onDismiss: () -> Unit,
+    onCancelClick: () -> Unit,
+    onNextButtonClick: (String) -> Unit
+){
+    val treeSpecies = remember {
+        mutableStateOf("")
+    }
+
+    Dialog(
+        onDismissRequest = {
+            onDismiss.invoke()
+        }
+    ) {
+        Surface(shape = Shapes.small) {
+            Column(modifier = Modifier.padding(10.dp)) {
+
+                SearchableDropdownMenu2(
+                    optionsInput = SpeciesList as MutableList<String>,
+                    onChoose = {
+                        treeSpecies.value = it
+                    }
+                )
+
+                Spacer(modifier = Modifier.padding(10.dp))
+
+                Row{
+                    Button(
+                        modifier = Modifier.padding(10.dp),
+                        onClick = onCancelClick,
+                    ) {
+                        Text("取消")
+                    }
+
+                    Button(
+                        modifier = Modifier.padding(10.dp),
+                        onClick = {
+                            if(treeSpecies.value != "") {
+                                onNextButtonClick(treeSpecies.value)
+                            }
+                        }
+                    ) {
+                        Text("修改")
+                    }
+                }
+            }
+        }
     }
 }

@@ -3,6 +3,7 @@ package com.example.ntufapp.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -21,7 +22,9 @@ fun CheckAddButton(){
     ) {
         OutlinedButton(
             onClick = { /* Handle second button click */ },
-            modifier = Modifier.padding(end = 16.dp)
+            modifier = Modifier
+                .padding(end = 16.dp)
+                .height(70.dp)
         ) {
             Text("完成此次調查", fontSize = 20.sp)
         }

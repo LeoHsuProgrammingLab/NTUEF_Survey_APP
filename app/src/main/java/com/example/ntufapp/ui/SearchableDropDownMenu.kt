@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -77,7 +78,15 @@ fun SearchableDropdownMenu(
             OutlinedTextField(
                 value = searchText.value,
                 readOnly = readOnly,
-                label = {Text(label)},
+                label = {
+                    Text(
+                        text = label,
+                        style = TextStyle(
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                },
                 onValueChange = { text ->
                     filterOptions(options.value, text).let {
                         filteredOptions.value = it as MutableList<String>
@@ -102,17 +111,19 @@ fun SearchableDropdownMenu(
                     }
                 ),
                 singleLine = true,
-                textStyle = TextStyle(fontSize = 13.sp),
+                textStyle = TextStyle(
+                    fontSize = 18.sp
+                ),
                 modifier = Modifier
                     .width(150.dp)
-                    .height(70.dp)
-                    .menuAnchor()
+                    .height(75.dp)
+                    .menuAnchor() // super important
             )
             // DropdownMenu
             ExposedDropdownMenu(
                 expanded = dropdownExpanded.value,
                 onDismissRequest = { dropdownExpanded.value = false },
-                modifier = Modifier.height(100.dp)
+                modifier = Modifier.height(200.dp)
             ) {
 
                 filteredOptions.value.forEach { option ->
@@ -171,62 +182,24 @@ fun SearchableDropdownMenu(
                     )
                 }
             }
-
-
-//            Divider(
-//                color = Color.Black,
-//                thickness = 1.dp,
-//                modifier = Modifier.padding(5.dp)
-//            )
-//            Box(
-//                modifier = Modifier
-//                    //                .background(Color.White)
-//                    .border(BorderStroke(1.dp, Color.Black), RoundedCornerShape(8.dp))
-//            ) {
-//                LazyColumn(
-//                    modifier = Modifier
-//                        .padding(5.dp)
-//                        .width(150.dp)
-//                        .height(50.dp)
-//                ) {
-//                    itemsIndexed(filteredOptions.value) { idx, option ->
-//                        ListItem(
-//                            modifier = Modifier
-//                                .width(150.dp)
-//                                .height(40.dp)
-//                                .clickable { searchText.value = option }
-//                                .background(Color.Green),
-//                            headlineContent = { Text(option) }
-//                        )
-//                        Divider(
-//                            color = Color.Black,
-//                            thickness = 1.dp,
-//                            modifier = Modifier.padding(1.dp)
-//                        )
-//                    }
-//                }
-//            }
         }
     }
 }
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
-fun SubTreeLevelDropdownMenu(
+fun SearchableDropdownMenu2(
     optionsInput: MutableList<String>,
     defaultString: String = "",
     label: String = "搜尋",
-    dialogType: String = "Tree",
     readOnly: Boolean = false,
     onChoose: (String) -> Unit,
-    onAdd: (String) -> Unit
 ) {
     val options = remember {
         mutableStateOf(optionsInput)
     }
     val searchText = remember { mutableStateOf(defaultString) }
-
     val filteredOptions = remember { mutableStateOf(options.value) }
-    val showDialogue = remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
     val dropdownExpanded = remember { mutableStateOf(false) }
@@ -234,7 +207,8 @@ fun SubTreeLevelDropdownMenu(
 
     Column(
         modifier = Modifier
-            .width(150.dp)
+            .width(200.dp)
+            .padding(vertical = 10.dp, horizontal = 5.dp)
     ) {
         ExposedDropdownMenuBox(
             expanded = dropdownExpanded.value,
@@ -273,8 +247,8 @@ fun SubTreeLevelDropdownMenu(
                 singleLine = true,
                 textStyle = TextStyle(fontSize = 13.sp),
                 modifier = Modifier
-                    .width(150.dp)
-                    .height(70.dp)
+                    .width(180.dp)
+                    .height(100.dp)
                     .menuAnchor()
             )
             // DropdownMenu
@@ -283,6 +257,7 @@ fun SubTreeLevelDropdownMenu(
                 onDismissRequest = { dropdownExpanded.value = false },
                 modifier = Modifier.height(100.dp)
             ) {
+
                 filteredOptions.value.forEach { option ->
                     DropdownMenuItem(
                         text = {
@@ -294,46 +269,14 @@ fun SubTreeLevelDropdownMenu(
                             onChoose(option)
                         },
                         modifier = Modifier
-                            .width(120.dp)
+                            .width(150.dp)
                             .height(40.dp)
                     )
+
                     Divider(
                         color = Color.Black,
                         thickness = 1.dp,
                         modifier = Modifier.padding(1.dp)
-                    )
-                }
-
-                DropdownMenuItem(
-                    text = {
-                        Text(stringResource(R.string.add))
-                    },
-                    trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Add, // Replace with your desired icon
-                            contentDescription = "Add Icon",
-                        )
-                    },
-                    onClick = {
-                        showDialogue.value = true
-                    }
-                )
-
-                if(showDialogue.value) {
-                    AddDialogue(
-                        type = dialogType,
-                        onDismiss = {
-                            showDialogue.value = false
-                        },
-                        onCancelClick = {
-                            showDialogue.value = false
-                        },
-                        onNextButtonClick = {
-                            showDialogue.value = false
-                            options.value.add(it)
-                            onAdd(it)
-                        },
-                        curSize = options.value.size
                     )
                 }
             }
@@ -413,39 +356,11 @@ fun AddDialogue(
                     }
                 }
             }
-        "Species" ->
-            Dialog(
-                onDismissRequest = {
-                    onDismiss.invoke()
-                }
-            ) {
-                Surface(shape = Shapes.small) {
-                    Column(modifier = Modifier.padding(10.dp)) {
-                        // TODO: OutlinedTextField
-
-                        Spacer(modifier = Modifier.padding(10.dp))
-
-                        Row{
-                            Button(
-                                modifier = Modifier.padding(10.dp),
-                                onClick = onCancelClick,
-                            ) {
-                                Text("取消")
-                            }
-
-                            Button(
-                                modifier = Modifier.padding(10.dp),
-                                onClick = {
-                                    onNextButtonClick((curSize + 1).toString())
-                                }
-                            ) {
-                                Text("下一步")
-                            }
-                        }
-                    }
-                }
-            }
     }
+}
 
-
+fun filterOptions(options: List<String>, query: String): List<String> {
+    return options.filter { it.contains(query, ignoreCase = true) }.ifEmpty {
+        listOf("查無此資料")
+    }
 }

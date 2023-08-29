@@ -1,4 +1,4 @@
-package com.example.ntufapp.ui.theme
+package com.example.ntufapp.ui
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -32,6 +32,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.ntufapp.model.PlotData
+import com.example.ntufapp.ui.theme.md_theme_light_inverseOnSurface
+import com.example.ntufapp.ui.theme.md_theme_light_primaryContainer
 
 
 @Composable
@@ -54,37 +56,43 @@ fun InputProgressView(
     val forkHtState = remember {
         mutableDoubleStateOf(0.0)
     }
-    Row {
-        Column(
-            modifier = Modifier.width(320.dp)
-        ) {
-            InputRow(label = "DBH",
-                onClick = {
-                    dbhState.doubleValue = it
-                    newPlotData.searchTree(curTreeNum.toInt())!!.DBH = it
-                }
-            )
-            InputRow(label = "目視樹高",
-                onClick = {
-                    visHtState.doubleValue = it
-                    newPlotData.searchTree(curTreeNum.toInt())!!.VisHeight = it
-                }
-            )
-            InputRow(label = "量測樹高",
-                onClick = {
-                    htState.doubleValue = it
-                    newPlotData.searchTree(curTreeNum.toInt())!!.MeasHeight = it
-                }
-            )
-            InputRow(label = "分岔樹高",
-                onClick = {
-                    forkHtState.doubleValue = it
-                    newPlotData.searchTree(curTreeNum.toInt())!!.ForkHeight = it
-                }
-            )
-        }
+        Row {
+            Column(
+                modifier = Modifier.width(320.dp)
+            ) {
+                InputRow(label = "DBH",
+                    onClick = {
+                        dbhState.doubleValue = it
+                        newPlotData.searchTree(curTreeNum.toInt())!!.DBH = it
+                    }
+                )
+                InputRow(label = "目視樹高",
+                    onClick = {
+                        visHtState.doubleValue = it
+                        newPlotData.searchTree(curTreeNum.toInt())!!.VisHeight = it
+                    }
+                )
+                InputRow(label = "量測樹高",
+                    onClick = {
+                        htState.doubleValue = it
+                        newPlotData.searchTree(curTreeNum.toInt())!!.MeasHeight = it
+                    }
+                )
+                InputRow(label = "分岔樹高",
+                    onClick = {
+                        forkHtState.doubleValue = it
+                        newPlotData.searchTree(curTreeNum.toInt())!!.ForkHeight = it
+                    }
+                )
+            }
 
-        Progress(dbh = dbhState.doubleValue, ht = htState.doubleValue, visHt = visHtState.doubleValue, forkHt = forkHtState.doubleValue, newPlotData = newPlotData)
+        Progress(
+            dbh = dbhState.doubleValue,
+            ht = htState.doubleValue,
+            visHt = visHtState.doubleValue,
+            forkHt = forkHtState.doubleValue,
+            newPlotData = newPlotData
+        )
 
     }
 }
@@ -134,10 +142,34 @@ fun Progress(
                             .padding(5.dp)
                             .size(width = 90.dp, height = 50.dp)
 
-                        TextField(value = "${tree.DBH}", onValueChange = {}, label = {Text("DBH")}, modifier = mod, readOnly = true)
-                        TextField(value = "${tree.VisHeight}", onValueChange = {}, label = {Text("目視樹高")}, modifier = mod, readOnly = true)
-                        TextField(value = "${tree.MeasHeight}", onValueChange = {}, label = {Text("量測樹高")}, modifier = mod, readOnly = true)
-                        TextField(value = "${tree.ForkHeight}", onValueChange = {}, label = {Text("分岔樹高")}, modifier = mod, readOnly = true)
+                        TextField(
+                            value = "${tree.DBH}",
+                            onValueChange = {},
+                            label = {Text("DBH")},
+                            modifier = mod,
+                            readOnly = true
+                        )
+                        TextField(
+                            value = "${tree.VisHeight}",
+                            onValueChange = {},
+                            label = {Text("目視樹高")},
+                            modifier = mod,
+                            readOnly = true
+                        )
+                        TextField(
+                            value = "${tree.MeasHeight}",
+                            onValueChange = {},
+                            label = {Text("量測樹高")},
+                            modifier = mod,
+                            readOnly = true
+                        )
+                        TextField(
+                            value = "${tree.ForkHeight}",
+                            onValueChange = {},
+                            label = {Text("分岔樹高")},
+                            modifier = mod,
+                            readOnly = true
+                        )
                     }
                 }
 

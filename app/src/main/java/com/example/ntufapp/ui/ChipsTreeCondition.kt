@@ -20,7 +20,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.ntufapp.data.DataSource
 import com.example.ntufapp.layout.showMessage
 import com.example.ntufapp.model.PlotData
@@ -52,7 +55,7 @@ fun ChipsTreeCondition(//https://semicolonspace.com/jetpack-compose-filterchip/
 
     treeCondition.value = curTree.State.joinToString()
 
-    val mod = Modifier.width(360.dp)
+    val mod = Modifier.width(450.dp)
     Box(
         modifier = mod
 //            .height()
@@ -78,7 +81,12 @@ fun ChipsTreeCondition(//https://semicolonspace.com/jetpack-compose-filterchip/
 //                                .show()
                         },
                         label = {
-                            Text(text = item)
+                            Text(
+                                text = item,
+                                style = TextStyle(
+                                    fontSize = 18.sp
+                                )
+                            )
                         }
                     )
                 }
@@ -109,7 +117,12 @@ fun ChipsTreeCondition(//https://semicolonspace.com/jetpack-compose-filterchip/
 //                                .show()
                         },
                         label = {
-                            Text(text = item)
+                            Text(
+                                text = item,
+                                style = TextStyle(
+                                    fontSize = 18.sp
+                                )
+                            )
                         }
                     )
                 }
@@ -135,7 +148,12 @@ fun ChipsTreeCondition(//https://semicolonspace.com/jetpack-compose-filterchip/
 //                                .show()
                         },
                         label = {
-                            Text(text = item)
+                            Text(
+                                text = item,
+                                style = TextStyle(
+                                    fontSize = 18.sp
+                                )
+                            )
                         }
                     )
                 }
@@ -147,18 +165,35 @@ fun ChipsTreeCondition(//https://semicolonspace.com/jetpack-compose-filterchip/
                     onValueChange = {
                     },
                     readOnly = true,
-                    label = { Text("生長狀況") },
+                    label = {
+                        Text(
+                            text = "生長狀況",
+                            style = TextStyle(
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                    },
+                    textStyle = TextStyle(
+                        fontSize = 18.sp
+                    ),
                     modifier = Modifier
                         .width(200.dp)
                         .padding(top = 10.dp, bottom = 10.dp, end = 10.dp)
                 )
 
                 Button(
-                    modifier = Modifier.width(90.dp),
+                    modifier = Modifier
+                        .width(90.dp)
+                        .padding(top = 10.dp, bottom = 10.dp),
                     onClick = {
-                        curTree.State = selectedItems
-                        treeCondition.value = curTree.State.joinToString()
-                        showMessage(curContext, "您已新增 樣樹${curTree.SampleNum} 之生長狀態\n${curTree.State.joinToString()}")
+                        if (selectedItems.isEmpty()) {
+                            showMessage(curContext, "請選擇生長狀態")
+                        } else {
+                            curTree.State = selectedItems
+                            treeCondition.value = curTree.State.joinToString()
+                            showMessage(curContext, "您已新增 樣樹${curTree.SampleNum} 之生長狀態\n${curTree.State.joinToString()}")
+                        }
                     }
                 ) {
                     Text("新增")

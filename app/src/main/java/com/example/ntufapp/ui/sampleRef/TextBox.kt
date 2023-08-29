@@ -1,4 +1,4 @@
-package com.example.ntufapp.ui
+package com.example.ntufapp.ui.sampleRef
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
