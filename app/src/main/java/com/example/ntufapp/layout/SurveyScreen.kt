@@ -29,7 +29,7 @@ import com.example.ntufapp.ui.InputProgressView2
 
 @Composable
 fun ReSurveyScreen(
-    onNextButtonClick: (Int) -> Unit,
+    onNextButtonClick: () -> Unit,
     oldPlotData: PlotData,
     newPlotData: PlotData
 ) {
@@ -61,7 +61,6 @@ fun ReSurveyScreen(
             modifier = Modifier
                 .padding(5.dp)
                 .fillMaxWidth()
-                .height(450.dp)
         ) {
 
             val curTreeNum = remember {
@@ -78,19 +77,11 @@ fun ReSurveyScreen(
 //                )
                 InputProgressView2(
                     totalTreesState.value,
-                    newPlotDataState.value
+                    newPlotDataState.value,
+                    onNextButtonClick
                 )
             }
 
-        }
-
-        Column(
-            modifier = Modifier
-                .fillMaxHeight()
-                .fillMaxWidth(),
-            verticalArrangement = Arrangement.Bottom
-        ){
-            CheckAddButton()
         }
     }
 }

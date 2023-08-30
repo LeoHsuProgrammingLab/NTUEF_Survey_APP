@@ -30,6 +30,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.ntufapp.R
 import com.example.ntufapp.model.PlotData
+import com.example.ntufapp.ui.ConfirmDialogue
+import com.example.ntufapp.ui.UploadFileDialog
 import com.example.ntufapp.ui.theme.Shapes
 import com.google.gson.Gson
 import java.io.BufferedReader
@@ -121,98 +123,6 @@ fun PlotOptionsScreen(
                 onClick = { /*TODO Add a new plot*/ }
             ) {
                 Text("新增樣區", fontSize = 20.sp)
-            }
-        }
-    }
-}
-
-@Composable
-fun UploadFileDialog(
-    selectedFileUri: Uri?,
-    onDismiss: () -> Unit,
-    filePicker: ManagedActivityResultLauncher<String, Uri?>,
-    onSendClick: (Uri?) -> Unit,
-    onCancelClick: () -> Unit
-) {
-    Dialog(
-        onDismissRequest = {
-            onDismiss.invoke()
-        }
-    ) {
-        Surface(shape = Shapes.small) {
-            Column(modifier = Modifier.padding(10.dp)) {
-                Text(text = "請上傳樣區資料")
-
-                Spacer(modifier = Modifier.padding(10.dp))
-
-                Button(
-                    modifier = Modifier.padding(10.dp),
-                    onClick = {
-                        filePicker.launch("application/json")
-                    }
-                ) {
-                    Text("請選擇JSON檔案")
-                }
-
-                Spacer(modifier = Modifier.padding(10.dp))
-
-                Row{
-                    Button(
-                        modifier = Modifier.padding(10.dp),
-                        onClick = onCancelClick,
-                    ) {
-                        Text("取消")
-                    }
-
-                    Button(
-                        modifier = Modifier.padding(10.dp),
-                        onClick = {onSendClick(selectedFileUri)}
-                    ) {
-                        Text("上傳")
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-// https://medium.com/@rooparshkalia/single-choice-dialog-with-jetpack-compose-d021650d31ca
-fun ConfirmDialogue(
-    metaData: PlotData,
-    onDismiss: () -> Unit,
-    onCancelClick: () -> Unit,
-    onNextButtonClick: () -> Unit
-){
-    Dialog(
-        onDismissRequest = {
-            onDismiss.invoke()
-        }
-    ) {
-        Surface(shape = Shapes.small) {
-            Column(modifier = Modifier.padding(10.dp)) {
-                Text(text = "您已上傳${metaData.ManageUnit}${metaData.SubUnit}的資料")
-                Text("樣區名稱：${metaData.PlotName}")
-                Text("樣區編號：${metaData.PlotNum}")
-                Text("該樣區有${metaData.PlotTrees.size}棵樣樹")
-
-                Spacer(modifier = Modifier.padding(10.dp))
-
-                Row{
-                    Button(
-                        modifier = Modifier.padding(10.dp),
-                        onClick = onCancelClick,
-                    ) {
-                        Text("取消")
-                    }
-
-                    Button(
-                        modifier = Modifier.padding(10.dp),
-                        onClick = {onNextButtonClick()}
-                    ) {
-                        Text("下一步")
-                    }
-                }
             }
         }
     }
