@@ -1,12 +1,9 @@
 package com.example.ntufapp.layout
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -17,11 +14,8 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ntufapp.model.PlotData
-import com.example.ntufapp.model.Tree
-import com.example.ntufapp.ui.CheckAddButton
 import com.example.ntufapp.ui.MetaDateView
 import com.example.ntufapp.ui.PlotTreeView
-import com.example.ntufapp.ui.InputProgressView
 import com.example.ntufapp.ui.InputProgressView2
 
 //ref: https://www.youtube.com/watch?v=8XJfLaAOxD0&ab_channel=AndroidDevelopers
@@ -33,7 +27,13 @@ fun ReSurveyScreen(
     oldPlotData: PlotData,
     newPlotData: PlotData
 ) {
-    val contextNow = LocalContext.current
+//    Debug:
+//    val contextNow = LocalContext.current
+//    for(i in 0 until newPlotData.PlotTrees.size) {
+//        showMessage(contextNow, "new: ${newPlotData.PlotTrees[i].DBH}")
+//        showMessage(contextNow, "old: ${oldPlotData.PlotTrees[i].DBH}")
+//    }
+
     // Save the final return data
     val newPlotDataState = remember {
         mutableStateOf(newPlotData)
@@ -84,11 +84,6 @@ fun ReSurveyScreen(
 
         }
     }
-}
-
-@Composable
-fun checkDialogue(treeData: Tree, onDismiss: () -> Unit) {
-
 }
 
 @Preview(device = Devices.PIXEL_C)

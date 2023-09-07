@@ -91,6 +91,9 @@ fun PlotOptionsScreen(
                         if(uri != null) {
                             selectedFileUri.value = uri
                             oldPlotData.value  = parseJsonToMetaData(uri, context)!!
+//                            for(i in 0 until oldPlotData.value.PlotTrees.size) {
+//                                showMessage(context, "Read DBH = ${oldPlotData.value.PlotTrees[i].DBH}")
+//                            }
                             if(oldPlotData.value.ManageUnit == "") {
                                 Toast.makeText(context, "你上傳了錯誤的檔案(.json)！", Toast.LENGTH_SHORT).show()
                             } else {
@@ -113,9 +116,7 @@ fun PlotOptionsScreen(
                     onCancelClick = {
                         showUploadData.value = false
                     },
-                    onNextButtonClick = {
-                        onNextButtonClick(oldPlotData.value)
-                    }
+                    onNextButtonClick = onNextButtonClick
                 )
             }
 
@@ -135,6 +136,11 @@ fun showMessage(context: Context, s: String) {
 fun parseJsonToMetaData(uri: Uri, context: Context): PlotData? {
     val inputStream = context.contentResolver.openInputStream(uri)
     val jsonString = inputStream?.bufferedReader()?.use(BufferedReader::readText)
+//    Debug
+//    val jsonPlotData = Gson().fromJson(jsonString, PlotData::class.java)
+//    for(i in 0 until jsonPlotData.PlotTrees.size) {
+//        showMessage(context, "${jsonPlotData.PlotTrees[i].DBH}")
+//    }
     return try {
         Gson().fromJson(jsonString, PlotData::class.java)
     } catch (e: Exception) {

@@ -12,6 +12,20 @@ data class Tree(
     var MeasHeight: Double = 0.0,
     var ForkHeight: Double = 0.0,
 ) {
+    fun clone(): Tree {
+        val cloneTree = Tree()
+        cloneTree.SampleNum = SampleNum
+        cloneTree.Species = Species
+        cloneTree.DBH = DBH
+        cloneTree.VisHeight = VisHeight
+        cloneTree.MeasHeight = MeasHeight
+        cloneTree.ForkHeight = ForkHeight
+        for(state in State) {
+            cloneTree.State.add(state)
+        }
+
+        return cloneTree
+    }
     fun reset() {
         DBH = 0.0
         VisHeight = 0.0

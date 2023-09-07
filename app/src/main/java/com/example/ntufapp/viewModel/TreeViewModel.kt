@@ -15,16 +15,17 @@ class TreeViewModel: ViewModel() {
     fun setOldData(oldPlot: PlotData){
         _resultState.update { currentState ->
             currentState.copy(
-                first = oldPlot
+                first = oldPlot.clone()
             )
         }
     }
 
     fun setNewData(newPlot: PlotData) {
-        newPlot.resetAllTrees()
-        _resultState.update {currentState ->
+        val temp = newPlot.clone()
+        temp.resetAllTrees()
+        _resultState.update { currentState ->
             currentState.copy(
-                second = newPlot
+                second = temp
             )
         }
     }

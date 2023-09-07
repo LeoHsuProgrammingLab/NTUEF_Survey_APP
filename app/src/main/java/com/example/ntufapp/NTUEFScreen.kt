@@ -15,6 +15,9 @@ import com.example.ntufapp.viewModel.TreeViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
+import com.example.ntufapp.layout.ResultDisplayScreen
+import com.example.ntufapp.layout.showMessage
 
 enum class Screens {
     Start,
@@ -34,6 +37,7 @@ fun NTUEFApp(
             NTUEFTopBar()
         }
     ) { paddingValues ->
+
         val resultState by viewModel.resultState.collectAsState()
 
         NavHost(
@@ -42,13 +46,12 @@ fun NTUEFApp(
             modifier = Modifier.padding(paddingValues)
         ) {
 
-
             composable(route = Screens.Start.name) {
                 PlotOptionsScreen(
                     onNextButtonClick = {
-                        navController.navigate(Screens.ReSurvey.name)
                         viewModel.setOldData(it)
                         viewModel.setNewData(it)
+                        navController.navigate(Screens.ReSurvey.name)
                     }
                 )
             }
@@ -58,13 +61,22 @@ fun NTUEFApp(
                     onNextButtonClick = {
                         navController.navigate(Screens.ResultDisplay.name)
                     },
-                    resultState.first, // old plot data
-                    resultState.second //new plot data
+                    oldPlotData = resultState.first, // old plot data
+                    newPlotData = resultState.second //new plot data
                 )
             }
 
             composable(route = Screens.ResultDisplay.name) {
-
+                ResultDisplayScreen(
+                    oldPlotData = resultState.first,
+                    newPlotData = resultState.second,
+                    onBackButtonClick = {
+                        navController.navigate(Screens.ReSurvey.name)
+                    },
+                    onNextButtonClick = {
+                        navController.navigate(Screens.Visualization.name)
+                    }
+                )
             }
 
             composable(route = Screens.Visualization.name) {

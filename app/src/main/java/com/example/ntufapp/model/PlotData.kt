@@ -38,6 +38,36 @@ data class PlotData(
         return null
     }
 
+    fun clone(): PlotData {
+        val clonePlot = PlotData()
+        clonePlot.Date = Date
+        clonePlot.ManageUnit = ManageUnit
+        clonePlot.SubUnit = SubUnit
+        clonePlot.PlotName = PlotName
+        clonePlot.PlotNum = PlotNum
+        clonePlot.PlotType = PlotType
+        clonePlot.PlotArea = PlotArea
+        clonePlot.TWD97_X = TWD97_X
+        clonePlot.TWD97_Y = TWD97_Y
+        clonePlot.Altitude = Altitude
+        clonePlot.Slope = Slope
+        clonePlot.aspect = aspect
+
+        for (surveyor in Surveyor) {
+            clonePlot.Surveyor.add(surveyor)
+        }
+
+        for (htSurveyor in HtSurveyor) {
+            clonePlot.HtSurveyor.add(htSurveyor)
+        }
+
+        for (tree in PlotTrees) {
+            clonePlot.PlotTrees.add(tree.clone())
+        }
+
+        return clonePlot
+    }
+
     fun resetAllTrees() {
         for (tree in PlotTrees) {
             tree.reset()

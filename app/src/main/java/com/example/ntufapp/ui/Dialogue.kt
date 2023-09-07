@@ -13,12 +13,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.ntufapp.data.DataSource
+import com.example.ntufapp.layout.showMessage
 import com.example.ntufapp.model.PlotData
 import com.example.ntufapp.ui.theme.Shapes
 
@@ -78,19 +80,25 @@ fun ConfirmDialogue(
     metaData: PlotData,
     onDismiss: () -> Unit,
     onCancelClick: () -> Unit,
-    onNextButtonClick: () -> Unit
+    onNextButtonClick: (PlotData) -> Unit
 ){
     Dialog(
         onDismissRequest = {
             onDismiss.invoke()
         }
     ) {
+        val context = LocalContext.current
+
         Surface(shape = Shapes.small) {
             Column(modifier = Modifier.padding(10.dp)) {
                 Text(text = "您已上傳${metaData.ManageUnit}${metaData.SubUnit}的資料")
                 Text("樣區名稱：${metaData.PlotName}")
                 Text("樣區編號：${metaData.PlotNum}")
                 Text("該樣區有${metaData.PlotTrees.size}棵樣樹")
+
+//                for (i in 0 until metaData.PlotTrees.size) {
+//                    showMessage(context, "Read DBH = ${metaData.PlotTrees[i].DBH}")
+//                }
 
                 Spacer(modifier = Modifier.padding(10.dp))
 
@@ -104,7 +112,7 @@ fun ConfirmDialogue(
 
                     Button(
                         modifier = Modifier.padding(10.dp),
-                        onClick = {onNextButtonClick()}
+                        onClick = { onNextButtonClick(metaData) }
                     ) {
                         Text("下一步")
                     }
