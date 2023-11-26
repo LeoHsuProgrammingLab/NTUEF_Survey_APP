@@ -40,10 +40,12 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ntufapp.layout.showMessage
 import com.example.ntufapp.model.PlotData
 import com.example.ntufapp.model.Tree
 import com.example.ntufapp.ui.theme.CustomizedDivider
@@ -61,242 +63,245 @@ fun InputProgressView2(
     newPlotData: PlotData,
     onNextButtonClick: () -> Unit
 ) {
+    val coroutineScope = rememberCoroutineScope()
+    val lazyListState = rememberLazyListState()
+
+    val numPlotTrees = remember {
+        mutableStateOf(totalTreesState.size)
+    }
+
+    val dbhTreeSet = remember {
+        mutableStateOf(totalTreesState.toMutableSet())
+    }
+
+    val measHtTreeSet = remember {
+        mutableStateOf(totalTreesState.toMutableSet())
+    }
+
+    val forkHtTreeSet = remember {
+        mutableStateOf(totalTreesState.toMutableSet())
+    }
+
+    val visHtTreeSet = remember {
+        mutableStateOf(totalTreesState.toMutableSet())
+    }
+
+    if (newPlotData.PlotTrees.size > numPlotTrees.value) {
+        for (i in newPlotData.PlotTrees.size downTo numPlotTrees.value + 1) {
+            dbhTreeSet.value.add(i.toString())
+            visHtTreeSet.value.add(i.toString())
+            forkHtTreeSet.value.add(i.toString())
+            measHtTreeSet.value.add(i.toString())
+        }
+        numPlotTrees.value = newPlotData.PlotTrees.size
+    }
+
+    val curItemId = remember {
+        mutableStateOf("1")
+    }
     Column {
-        val coroutineScope = rememberCoroutineScope()
-        val lazyListState = rememberLazyListState()
-
-        val numPlotTrees = remember {
-            mutableStateOf(totalTreesState.size)
+        val windowInfo = rememberWindowInfo()
+        val height =  when (windowInfo.screenHeightInfo) {
+            WindowInfo.WindowType.Medium -> 300.dp
+            WindowInfo.WindowType.Expanded -> 400.dp
+            else -> 400.dp
         }
+        Box(
+            modifier = Modifier
+                .padding(20.dp)
+                .background(md_theme_light_primaryContainer, RoundedCornerShape(8.dp))
+                .border(BorderStroke(1.dp, Color.Black), RoundedCornerShape(8.dp))
+                .height(height)
+                .width(700.dp)
+        ) {
+            Column {
 
-        val dbhTreeSet = remember {
-            mutableStateOf(totalTreesState.toMutableSet())
-        }
+                val targetId = remember {
+                    mutableStateOf(1)
+                }
 
-        val measHtTreeSet = remember {
-            mutableStateOf(totalTreesState.toMutableSet())
-        }
+                Row(
 
-        val forkHtTreeSet = remember {
-            mutableStateOf(totalTreesState.toMutableSet())
-        }
-
-        val visHtTreeSet = remember {
-            mutableStateOf(totalTreesState.toMutableSet())
-        }
-
-        if (newPlotData.PlotTrees.size > numPlotTrees.value) {
-            for (i in newPlotData.PlotTrees.size downTo numPlotTrees.value + 1) {
-                dbhTreeSet.value.add(i.toString())
-                visHtTreeSet.value.add(i.toString())
-                forkHtTreeSet.value.add(i.toString())
-                measHtTreeSet.value.add(i.toString())
-            }
-            numPlotTrees.value = newPlotData.PlotTrees.size
-        }
-
-        val curItemId = remember {
-            mutableStateOf("1")
-        }
-        Column {
-            Box(
-                modifier = Modifier
-                    .padding(20.dp)
-                    .background(md_theme_light_primaryContainer, RoundedCornerShape(8.dp))
-                    .border(BorderStroke(1.dp, Color.Black), RoundedCornerShape(8.dp))
-                    .height(400.dp)
-                    .fillMaxWidth()
-            ) {
-                Column {
-
-                    val targetId = remember {
-                        mutableStateOf(1)
-                    }
-
-                    Row(
-
-                    ){
-                        OutlinedTextField(
-                            value = curItemId.value,
-                            onValueChange = {
-                                curItemId.value = it
-                                targetId.value = it.toIntOrNull()?: 1
-                                coroutineScope.launch {
-                                    lazyListState.scrollToItem(targetId.value - 1)
-                                }
-                            },
-                            label = {
-                                Text(
-                                    text = "查看樣樹",
-                                    style = TextStyle(
-                                        fontSize = 15.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
+                ){
+                    OutlinedTextField(
+                        value = curItemId.value,
+                        onValueChange = {
+                            curItemId.value = it
+                            targetId.value = it.toIntOrNull()?: 1
+                            coroutineScope.launch {
+                                lazyListState.scrollToItem(targetId.value - 1)
+                            }
+                        },
+                        label = {
+                            Text(
+                                text = "查看樣樹",
+                                style = TextStyle(
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.Bold
                                 )
-                            },
-                            leadingIcon = {
-                                Icon(imageVector = Icons.Filled.Search, contentDescription = null)
-                            },
-                            textStyle = TextStyle(fontSize = 18.sp),
-                            modifier = Modifier
-                                .padding(10.dp)
-                                .width(100.dp)
-                        )
-
-                        ExposedUnaddressedTreeList(
-                            treeSet = dbhTreeSet,
-                            label = "剩餘DBH",
-                            widthType = "medium",
-                            onChoose = {
-                                targetId.value = it.toInt()
-                                coroutineScope.launch {
-                                    lazyListState.scrollToItem(targetId.value - 1)
-                                }
-                            }
-                        )
-
-                        ExposedUnaddressedTreeList(
-                            treeSet = measHtTreeSet,
-                            label = "剩餘樹高",
-                            widthType = "medium",
-                            onChoose = {
-                                targetId.value = it.toInt()
-                                coroutineScope.launch {
-                                    lazyListState.scrollToItem(targetId.value - 1)
-                                }
-                            }
-                        )
-
-                        ExposedUnaddressedTreeList(
-                            treeSet = visHtTreeSet,
-                            label = "剩餘目視樹高",
-                            widthType = "large",
-                            onChoose = {
-                                targetId.value = it.toInt()
-                                coroutineScope.launch {
-                                    lazyListState.scrollToItem(targetId.value - 1)
-                                }
-                            }
-                        )
-
-                        ExposedUnaddressedTreeList(
-                            treeSet = forkHtTreeSet,
-                            label = "剩餘分岔樹高",
-                            widthType = "large",
-                            onChoose = {
-                                targetId.value = it.toInt()
-                                coroutineScope.launch {
-                                    lazyListState.scrollToItem(targetId.value - 1)
-                                }
-                            }
-                        )
-                    }
-
-                    CustomizedDivider()
-
-                    LazyColumn(
-                        state = lazyListState,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(
-                                color = md_theme_light_primary,
-                                shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp)
                             )
-                    ) {
-                        itemsIndexed(newPlotData.PlotTrees) { idx, tree ->
-                            Row(
-                                modifier = Modifier.padding(10.dp)
-                            ) {
-                                ListItem(
-                                    modifier = Modifier
-                                        .padding(10.dp)
-                                        .width(55.dp)
-                                        .height(55.dp)
-                                        .clip(CircleShape)
-                                        .background(md_theme_light_inverseOnSurface),
-                                    headlineContent = {
-                                        Text(
-                                            text = String.format("%02d", tree.SampleNum),
-                                            style = TextStyle(
-                                                fontSize = 18.sp,
-                                                fontWeight = FontWeight.Bold
-                                            ),
-                                            modifier = Modifier
-                                                .wrapContentWidth(Alignment.CenterHorizontally)
-                                                .wrapContentHeight(Alignment.CenterVertically)
-                                        )
+                        },
+                        leadingIcon = {
+                            Icon(imageVector = Icons.Filled.Search, contentDescription = null)
+                        },
+                        textStyle = TextStyle(fontSize = 18.sp),
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .width(100.dp)
+                    )
 
-                                    }
+                    ExposedUnaddressedTreeList(
+                        treeSet = dbhTreeSet,
+                        label = "剩餘DBH",
+                        widthType = "medium",
+                        onChoose = {
+                            targetId.value = it.toInt()
+                            coroutineScope.launch {
+                                lazyListState.scrollToItem(targetId.value - 1)
+                            }
+                        }
+                    )
+
+                    ExposedUnaddressedTreeList(
+                        treeSet = measHtTreeSet,
+                        label = "剩餘樹高",
+                        widthType = "medium",
+                        onChoose = {
+                            targetId.value = it.toInt()
+                            coroutineScope.launch {
+                                lazyListState.scrollToItem(targetId.value - 1)
+                            }
+                        }
+                    )
+
+                    ExposedUnaddressedTreeList(
+                        treeSet = visHtTreeSet,
+                        label = "剩餘目視樹高",
+                        widthType = "large",
+                        onChoose = {
+                            targetId.value = it.toInt()
+                            coroutineScope.launch {
+                                lazyListState.scrollToItem(targetId.value - 1)
+                            }
+                        }
+                    )
+
+                    ExposedUnaddressedTreeList(
+                        treeSet = forkHtTreeSet,
+                        label = "剩餘分岔樹高",
+                        widthType = "large",
+                        onChoose = {
+                            targetId.value = it.toInt()
+                            coroutineScope.launch {
+                                lazyListState.scrollToItem(targetId.value - 1)
+                            }
+                        }
+                    )
+                }
+
+                CustomizedDivider()
+
+                LazyColumn(
+                    state = lazyListState,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            color = md_theme_light_primary,
+                            shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp)
+                        )
+                ) {
+                    itemsIndexed(newPlotData.PlotTrees) { idx, tree ->
+                        Row(
+                            modifier = Modifier.padding(10.dp)
+                        ) {
+                            ListItem(
+                                modifier = Modifier
+                                    .padding(10.dp)
+                                    .width(55.dp)
+                                    .height(55.dp)
+                                    .clip(CircleShape)
+                                    .background(md_theme_light_inverseOnSurface),
+                                headlineContent = {
+                                    Text(
+                                        text = String.format("%02d", tree.SampleNum),
+                                        style = TextStyle(
+                                            fontSize = 18.sp,
+                                            fontWeight = FontWeight.Bold
+                                        ),
+                                        modifier = Modifier
+                                            .wrapContentWidth(Alignment.CenterHorizontally)
+                                            .wrapContentHeight(Alignment.CenterVertically)
+                                    )
+                                }
+                            )
+
+                            val treeDBH = remember {
+                                mutableStateOf(tree.DBH.toString())
+                            }
+
+                            val treeMeasHt = remember {
+                                mutableStateOf(tree.MeasHeight.toString())
+                            }
+
+                            val treeVisHt = remember {
+                                mutableStateOf(tree.VisHeight.toString())
+                            }
+
+                            val treeForkHt = remember {
+                                mutableStateOf(tree.ForkHeight.toString())
+                            }
+
+                            Row(
+                                modifier = Modifier.padding(5.dp),
+                                horizontalArrangement = Arrangement.SpaceEvenly
+                            ) {
+
+                                LazyColumnInputTextField(
+                                    textContent = treeDBH,
+                                    unaddressedTreeSet = dbhTreeSet,
+                                    tree = tree,
+                                    label = "DBH",
+                                    modifier = modifierInputText
                                 )
 
-                                val treeDBH = remember {
-                                    mutableStateOf(tree.DBH.toString())
-                                }
+                                LazyColumnInputTextField(
+                                    textContent = treeMeasHt,
+                                    unaddressedTreeSet = measHtTreeSet,
+                                    tree = tree,
+                                    label = "測量樹高",
+                                    modifier = modifierInputText
+                                )
 
-                                val treeMeasHt = remember {
-                                    mutableStateOf(tree.MeasHeight.toString())
-                                }
+                                LazyColumnInputTextField(
+                                    textContent = treeVisHt,
+                                    unaddressedTreeSet = visHtTreeSet,
+                                    tree = tree,
+                                    label = "目視樹高",
+                                    modifier = modifierInputText
+                                )
 
-                                val treeVisHt = remember {
-                                    mutableStateOf(tree.VisHeight.toString())
-                                }
-
-                                val treeForkHt = remember {
-                                    mutableStateOf(tree.ForkHeight.toString())
-                                }
-
-                                Row(
-                                    modifier = Modifier.padding(5.dp),
-                                    horizontalArrangement = Arrangement.SpaceEvenly
-                                ) {
-
-                                    LazyColumnInputTextField(
-                                        textContent = treeDBH,
-                                        unaddressedTreeSet = dbhTreeSet,
-                                        tree = tree,
-                                        label = "DBH",
-                                        modifier = modifierInputText
-                                    )
-
-                                    LazyColumnInputTextField(
-                                        textContent = treeMeasHt,
-                                        unaddressedTreeSet = measHtTreeSet,
-                                        tree = tree,
-                                        label = "測量樹高",
-                                        modifier = modifierInputText
-                                    )
-
-                                    LazyColumnInputTextField(
-                                        textContent = treeVisHt,
-                                        unaddressedTreeSet = visHtTreeSet,
-                                        tree = tree,
-                                        label = "目視樹高",
-                                        modifier = modifierInputText
-                                    )
-
-                                    LazyColumnInputTextField(
-                                        textContent = treeForkHt,
-                                        unaddressedTreeSet = forkHtTreeSet,
-                                        tree = tree,
-                                        label = "分岔樹高",
-                                        modifier = modifierInputText
-                                    )
-                                }
+                                LazyColumnInputTextField(
+                                    textContent = treeForkHt,
+                                    unaddressedTreeSet = forkHtTreeSet,
+                                    tree = tree,
+                                    label = "分岔樹高",
+                                    modifier = modifierInputText
+                                )
                             }
-                            DropdownDivider()
                         }
+                        DropdownDivider()
                     }
                 }
             }
-
-            CheckAddButton(
-                dbhSet = dbhTreeSet,
-                htSet = measHtTreeSet,
-                visHtSet = visHtTreeSet,
-                measHtSet = forkHtTreeSet,
-                onNextButtonClick = onNextButtonClick
-            )
         }
+
+        CheckAddButton(
+            dbhSet = dbhTreeSet,
+            htSet = measHtTreeSet,
+            visHtSet = visHtTreeSet,
+            measHtSet = forkHtTreeSet,
+            onNextButtonClick = onNextButtonClick
+        )
     }
 }
 
@@ -308,6 +313,7 @@ fun LazyColumnInputTextField(
     label: String,
     modifier: Modifier
 ) {
+    val context = LocalContext.current
     TextField(
         value = textContent.value,
         onValueChange = {
@@ -327,6 +333,7 @@ fun LazyColumnInputTextField(
                 }
             } else {
                 //alarm
+                showMessage(context,"請輸入正確的數字")
             }
         },
         label = {

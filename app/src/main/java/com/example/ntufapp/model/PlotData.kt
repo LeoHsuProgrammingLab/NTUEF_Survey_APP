@@ -1,8 +1,10 @@
 package com.example.ntufapp.model
 
+import android.annotation.TargetApi
 import android.os.Build
 import androidx.annotation.RequiresApi
 import java.time.LocalDate
+import kotlin.math.abs
 
 data class PlotData(
     var Date: String = "",
@@ -73,4 +75,38 @@ data class PlotData(
             tree.reset()
         }
     }
+}
+
+fun compare2Plots(oldPlot: PlotData, newPlot: PlotData, threshold: Double, target: String): MutableSet<Tree> {
+    val targetSet = mutableSetOf<Tree>()
+
+    for(i in 0 until oldPlot.PlotTrees.size) {
+        val tree = newPlot.searchTree(oldPlot.PlotTrees[i].SampleNum)
+
+        when(target) {
+            "DBH" -> {
+                if(abs(oldPlot.PlotTrees[i].DBH - tree!!.DBH) > threshold) {
+                    tree.DBH = oldPlot.PlotTrees[i].DBH
+                }
+            }
+            "Meas" -> {
+                if(abs(oldPlot.PlotTrees[i].MeasHeight - tree!!.MeasHeight) > threshold) {
+                    tree.MeasHeight = oldPlot.PlotTrees[i].MeasHeight
+                }
+            }
+            "Vis" -> {
+                if(abs(oldPlot.PlotTrees[i].VisHeight - tree!!.VisHeight) > threshold) {
+                    tree.VisHeight = oldPlot.PlotTrees[i].VisHeight
+                }
+            }
+            "Fork" -> {
+                if(abs(oldPlot.PlotTrees[i].ForkHeight - tree!!.ForkHeight) > threshold) {
+                    tree.ForkHeight = oldPlot.PlotTrees[i].ForkHeight
+                }
+            }
+        }
+        targetSet.add(tree!!)
+    }
+
+    return targetSet
 }

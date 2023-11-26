@@ -1,5 +1,7 @@
 package com.example.ntufapp.model
 
+import androidx.compose.runtime.MutableState
+
 data class Tree(
 //    var SiteNum: String = "", // redundant
 //    var PlotNum: Int = -1, // redundant
@@ -7,7 +9,7 @@ data class Tree(
     var SampleNum: Int = -1,
     var Species: String = "", // 2
     var DBH: Double = 0.0,
-    var State: MutableList<String> = mutableListOf(""),
+    var State: MutableList<String> = mutableListOf(),
     var VisHeight: Double = 0.0,
     var MeasHeight: Double = 0.0,
     var ForkHeight: Double = 0.0,
