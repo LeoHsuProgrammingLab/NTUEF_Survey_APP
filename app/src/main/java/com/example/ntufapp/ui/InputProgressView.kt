@@ -145,28 +145,28 @@ fun Progress(
                         TextField(
                             value = "${tree.DBH}",
                             onValueChange = {},
-                            label = {Text("DBH")},
+                            label = { Text("DBH") },
                             modifier = mod,
                             readOnly = true
                         )
                         TextField(
                             value = "${tree.VisHeight}",
                             onValueChange = {},
-                            label = {Text("目視樹高")},
+                            label = { Text("目視樹高") },
                             modifier = mod,
                             readOnly = true
                         )
                         TextField(
                             value = "${tree.MeasHeight}",
                             onValueChange = {},
-                            label = {Text("量測樹高")},
+                            label = { Text("量測樹高") },
                             modifier = mod,
                             readOnly = true
                         )
                         TextField(
                             value = "${tree.ForkHeight}",
                             onValueChange = {},
-                            label = {Text("分岔樹高")},
+                            label = { Text("分岔樹高") },
                             modifier = mod,
                             readOnly = true
                         )

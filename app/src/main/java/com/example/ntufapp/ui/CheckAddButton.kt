@@ -50,7 +50,7 @@ fun CheckAddButton(
         }
 
         if (showDialogue.value) {
-            surveyConfirmDialogue(
+            SurveyConfirmDialogue(
                 dbhSetSize = dbhSet.value.size,
                 htSetSize = htSet.value.size,
                 visHtSetSize = visHtSet.value.size,

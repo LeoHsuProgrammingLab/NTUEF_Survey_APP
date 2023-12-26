@@ -1,14 +1,11 @@
 package com.example.ntufapp.ui
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -20,11 +17,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import com.example.ntufapp.data.DataSource.SpeciesList
 import com.example.ntufapp.model.PlotData
 import com.example.ntufapp.model.Tree
-import com.example.ntufapp.ui.theme.Shapes
 
 @Composable
 fun PlotTreeView(
@@ -109,7 +103,7 @@ fun TreeSpeciesWidget(
         }
 
         if (showDialog.value) {
-            FixSpeciesDialogue(
+            AdjustSpeciesDialogue(
                 onDismiss = {showDialog.value = false},
                 onCancelClick = { showDialog.value = false},
                 onNextButtonClick = {

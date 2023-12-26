@@ -16,6 +16,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import com.example.ntufapp.layout.NewSurveyScreen
 import com.example.ntufapp.layout.ResultDisplayScreen
 import com.example.ntufapp.layout.showMessage
 
@@ -45,13 +46,16 @@ fun NTUEFApp(
             startDestination = Screens.Start.name,
             modifier = Modifier.padding(paddingValues)
         ) {
-
             composable(route = Screens.Start.name) {
                 PlotOptionsScreen(
-                    onNextButtonClick = {
-                        viewModel.setOldData(it)
-                        viewModel.setNewData(it)
-                        navController.navigate(Screens.ReSurvey.name)
+                    onNextButtonClick = {plotData, surveyType ->
+                        viewModel.setOldData(plotData)
+                        viewModel.setNewData(plotData)
+                        if (surveyType == "ReSurvey") {
+                            navController.navigate(Screens.ReSurvey.name)
+                        } else {
+                            navController.navigate(Screens.NewSurvey.name)
+                        }
                     }
                 )
             }
@@ -84,7 +88,12 @@ fun NTUEFApp(
             }
 
             composable(route = Screens.NewSurvey.name) {
-
+                NewSurveyScreen(
+                    onNextButtonClick = {
+                        navController.navigate(Screens.ResultDisplay.name)
+                    },
+                    newPlotData = resultState.second
+                )
             }
         }
     }

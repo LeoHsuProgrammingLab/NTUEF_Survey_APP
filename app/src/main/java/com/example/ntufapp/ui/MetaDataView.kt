@@ -27,7 +27,7 @@ fun MetaDateView(newPlotData: PlotData) {
         MetaDataCol(info1 = Pair("調查日期", newPlotData.Date), info2 = Pair("營林區", newPlotData.ManageUnit), info3 = Pair("林班地", newPlotData.SubUnit))
         MetaDataCol(info1 = Pair("樣區名稱", newPlotData.PlotName), info2 = Pair("樣區編號", newPlotData.PlotNum.toString()), info3 = Pair("樣區型態", newPlotData.PlotType))
         MetaDataCol(info1 = Pair("樣區面積", newPlotData.PlotArea.toString()), info2 = Pair("TWD97_X", newPlotData.TWD97_X.toString()), info3 = Pair("TWD97_Y", newPlotData.TWD97_Y.toString()))
-        MetaDataCol(info1 = Pair("海拔", newPlotData.Altitude.toString()), info2 = Pair("坡度", newPlotData.Slope.toString()), info3 = Pair("坡向", newPlotData.aspect))
+        MetaDataCol(info1 = Pair("海拔", newPlotData.Altitude.toString()), info2 = Pair("坡度", newPlotData.Slope.toString()), info3 = Pair("坡向", newPlotData.Aspect))
         Column(modifier = Modifier.padding(5.dp)) {
             SearchableDropdownMenu(newPlotData.Surveyor, defaultString = "名單", label = "樣區調查人員", dialogType = "Name", readOnly = true, onChoose = {}, onAdd = {})
             Divider(modifier = Modifier.padding(3.dp))

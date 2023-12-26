@@ -248,16 +248,15 @@ fun SearchableDropdownMenu2(
                 textStyle = TextStyle(fontSize = 13.sp),
                 modifier = Modifier
                     .width(180.dp)
-                    .height(100.dp)
+                    .height(80.dp)
                     .menuAnchor()
             )
             // DropdownMenu
             ExposedDropdownMenu(
                 expanded = dropdownExpanded.value,
                 onDismissRequest = { dropdownExpanded.value = false },
-                modifier = Modifier.height(100.dp)
+                modifier = Modifier.height(200.dp)
             ) {
-
                 filteredOptions.value.forEach { option ->
                     DropdownMenuItem(
                         text = {
@@ -268,9 +267,7 @@ fun SearchableDropdownMenu2(
                             dropdownExpanded.value = false
                             onChoose(option)
                         },
-                        modifier = Modifier
-                            .width(150.dp)
-                            .height(40.dp)
+                        modifier = Modifier.width(150.dp).height(40.dp)
                     )
 
                     Divider(

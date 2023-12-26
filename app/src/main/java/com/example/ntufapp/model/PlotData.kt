@@ -16,12 +16,12 @@ data class PlotData(
     var PlotType: String = "",
 
     var PlotArea: Double = 0.0,
-    var TWD97_X: Double = 0.0,
-    var TWD97_Y: Double = 0.0,
+    var TWD97_X: String = "",
+    var TWD97_Y: String = "",
 
     var Altitude: Double = 0.0,
     var Slope: Double = 0.0, //
-    var aspect: String = "",
+    var Aspect: String = "",
 
     var Surveyor: MutableList<String> = mutableListOf(), // 1
     var HtSurveyor: MutableList<String> = mutableListOf(), // 3
@@ -53,7 +53,7 @@ data class PlotData(
         clonePlot.TWD97_Y = TWD97_Y
         clonePlot.Altitude = Altitude
         clonePlot.Slope = Slope
-        clonePlot.aspect = aspect
+        clonePlot.Aspect = Aspect
 
         for (surveyor in Surveyor) {
             clonePlot.Surveyor.add(surveyor)

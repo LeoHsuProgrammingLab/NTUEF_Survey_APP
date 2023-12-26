@@ -27,13 +27,6 @@ fun ReSurveyScreen(
     oldPlotData: PlotData,
     newPlotData: PlotData
 ) {
-//    Debug:
-//    val contextNow = LocalContext.current
-//    for(i in 0 until newPlotData.PlotTrees.size) {
-//        showMessage(contextNow, "new: ${newPlotData.PlotTrees[i].DBH}")
-//        showMessage(contextNow, "old: ${oldPlotData.PlotTrees[i].DBH}")
-//    }
-
     // Save the final return data
     val newPlotDataState = remember {
         mutableStateOf(newPlotData)
@@ -84,6 +77,14 @@ fun ReSurveyScreen(
 
         }
     }
+}
+
+@Composable
+fun NewSurveyScreen(
+    onNextButtonClick: () -> Unit,
+    newPlotData: PlotData
+) {
+
 }
 
 @Preview(device = Devices.PIXEL_C)

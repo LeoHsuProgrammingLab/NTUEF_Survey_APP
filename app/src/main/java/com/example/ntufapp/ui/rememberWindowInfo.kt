@@ -1,5 +1,6 @@
 package com.example.ntufapp.ui
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.Dp
@@ -8,6 +9,8 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun rememberWindowInfo(): WindowInfo {
     val configuration = LocalConfiguration.current
+    Log.i("inside rememberWindowInfo", configuration.screenWidthDp.toString())
+    Log.i("inside rememberWindowInfo", configuration.screenHeightDp.toString())
     return WindowInfo(
         screenWidthInfo = when {
             configuration.screenWidthDp < 600 -> WindowInfo.WindowType.Compact
@@ -24,6 +27,7 @@ fun rememberWindowInfo(): WindowInfo {
     )
 }
 
+// Constructor of WindowInfo with 4 properties
 data class WindowInfo(
     val screenWidthInfo: WindowType,
     val screenHeightInfo: WindowType,
@@ -31,7 +35,7 @@ data class WindowInfo(
     val screenHeight: Dp
 ) {
     // width
-    // < 600: small, 600 < < 840: medium, 840 < : large
+    // < 600: Compact, 600 < < 840: Medium, 840 < : Expanded
     sealed class WindowType {
         object Compact: WindowType()
         object Medium: WindowType()
