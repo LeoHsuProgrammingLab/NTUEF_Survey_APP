@@ -30,15 +30,15 @@ fun NTUEFTopBar() {
             Text("臺大實驗林調查APP",
                 fontSize = 40.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.clip(
-                    MaterialTheme.shapes.small
-                ),
+                modifier = Modifier.clip(MaterialTheme.shapes.small),
                 style = MaterialTheme.typography.displayMedium,
                 color = Color.White
             )
         },
         navigationIcon = {
-            IconButton(onClick = {}) {
+            IconButton(
+                onClick = {}
+            ) {
                 Icon(Icons.Default.Menu, contentDescription = "Menu")
             }
         },

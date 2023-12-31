@@ -1,0 +1,6 @@
+{
+    "target": "Survey",
+    "package": "com.example.ntufapp.survey",
+    "generateImplementation": true,
+    "generatePreviews": true
+}

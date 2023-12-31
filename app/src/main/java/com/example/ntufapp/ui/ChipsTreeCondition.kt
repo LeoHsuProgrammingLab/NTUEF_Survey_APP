@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Text
@@ -18,6 +19,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
@@ -33,7 +35,8 @@ import com.example.ntufapp.ui.theme.md_theme_light_primary
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChipsTreeCondition(//https://semicolonspace.com/jetpack-compose-filterchip/
-    curTree: Tree
+    curTree: Tree,
+    modifier: Modifier
 ) {
     val curContext = LocalContext.current
 
@@ -49,23 +52,20 @@ fun ChipsTreeCondition(//https://semicolonspace.com/jetpack-compose-filterchip/
         } // initially, first item is selected*/
     }
 
-    val treeCondition = remember {
-        mutableStateOf("")
-    }
+    val treeCondition = remember { mutableStateOf("") }
 
     treeCondition.value = curTree.State.joinToString()
 
-    val mod = Modifier.width(450.dp)
     Box(
-        modifier = mod
+        modifier = modifier
 //            .height()
             .border(width = 1.dp, md_theme_light_primary)
             .padding(10.dp)
     ) {
         Column(
-            modifier = mod
+            modifier = modifier
         ) {
-            LazyRow( modifier = mod){
+            LazyRow( modifier = modifier){
                 itemsIndexed(singleItemList) { id, item ->
                     FilterChip(
                         modifier = Modifier.padding(horizontal = 6.dp), // gap between items
@@ -92,7 +92,7 @@ fun ChipsTreeCondition(//https://semicolonspace.com/jetpack-compose-filterchip/
                 }
             }
 
-            LazyRow( modifier = mod) {
+            LazyRow( modifier = modifier) {
                 itemsIndexed(squirrelItemList) {id, item ->
                     FilterChip(
                         modifier = Modifier.padding(horizontal = 6.dp), // gap between items
@@ -128,7 +128,7 @@ fun ChipsTreeCondition(//https://semicolonspace.com/jetpack-compose-filterchip/
                 }
             }
 
-            LazyRow( modifier = mod) {
+            LazyRow( modifier = modifier) {
                 itemsIndexed(multiItemList) { id, item ->
                     FilterChip(
                         modifier = Modifier.padding(horizontal = 6.dp), // gap between items
@@ -144,8 +144,6 @@ fun ChipsTreeCondition(//https://semicolonspace.com/jetpack-compose-filterchip/
                                 }
                                 selectedItems.add(item)
                             }
-//                            Toast.makeText(contextForToast, selectedItems.joinToString(), Toast.LENGTH_SHORT)
-//                                .show()
                         },
                         label = {
                             Text(
@@ -159,7 +157,10 @@ fun ChipsTreeCondition(//https://semicolonspace.com/jetpack-compose-filterchip/
                 }
             }
 
-            Row() {
+            Row(
+                modifier = modifier,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 TextField(
                     value = treeCondition.value,
                     onValueChange = {
@@ -182,22 +183,22 @@ fun ChipsTreeCondition(//https://semicolonspace.com/jetpack-compose-filterchip/
                         .padding(top = 10.dp, bottom = 10.dp, end = 10.dp)
                 )
 
-                Button(
-                    modifier = Modifier
-                        .width(90.dp)
-                        .padding(top = 10.dp, bottom = 10.dp),
-                    onClick = {
-                        if (selectedItems.isEmpty()) {
-                            showMessage(curContext, "請選擇生長狀態")
-                        } else {
-                            curTree.State = selectedItems
-                            treeCondition.value = curTree.State.joinToString()
-                            showMessage(curContext, "您已新增 樣樹${curTree.SampleNum} 之生長狀態\n${curTree.State.joinToString()}")
+                    Button(
+                        modifier = Modifier
+                            .width(90.dp)
+                            .padding(top = 10.dp, bottom = 10.dp),
+                        onClick = {
+                            if (selectedItems.isEmpty()) {
+                                showMessage(curContext, "請選擇生長狀態")
+                            } else {
+                                curTree.State = selectedItems
+                                treeCondition.value = curTree.State.joinToString()
+                                showMessage(curContext, "您已新增 樣樹${curTree.SampleNum} 之生長狀態\n${curTree.State.joinToString()}")
+                            }
                         }
+                    ) {
+                        Text("新增")
                     }
-                ) {
-                    Text("新增")
-                }
             }
         }
     }

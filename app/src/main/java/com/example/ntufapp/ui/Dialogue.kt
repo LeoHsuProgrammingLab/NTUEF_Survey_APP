@@ -195,8 +195,7 @@ fun ManualInputNewPlotDialogue(
                 Row{
                     Button(
                         modifier = Modifier.padding(10.dp),
-                        onClick = {
-                            plotData.value.setToday()
+                        onClick ={
                             plotData.value.ManageUnit = manageUnit.value
                             plotData.value.SubUnit = subUnit.value
                             plotData.value.PlotName = plotName.value
@@ -237,7 +236,6 @@ fun AdjustSpeciesDialogue( // Survey Screen
     ) {
         Surface(shape = Shapes.small) {
             Column(modifier = Modifier.padding(10.dp)) {
-
                 SearchableDropdownMenu2(
                     optionsInput = DataSource.SpeciesList as MutableList<String>,
                     onChoose = {
@@ -274,9 +272,9 @@ fun AdjustSpeciesDialogue( // Survey Screen
 @Composable
 fun SurveyConfirmDialogue( // Survey Screen
     dbhSetSize: Int,
-    htSetSize: Int,
-    visHtSetSize: Int,
     measHtSetSize: Int,
+    visHtSetSize: Int,
+    forkHtSetSize: Int,
     onDismiss: () -> Unit,
     onCancelClick: () -> Unit,
     onNextButtonClick: () -> Unit
@@ -289,9 +287,9 @@ fun SurveyConfirmDialogue( // Survey Screen
         Surface(shape = Shapes.small) {
             Column(modifier = Modifier.padding(10.dp)) {
                 Text(text = "DBH還有${dbhSetSize}棵樹未調查")
-                Text("樹高還有${htSetSize}棵樹未調查")
+                Text("樹高還有${measHtSetSize}棵樹未調查")
                 Text("目視樹高還有${visHtSetSize}棵樹未調查")
-                Text("分岔樹高還有${measHtSetSize}棵樹未調查")
+                Text("分岔樹高還有${forkHtSetSize}棵樹未調查")
                 Text("請確認是否要完成此次調查?", style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 18.sp))
 
                 Spacer(modifier = Modifier.padding(10.dp))

@@ -32,6 +32,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.ntufapp.model.PlotData
+import com.example.ntufapp.ui.theme.Shapes
+import com.example.ntufapp.ui.theme.lightBorder
 import com.example.ntufapp.ui.theme.md_theme_light_inverseOnSurface
 import com.example.ntufapp.ui.theme.md_theme_light_primaryContainer
 
@@ -108,8 +110,8 @@ fun Progress(
     Box(
         modifier = Modifier
             .padding(20.dp)
-            .background(md_theme_light_primaryContainer, RoundedCornerShape(8.dp))
-            .border(BorderStroke(1.dp, Color.Black), RoundedCornerShape(8.dp))
+            .background(md_theme_light_primaryContainer, Shapes.medium)
+            .border(lightBorder, Shapes.medium)
             .fillMaxWidth()
     ) {
         LazyColumn(

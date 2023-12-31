@@ -20,41 +20,39 @@ import com.example.ntufapp.model.PlotData
 @Composable
 fun CheckAddButton(
     dbhSet: MutableState<MutableSet<String>>,
-    htSet: MutableState<MutableSet<String>>,
-    visHtSet: MutableState<MutableSet<String>>,
     measHtSet: MutableState<MutableSet<String>>,
+    visHtSet: MutableState<MutableSet<String>>,
+    forkHtSet: MutableState<MutableSet<String>>,
     onNextButtonClick: () -> Unit
 ){
     Row(
         modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.Bottom,
-        horizontalArrangement = Arrangement.End
+        horizontalArrangement = Arrangement.End,
+        verticalAlignment = Alignment.Bottom
     ) {
-        val showDialogue = remember {
-            mutableStateOf(false)
-        }
+        val showDialogue = remember { mutableStateOf(false) }
 
         OutlinedButton(
             onClick = {
-                if (dbhSet.value.size == 0 || htSet.value.size == 0 || visHtSet.value.size == 0 || measHtSet.value.size == 0) {
+                if (dbhSet.value.size == 0 || measHtSet.value.size == 0 || visHtSet.value.size == 0 || forkHtSet.value.size == 0) {
                     onNextButtonClick()
                 } else {
                     showDialogue.value = true
                 }
             },
             modifier = Modifier
-                .padding(end = 16.dp)
-                .height(70.dp)
+                .padding(top = 10.dp, end = 30.dp)
+                .height(50.dp)
         ) {
-            Text("完成此次調查", fontSize = 20.sp)
+            Text("完成此次調查", fontSize = 18.sp)
         }
 
         if (showDialogue.value) {
             SurveyConfirmDialogue(
                 dbhSetSize = dbhSet.value.size,
-                htSetSize = htSet.value.size,
-                visHtSetSize = visHtSet.value.size,
                 measHtSetSize = measHtSet.value.size,
+                visHtSetSize = visHtSet.value.size,
+                forkHtSetSize = forkHtSet.value.size,
                 onDismiss = { showDialogue.value = false },
                 onCancelClick = { showDialogue.value = false },
                 onNextButtonClick = onNextButtonClick

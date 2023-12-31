@@ -22,4 +22,15 @@ import androidx.compose.ui.unit.dp
 
 val Shapes = Shapes(
     small = RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp, bottomEnd = 5.dp, bottomStart = 5.dp),
+    medium = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp, bottomEnd = 8.dp, bottomStart = 8.dp),
+)
+
+val UpperShapes = Shapes(
+    small = RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp),
+    medium = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp),
+)
+
+val LowerShapes = Shapes(
+    small = RoundedCornerShape(bottomEnd = 5.dp, bottomStart = 5.dp),
+    medium = RoundedCornerShape(bottomEnd = 8.dp, bottomStart = 8.dp),
 )

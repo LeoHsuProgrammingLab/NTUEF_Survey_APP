@@ -1,4 +1,4 @@
-package com.example.ntufapp
+package com.example.ntufapp.router
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -15,10 +15,8 @@ import com.example.ntufapp.viewModel.TreeViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
 import com.example.ntufapp.layout.NewSurveyScreen
 import com.example.ntufapp.layout.ResultDisplayScreen
-import com.example.ntufapp.layout.showMessage
 
 enum class Screens {
     Start,
@@ -34,9 +32,7 @@ fun NTUEFApp(
     viewModel: TreeViewModel = viewModel()
 ) {
     Scaffold(
-        topBar = {
-            NTUEFTopBar()
-        }
+        topBar = { NTUEFTopBar() }
     ) { paddingValues ->
 
         val resultState by viewModel.resultState.collectAsState()
@@ -49,11 +45,13 @@ fun NTUEFApp(
             composable(route = Screens.Start.name) {
                 PlotOptionsScreen(
                     onNextButtonClick = {plotData, surveyType ->
-                        viewModel.setOldData(plotData)
+
                         viewModel.setNewData(plotData)
                         if (surveyType == "ReSurvey") {
+                            viewModel.setOldData(plotData)
                             navController.navigate(Screens.ReSurvey.name)
                         } else {
+
                             navController.navigate(Screens.NewSurvey.name)
                         }
                     }
@@ -67,6 +65,15 @@ fun NTUEFApp(
                     },
                     oldPlotData = resultState.first, // old plot data
                     newPlotData = resultState.second //new plot data
+                )
+            }
+
+            composable(route = Screens.NewSurvey.name) {
+                NewSurveyScreen(
+                    onNextButtonClick = {
+                        navController.navigate(Screens.ResultDisplay.name)
+                    },
+                    newPlotData = resultState.second
                 )
             }
 
@@ -85,15 +92,6 @@ fun NTUEFApp(
 
             composable(route = Screens.Visualization.name) {
 
-            }
-
-            composable(route = Screens.NewSurvey.name) {
-                NewSurveyScreen(
-                    onNextButtonClick = {
-                        navController.navigate(Screens.ResultDisplay.name)
-                    },
-                    newPlotData = resultState.second
-                )
             }
         }
     }

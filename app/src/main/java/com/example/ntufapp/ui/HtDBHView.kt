@@ -1,5 +1,6 @@
 package com.example.ntufapp.ui
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -20,7 +22,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -45,83 +46,89 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ntufapp.data.ntufappInfo.Companion.tag
 import com.example.ntufapp.layout.showMessage
 import com.example.ntufapp.model.PlotData
 import com.example.ntufapp.model.Tree
 import com.example.ntufapp.ui.theme.CustomizedDivider
 import com.example.ntufapp.ui.theme.DropdownDivider
+import com.example.ntufapp.ui.theme.LowerShapes
+import com.example.ntufapp.ui.theme.Shapes
+import com.example.ntufapp.ui.theme.UpperShapes
+import com.example.ntufapp.ui.theme.dropDownItemModifier
+import com.example.ntufapp.ui.theme.dropDownMenuModifier
+import com.example.ntufapp.ui.theme.inputTextModifier
+import com.example.ntufapp.ui.theme.lightBorder
 import com.example.ntufapp.ui.theme.md_theme_light_inverseOnSurface
 import com.example.ntufapp.ui.theme.md_theme_light_primary
 import com.example.ntufapp.ui.theme.md_theme_light_primaryContainer
-import com.example.ntufapp.ui.theme.modifierInputText
 import kotlinx.coroutines.launch
 
 
 @Composable
-fun InputProgressView2(
-    totalTreesState: MutableList<String>,
+fun HtDBHView(
+    numPlotTrees: MutableState<Int>,
+    dbhTreeSet: MutableState<MutableSet<String>>,
+    measHtTreeSet: MutableState<MutableSet<String>>,
+    forkHtTreeSet: MutableState<MutableSet<String>>,
+    visHtTreeSet: MutableState<MutableSet<String>>,
     newPlotData: PlotData,
     onNextButtonClick: () -> Unit
 ) {
+    // Adjust the height
+    val windowInfo = rememberWindowInfo()
+    val height =  when (windowInfo.screenHeightInfo) {
+        WindowInfo.WindowType.Compact -> 300.dp
+        WindowInfo.WindowType.Medium -> 350.dp
+        WindowInfo.WindowType.Expanded -> 420.dp
+        else -> 400.dp
+    }
+
     val coroutineScope = rememberCoroutineScope()
     val lazyListState = rememberLazyListState()
 
-    val numPlotTrees = remember {
-        mutableStateOf(totalTreesState.size)
-    }
+//    val numPlotTrees = remember { mutableStateOf(totalTreesState.size) }
+//    val dbhTreeSet = remember { mutableStateOf(totalTreesState.toMutableSet()) }
+//    val measHtTreeSet = remember { mutableStateOf(totalTreesState.toMutableSet())}
+//    val forkHtTreeSet = remember { mutableStateOf(totalTreesState.toMutableSet()) }
+//    val visHtTreeSet = remember { mutableStateOf(totalTreesState.toMutableSet()) }
+//
+//    if (newPlotData.PlotTrees.size > numPlotTrees.value) {
+//        for (i in newPlotData.PlotTrees.size downTo numPlotTrees.value + 1) {
+//            dbhTreeSet.value.add(i.toString())
+//            visHtTreeSet.value.add(i.toString())
+//            forkHtTreeSet.value.add(i.toString())
+//            measHtTreeSet.value.add(i.toString())
+//        }
+//        numPlotTrees.value = newPlotData.PlotTrees.size
+//    }
 
-    val dbhTreeSet = remember {
-        mutableStateOf(totalTreesState.toMutableSet())
-    }
+    val curItemId = remember { mutableStateOf("1") }
 
-    val measHtTreeSet = remember {
-        mutableStateOf(totalTreesState.toMutableSet())
-    }
-
-    val forkHtTreeSet = remember {
-        mutableStateOf(totalTreesState.toMutableSet())
-    }
-
-    val visHtTreeSet = remember {
-        mutableStateOf(totalTreesState.toMutableSet())
-    }
-
-    if (newPlotData.PlotTrees.size > numPlotTrees.value) {
-        for (i in newPlotData.PlotTrees.size downTo numPlotTrees.value + 1) {
-            dbhTreeSet.value.add(i.toString())
-            visHtTreeSet.value.add(i.toString())
-            forkHtTreeSet.value.add(i.toString())
-            measHtTreeSet.value.add(i.toString())
-        }
-        numPlotTrees.value = newPlotData.PlotTrees.size
-    }
-
-    val curItemId = remember {
-        mutableStateOf("1")
-    }
-    Column {
-        val windowInfo = rememberWindowInfo()
-        val height =  when (windowInfo.screenHeightInfo) {
-            WindowInfo.WindowType.Medium -> 300.dp
-            WindowInfo.WindowType.Expanded -> 400.dp
-            else -> 400.dp
-        }
+    Column(
+        modifier = Modifier
+            .width(700.dp)
+            .height(350.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
         Box(
             modifier = Modifier
-                .padding(20.dp)
-                .background(md_theme_light_primaryContainer, RoundedCornerShape(8.dp))
-                .border(BorderStroke(1.dp, Color.Black), RoundedCornerShape(8.dp))
-                .height(height)
-                .width(700.dp)
+                .padding(start = 20.dp, end = 20.dp, top = 10.dp, bottom = 5.dp)
+                .background(md_theme_light_primaryContainer, Shapes.medium)
+                .border(lightBorder, Shapes.medium)
         ) {
             Column {
 
-                val targetId = remember {
-                    mutableStateOf(1)
-                }
+                val targetId = remember { mutableStateOf(1) }
 
+                // Search Block
                 Row(
-
+                    modifier = Modifier
+                        .height(70.dp)
+                        .padding(5.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
                 ){
                     OutlinedTextField(
                         value = curItemId.value,
@@ -136,7 +143,7 @@ fun InputProgressView2(
                             Text(
                                 text = "查看樣樹",
                                 style = TextStyle(
-                                    fontSize = 15.sp,
+                                    fontSize = 13.sp,
                                     fontWeight = FontWeight.Bold
                                 )
                             )
@@ -144,9 +151,9 @@ fun InputProgressView2(
                         leadingIcon = {
                             Icon(imageVector = Icons.Filled.Search, contentDescription = null)
                         },
-                        textStyle = TextStyle(fontSize = 18.sp),
+                        textStyle = TextStyle(fontSize = 16.sp),
                         modifier = Modifier
-                            .padding(10.dp)
+                            .padding(horizontal = 10.dp)
                             .width(100.dp)
                     )
 
@@ -201,29 +208,35 @@ fun InputProgressView2(
 
                 CustomizedDivider()
 
+                // Progress Block
                 LazyColumn(
                     state = lazyListState,
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(
                             color = md_theme_light_primary,
-                            shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp)
+                            shape = LowerShapes.medium
                         )
                 ) {
                     itemsIndexed(newPlotData.PlotTrees) { idx, tree ->
                         Row(
-                            modifier = Modifier.padding(10.dp)
+                            modifier = Modifier.padding(10.dp),
+                            horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
+                            val treeDBH = remember { mutableStateOf(tree.DBH.toString()) }
+                            val treeMeasHt = remember { mutableStateOf(tree.MeasHeight.toString()) }
+                            val treeVisHt = remember { mutableStateOf(tree.VisHeight.toString()) }
+                            val treeForkHt = remember { mutableStateOf(tree.ForkHeight.toString()) }
+
                             ListItem(
                                 modifier = Modifier
-                                    .padding(10.dp)
-                                    .width(55.dp)
-                                    .height(55.dp)
+                                    .padding(horizontal = 10.dp, vertical = 5.dp)
+                                    .size(70.dp)
                                     .clip(CircleShape)
                                     .background(md_theme_light_inverseOnSurface),
                                 headlineContent = {
                                     Text(
-                                        text = String.format("%02d", tree.SampleNum),
+                                        text = String.format("%03d", tree.SampleNum),
                                         style = TextStyle(
                                             fontSize = 18.sp,
                                             fontWeight = FontWeight.Bold
@@ -235,59 +248,37 @@ fun InputProgressView2(
                                 }
                             )
 
-                            val treeDBH = remember {
-                                mutableStateOf(tree.DBH.toString())
-                            }
+                            LazyColumnInputTextField(
+                                textContent = treeDBH,
+                                unaddressedTreeSet = dbhTreeSet,
+                                tree = tree,
+                                label = "DBH",
+                                modifier = inputTextModifier
+                            )
 
-                            val treeMeasHt = remember {
-                                mutableStateOf(tree.MeasHeight.toString())
-                            }
+                            LazyColumnInputTextField(
+                                textContent = treeMeasHt,
+                                unaddressedTreeSet = measHtTreeSet,
+                                tree = tree,
+                                label = "測量樹高",
+                                modifier = inputTextModifier
+                            )
 
-                            val treeVisHt = remember {
-                                mutableStateOf(tree.VisHeight.toString())
-                            }
+                            LazyColumnInputTextField(
+                                textContent = treeVisHt,
+                                unaddressedTreeSet = visHtTreeSet,
+                                tree = tree,
+                                label = "目視樹高",
+                                modifier = inputTextModifier
+                            )
 
-                            val treeForkHt = remember {
-                                mutableStateOf(tree.ForkHeight.toString())
-                            }
-
-                            Row(
-                                modifier = Modifier.padding(5.dp),
-                                horizontalArrangement = Arrangement.SpaceEvenly
-                            ) {
-
-                                LazyColumnInputTextField(
-                                    textContent = treeDBH,
-                                    unaddressedTreeSet = dbhTreeSet,
-                                    tree = tree,
-                                    label = "DBH",
-                                    modifier = modifierInputText
-                                )
-
-                                LazyColumnInputTextField(
-                                    textContent = treeMeasHt,
-                                    unaddressedTreeSet = measHtTreeSet,
-                                    tree = tree,
-                                    label = "測量樹高",
-                                    modifier = modifierInputText
-                                )
-
-                                LazyColumnInputTextField(
-                                    textContent = treeVisHt,
-                                    unaddressedTreeSet = visHtTreeSet,
-                                    tree = tree,
-                                    label = "目視樹高",
-                                    modifier = modifierInputText
-                                )
-
-                                LazyColumnInputTextField(
-                                    textContent = treeForkHt,
-                                    unaddressedTreeSet = forkHtTreeSet,
-                                    tree = tree,
-                                    label = "分岔樹高",
-                                    modifier = modifierInputText
-                                )
-                            }
+                            LazyColumnInputTextField(
+                                textContent = treeForkHt,
+                                unaddressedTreeSet = forkHtTreeSet,
+                                tree = tree,
+                                label = "分岔樹高",
+                                modifier = inputTextModifier
+                            )
                         }
                         DropdownDivider()
                     }
@@ -295,13 +286,13 @@ fun InputProgressView2(
             }
         }
 
-        CheckAddButton(
-            dbhSet = dbhTreeSet,
-            htSet = measHtTreeSet,
-            visHtSet = visHtTreeSet,
-            measHtSet = forkHtTreeSet,
-            onNextButtonClick = onNextButtonClick
-        )
+//        CheckAddButton(
+//            dbhSet = dbhTreeSet,
+//            htSet = measHtTreeSet,
+//            visHtSet = visHtTreeSet,
+//            measHtSet = forkHtTreeSet,
+//            onNextButtonClick = onNextButtonClick
+//        )
     }
 }
 
@@ -332,7 +323,6 @@ fun LazyColumnInputTextField(
                     unaddressedTreeSet.value.add(tree.SampleNum.toString())
                 }
             } else {
-                //alarm
                 showMessage(context,"請輸入正確的數字")
             }
         },
@@ -364,28 +354,26 @@ fun ExposedUnaddressedTreeList(
         expanded = dropdownExpanded.value,
         onExpandedChange = {
             dropdownExpanded.value = !dropdownExpanded.value
-        }
+        },
+        modifier = Modifier.padding(horizontal = 10.dp)
     ) {
         OutlinedTextField(
             value = treeSet.value.size.toString(),
             onValueChange = {},
             readOnly = true,
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(
-                    expanded = dropdownExpanded.value
-                )
-            },
             label = {
                 Text(
                     text = label,
                     style = TextStyle(
-                        fontSize = 15.sp,
+                        fontSize = 13.sp,
                         fontWeight = FontWeight.Bold
                     )
                 )
             },
-            modifier = Modifier
-                .padding(10.dp)
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropdownExpanded.value)
+            },
+            modifier = dropDownMenuModifier
                 .width(
                     when (widthType) {
                         "medium" -> 100.dp
@@ -393,16 +381,15 @@ fun ExposedUnaddressedTreeList(
                         else -> 90.dp
                     }
                 )
-                .height(60.dp)
                 .menuAnchor(),
-            textStyle = TextStyle(fontSize = 18.sp),
+            textStyle = TextStyle(fontSize = 16.sp),
         )
 
         // DropdownMenu
         ExposedDropdownMenu(
             expanded = dropdownExpanded.value,
             onDismissRequest = { dropdownExpanded.value = false },
-            modifier = Modifier.height(100.dp)
+            modifier = dropDownMenuModifier
         ) {
             treeSet.value.sortedWith(Comparator {
                 str1, str2 -> str1.toInt() - str2.toInt()
@@ -415,16 +402,16 @@ fun ExposedUnaddressedTreeList(
                         dropdownExpanded.value = false
                         onChoose(option)
                     },
-                    modifier = Modifier
-                        .width(150.dp)
-                        .height(30.dp)
+                    modifier = dropDownItemModifier
+                        .width(
+                            when (widthType) {
+                                "medium" -> 100.dp
+                                "large" -> 130.dp
+                                else -> 90.dp
+                            }
+                        )
                 )
-
-                Divider(
-                    color = Color.Black,
-                    thickness = 1.dp,
-                    modifier = Modifier.padding(1.dp)
-                )
+                DropdownDivider()
             }
         }
     }

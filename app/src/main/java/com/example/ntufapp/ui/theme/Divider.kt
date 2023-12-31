@@ -16,7 +16,18 @@ fun DropdownDivider() {
     Divider(
         color = Color.Black,
         thickness = 1.dp,
-        modifier = Modifier.padding(start = 5.dp, end = 5.dp)
+        modifier = Modifier.padding(1.dp)
+    )
+}
+
+@Composable
+fun IntervalDivider() {
+    Divider(
+        color = Color.Black,
+        thickness = 1.dp,
+        modifier = Modifier
+            .padding(5.dp)
+            .fillMaxWidth()
     )
 }
 

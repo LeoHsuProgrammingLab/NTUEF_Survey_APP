@@ -1,5 +1,8 @@
 package com.example.ntufapp.ui
 
+import android.util.Log
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -28,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -38,8 +42,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.ntufapp.R
+import com.example.ntufapp.data.ntufappInfo.Companion.tag
+import com.example.ntufapp.layout.showMessage
 import com.example.ntufapp.model.PlotData
+import com.example.ntufapp.ui.theme.DropdownDivider
 import com.example.ntufapp.ui.theme.Shapes
+import com.example.ntufapp.ui.theme.dropDownItemModifier
+import com.example.ntufapp.ui.theme.dropDownMenuModifier
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -52,139 +61,141 @@ fun SearchableDropdownMenu(
     onChoose: (String) -> Unit,
     onAdd: (String) -> Unit
 ) {
-    val options = remember {
-        mutableStateOf(optionsInput)
-    }
+    val allOptions = remember { mutableStateOf(optionsInput) }
     val searchText = remember { mutableStateOf(defaultString) }
-    val filteredOptions = remember { mutableStateOf(options.value) }
+    val validSearchText = remember { mutableStateOf(defaultString) }
+    val filteredOptions = remember { mutableStateOf(allOptions.value) }
     val showDialogue = remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
     val dropdownExpanded = remember { mutableStateOf(false) }
     val addExpanded = remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .width(150.dp)
-            .padding(vertical = 10.dp, horizontal = 5.dp)
-    ) {
-        ExposedDropdownMenuBox(
-            expanded = dropdownExpanded.value,
-            onExpandedChange = {
-                dropdownExpanded.value = !dropdownExpanded.value
-                addExpanded.value = false
-            }
-        ) {
-            OutlinedTextField(
-                value = searchText.value,
-                readOnly = readOnly,
-                label = {
-                    Text(
-                        text = label,
-                        style = TextStyle(
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
-                },
-                onValueChange = { text ->
-                    filterOptions(options.value, text).let {
-                        filteredOptions.value = it as MutableList<String>
-                    }
-                    searchText.value = text
-                },
-                leadingIcon = {
-                    Icon(imageVector = Icons.Filled.Search, contentDescription = null)
-                },
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(
-                        expanded = dropdownExpanded.value
-                    )
-                },
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    imeAction = ImeAction.Search,
-                    keyboardType = KeyboardType.Text
-                ),
-                keyboardActions = KeyboardActions(
-                    onSearch = {
-                        keyboardController?.hide()
-                    }
-                ),
-                singleLine = true,
-                textStyle = TextStyle(
-                    fontSize = 18.sp
-                ),
-                modifier = Modifier
-                    .width(150.dp)
-                    .height(75.dp)
-                    .menuAnchor() // super important
-            )
-            // DropdownMenu
-            ExposedDropdownMenu(
-                expanded = dropdownExpanded.value,
-                onDismissRequest = { dropdownExpanded.value = false },
-                modifier = Modifier.height(200.dp)
-            ) {
 
+    ExposedDropdownMenuBox(
+        expanded = dropdownExpanded.value,
+        onExpandedChange = {
+            dropdownExpanded.value = !dropdownExpanded.value
+            if (searchText.value !in allOptions.value) {
+                searchText.value = validSearchText.value
+            } else {
+                validSearchText.value = searchText.value
+            }
+            filteredOptions.value = filterOptions(allOptions.value, searchText.value) as MutableList<String>
+            onChoose(searchText.value)
+            addExpanded.value = false
+            Log.i(tag, "dropdownExpanded.value: ${dropdownExpanded.value}")
+        }
+    ) {
+        val curContext = LocalContext.current
+        OutlinedTextField(
+            value = searchText.value,
+            onValueChange = { text ->
+                filterOptions(allOptions.value, text).let { filteredOptions.value = it as MutableList<String> }
+                searchText.value = text
+                if (searchText.value in allOptions.value) {
+                    onChoose(searchText.value)
+                    validSearchText.value = searchText.value
+                } else if (searchText.value.isEmpty()) {
+                    onChoose("1")
+                } else {
+                    onChoose(validSearchText.value)
+                    showMessage(curContext, "您搜尋的樹不存在!")
+                    searchText.value = validSearchText.value
+                }
+                Log.i(tag, "dropdown searchText.value: ${searchText.value}")
+            },
+            label = {
+                Text(
+                    text = label,
+                    style = TextStyle(
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+            },
+            leadingIcon = {
+                Icon(imageVector = Icons.Filled.Search, contentDescription = null)
+            },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(
+                    expanded = dropdownExpanded.value
+                )
+            },
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Search,
+                keyboardType = KeyboardType.Text
+            ),
+            readOnly = readOnly,
+            singleLine = true,
+            textStyle = TextStyle(
+                fontSize = 18.sp
+            ),
+            modifier = Modifier
+                .width(150.dp)
+                .height(75.dp)
+                .menuAnchor() // super important
+                .focusable(true)
+        )
+        // DropdownMenu
+        ExposedDropdownMenu(
+            expanded = dropdownExpanded.value,
+            onDismissRequest = {
+                dropdownExpanded.value = false
+            },
+            modifier = dropDownMenuModifier
+        ) {
+            if (filteredOptions.value.isEmpty()) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.no_result)) },
+                    onClick = {},
+                    modifier = dropDownItemModifier
+                )
+                DropdownDivider()
+            } else {
                 filteredOptions.value.forEach { option ->
                     DropdownMenuItem(
-                        text = {
-                            Text(option)
-                        },
+                        text = { Text(option) },
                         onClick = {
+                            validSearchText.value = option
                             searchText.value = option
                             dropdownExpanded.value = false
                             onChoose(option)
                         },
-                        modifier = Modifier
-                            .width(120.dp)
-                            .height(40.dp)
+                        modifier = dropDownItemModifier
                     )
-
-
-                    Divider(
-                        color = Color.Black,
-                        thickness = 1.dp,
-                        modifier = Modifier.padding(1.dp)
-                    )
+                    DropdownDivider()
                 }
+            }
 
-                DropdownMenuItem(
-                    text = {
-                        Text(stringResource(R.string.add))
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.add)) },
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Add, // Replace with your desired icon
+                        contentDescription = "Add Icon",
+                    )
+                },
+                onClick = { showDialogue.value = true }
+            )
+
+            if(showDialogue.value) {
+                AddDialogue(
+                    type = dialogType,
+                    onDismiss = { showDialogue.value = false },
+                    onCancelClick = { showDialogue.value = false },
+                    onNextButtonClick = {
+                        showDialogue.value = false
+                        allOptions.value.add(it)
+                        onAdd(it)
                     },
-                    trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Add, // Replace with your desired icon
-                            contentDescription = "Add Icon",
-                        )
-                    },
-                    onClick = {
-                        showDialogue.value = true
-                    }
+                    curSize = allOptions.value.size
                 )
-
-                if(showDialogue.value) {
-                    AddDialogue(
-                        type = dialogType,
-                        onDismiss = {
-                            showDialogue.value = false
-                        },
-                        onCancelClick = {
-                            showDialogue.value = false
-                        },
-                        onNextButtonClick = {
-                            showDialogue.value = false
-                            options.value.add(it)
-                            onAdd(it)
-                        },
-                        curSize = options.value.size
-                    )
-                }
             }
         }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -267,14 +278,12 @@ fun SearchableDropdownMenu2(
                             dropdownExpanded.value = false
                             onChoose(option)
                         },
-                        modifier = Modifier.width(150.dp).height(40.dp)
+                        modifier = Modifier
+                            .width(150.dp)
+                            .height(40.dp)
                     )
 
-                    Divider(
-                        color = Color.Black,
-                        thickness = 1.dp,
-                        modifier = Modifier.padding(1.dp)
-                    )
+                    DropdownDivider()
                 }
             }
         }
@@ -289,6 +298,7 @@ fun AddDialogue(
     onNextButtonClick: (String) -> Unit,
     curSize: Int
 ){
+    val modifier = Modifier.padding(10.dp)
     when(type) {
         "Tree" ->
             Dialog(
@@ -297,23 +307,21 @@ fun AddDialogue(
                 }
             ) {
                 Surface(shape = Shapes.small) {
-                    Column(modifier = Modifier.padding(10.dp)) {
+                    Column(modifier = modifier) {
                         Text(text = "您預計新增第 ${curSize + 1} 棵樹")
-                        Spacer(modifier = Modifier.padding(10.dp))
+                        Spacer(modifier = modifier)
 
                         Row{
                             Button(
-                                modifier = Modifier.padding(10.dp),
+                                modifier = modifier,
                                 onClick = onCancelClick,
                             ) {
                                 Text("取消")
                             }
 
                             Button(
-                                modifier = Modifier.padding(10.dp),
-                                onClick = {
-                                    onNextButtonClick((curSize + 1).toString())
-                                }
+                                modifier = modifier,
+                                onClick = { onNextButtonClick((curSize + 1).toString()) }
                             ) {
                                 Text("下一步")
                             }
@@ -328,21 +336,21 @@ fun AddDialogue(
                 }
             ) {
                 Surface(shape = Shapes.small) {
-                    Column(modifier = Modifier.padding(10.dp)) {
+                    Column(modifier = modifier) {
                         // TODO: DropDownMenu
 
-                        Spacer(modifier = Modifier.padding(10.dp))
+                        Spacer(modifier = modifier)
 
                         Row{
                             Button(
-                                modifier = Modifier.padding(10.dp),
+                                modifier = modifier,
                                 onClick = onCancelClick,
                             ) {
                                 Text("取消")
                             }
 
                             Button(
-                                modifier = Modifier.padding(10.dp),
+                                modifier = modifier,
                                 onClick = {
                                     onNextButtonClick((curSize + 1).toString())
                                 }
@@ -357,7 +365,5 @@ fun AddDialogue(
 }
 
 fun filterOptions(options: List<String>, query: String): List<String> {
-    return options.filter { it.contains(query, ignoreCase = true) }.ifEmpty {
-        listOf("查無此資料")
-    }
+    return options.filter { it.contains(query, ignoreCase = true) }
 }

@@ -6,4 +6,5 @@
     <string name="display_result">Result_Display</string>
     <string name="visualization">visualization</string>
     <string name="add">"新增"</string>
+    <string name="no_result">"查無此資料"</string>
 </resources>

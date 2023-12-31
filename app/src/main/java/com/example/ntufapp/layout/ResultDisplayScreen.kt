@@ -53,6 +53,7 @@ import com.example.ntufapp.model.Tree
 import com.example.ntufapp.model.compare2Plots
 import com.example.ntufapp.ui.WindowInfo
 import com.example.ntufapp.ui.rememberWindowInfo
+import com.example.ntufapp.ui.theme.Shapes
 import com.example.ntufapp.ui.theme.md_theme_light_inverseOnSurface
 import com.example.ntufapp.ui.theme.md_theme_light_primary
 import java.lang.Math.abs
@@ -67,6 +68,9 @@ fun ResultDisplayScreen(
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
+        val buttonModifier = Modifier
+            .padding(end = 16.dp)
+            .height(50.dp)
         Row {
             TabbedValidationResult(
                 oldPlotData = oldPlotData,
@@ -81,24 +85,16 @@ fun ResultDisplayScreen(
             horizontalArrangement = Arrangement.End
         ) {
             OutlinedButton(
-                onClick = {
-                    onBackButtonClick()
-                },
-                modifier = Modifier
-                    .padding(end = 16.dp)
-                    .height(70.dp)
+                onClick = { onBackButtonClick() },
+                modifier = buttonModifier
             ) {
-                Text("繼續調查", fontSize = 20.sp)
+                Text("繼續調查", fontSize = 18.sp)
             }
             OutlinedButton(
-                onClick = {
-//                    onNextButtonClick()
-                },
-                modifier = Modifier
-                    .padding(end = 16.dp)
-                    .height(70.dp)
+                onClick = { onNextButtonClick() },
+                modifier = buttonModifier
             ) {
-                Text("完成此次調查", fontSize = 20.sp)
+                Text("完成此次調查", fontSize = 18.sp)
             }
         }
     }
@@ -131,8 +127,8 @@ fun TabbedValidationResult(
     ) {
         Row(
             modifier = Modifier
-                .width(400.dp)
-                .padding(10.dp),
+                .padding(10.dp)
+                .width(400.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             TabRow(
@@ -182,7 +178,7 @@ fun TabbedValidationResult(
                 .border(border = BorderStroke(1.dp, md_theme_light_primary))
                 .background(
                     color = md_theme_light_inverseOnSurface,
-                    shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp)
+                    shape = Shapes.medium
                 )
         ) {
             when (tabSelected.value) {
@@ -257,25 +253,11 @@ fun ValidationLazyColumn(
                     }
                 )
 
-                val treeDBH = remember {
-                    mutableStateOf(tree.DBH.toString())
-                }
-
-                val treeMeasHt = remember {
-                    mutableStateOf(tree.MeasHeight.toString())
-                }
-
-                val treeVisHt = remember {
-                    mutableStateOf(tree.VisHeight.toString())
-                }
-
-                val treeForkHt = remember {
-                    mutableStateOf(tree.ForkHeight.toString())
-                }
-
-                val changeChance = remember {
-                    mutableStateOf(3)
-                }
+                val treeDBH = remember { mutableStateOf(tree.DBH.toString()) }
+                val treeMeasHt = remember { mutableStateOf(tree.MeasHeight.toString()) }
+                val treeVisHt = remember { mutableStateOf(tree.VisHeight.toString()) }
+                val treeForkHt = remember { mutableStateOf(tree.ForkHeight.toString()) }
+                val changeChance = remember { mutableStateOf(3) }
 
                 ValidationLazyColumnInputTextField(
                     modifier = Modifier
@@ -292,8 +274,8 @@ fun ValidationLazyColumn(
 
                 OutlinedButton(
                     modifier = Modifier
-                        .width(200.dp)
-                        .padding(10.dp),
+                        .padding(10.dp)
+                        .width(200.dp),
                     onClick = {
                         val newValue = when(type) {
                             "DBH" -> treeDBH
