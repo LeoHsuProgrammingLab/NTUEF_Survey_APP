@@ -1,10 +1,9 @@
 package com.example.ntufapp.ui
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
@@ -24,14 +23,12 @@ import com.example.ntufapp.model.PlotData
 import com.example.ntufapp.model.Tree
 
 @Composable
-fun PlotTreeView(
+fun SpeciesConditionView(
     curTreeNum: MutableState<String>,
-    totalTreesState: MutableList<String>,
+    totalTreesNumList: MutableList<String>,
     newPlotData: PlotData
 ) {
-    val curTree = remember {
-        mutableStateOf(newPlotData.searchTree(curTreeNum.value.toInt()))
-    }
+    val curTree = remember { mutableStateOf(newPlotData.searchTree(curTreeNum.value.toInt())) }
     val modifier = Modifier.width(450.dp)
     Column(
         verticalArrangement = Arrangement.Center
@@ -40,7 +37,7 @@ fun PlotTreeView(
             verticalAlignment = Alignment.CenterVertically
         ){
             SearchableDropdownMenu(
-                totalTreesState,
+                totalTreesNumList,
                 label = "請選擇樣樹",
                 defaultString = "1",
                 onChoose = {
@@ -50,6 +47,8 @@ fun PlotTreeView(
                 onAdd = {
                     newPlotData.PlotTrees.add(Tree(SampleNum = it.toInt()))
                     curTreeNum.value = it
+                    curTree.value = newPlotData.searchTree(curTreeNum.value.toInt())
+                    Log.i("PlotTreeView", "newPlotData.getPlotTreesSize(): ${newPlotData.PlotTrees.size}")
                 }
             )
 

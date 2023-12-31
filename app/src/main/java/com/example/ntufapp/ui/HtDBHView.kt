@@ -33,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -67,6 +68,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun HtDBHView(
+    totalTreesNumList: MutableList<String>,
     numPlotTrees: MutableState<Int>,
     dbhTreeSet: MutableState<MutableSet<String>>,
     measHtTreeSet: MutableState<MutableSet<String>>,
@@ -75,6 +77,17 @@ fun HtDBHView(
     newPlotData: PlotData,
     onNextButtonClick: () -> Unit
 ) {
+    // update the current tree numbers
+    if (totalTreesNumList.size > numPlotTrees.value) {
+        for (i in totalTreesNumList.size downTo numPlotTrees.value + 1) {
+            dbhTreeSet.value.add(i.toString())
+            visHtTreeSet.value.add(i.toString())
+            forkHtTreeSet.value.add(i.toString())
+            measHtTreeSet.value.add(i.toString())
+        }
+        numPlotTrees.value = totalTreesNumList.size
+    }
+
     // Adjust the height
     val windowInfo = rememberWindowInfo()
     val height =  when (windowInfo.screenHeightInfo) {
@@ -86,22 +99,7 @@ fun HtDBHView(
 
     val coroutineScope = rememberCoroutineScope()
     val lazyListState = rememberLazyListState()
-
-//    val numPlotTrees = remember { mutableStateOf(totalTreesState.size) }
-//    val dbhTreeSet = remember { mutableStateOf(totalTreesState.toMutableSet()) }
-//    val measHtTreeSet = remember { mutableStateOf(totalTreesState.toMutableSet())}
-//    val forkHtTreeSet = remember { mutableStateOf(totalTreesState.toMutableSet()) }
-//    val visHtTreeSet = remember { mutableStateOf(totalTreesState.toMutableSet()) }
-//
-//    if (newPlotData.PlotTrees.size > numPlotTrees.value) {
-//        for (i in newPlotData.PlotTrees.size downTo numPlotTrees.value + 1) {
-//            dbhTreeSet.value.add(i.toString())
-//            visHtTreeSet.value.add(i.toString())
-//            forkHtTreeSet.value.add(i.toString())
-//            measHtTreeSet.value.add(i.toString())
-//        }
-//        numPlotTrees.value = newPlotData.PlotTrees.size
-//    }
+    Log.i("HtDBHView", "newPlotData.getPlotTreesSize(): ${newPlotData.PlotTrees.size}")
 
     val curItemId = remember { mutableStateOf("1") }
 
@@ -120,7 +118,7 @@ fun HtDBHView(
         ) {
             Column {
 
-                val targetId = remember { mutableStateOf(1) }
+                val targetId = remember { mutableIntStateOf(1) }
 
                 // Search Block
                 Row(
@@ -252,7 +250,7 @@ fun HtDBHView(
                                 textContent = treeDBH,
                                 unaddressedTreeSet = dbhTreeSet,
                                 tree = tree,
-                                label = "DBH",
+                                type = "DBH",
                                 modifier = inputTextModifier
                             )
 
@@ -260,7 +258,7 @@ fun HtDBHView(
                                 textContent = treeMeasHt,
                                 unaddressedTreeSet = measHtTreeSet,
                                 tree = tree,
-                                label = "測量樹高",
+                                type = "測量樹高",
                                 modifier = inputTextModifier
                             )
 
@@ -268,7 +266,7 @@ fun HtDBHView(
                                 textContent = treeVisHt,
                                 unaddressedTreeSet = visHtTreeSet,
                                 tree = tree,
-                                label = "目視樹高",
+                                type = "目視樹高",
                                 modifier = inputTextModifier
                             )
 
@@ -276,7 +274,7 @@ fun HtDBHView(
                                 textContent = treeForkHt,
                                 unaddressedTreeSet = forkHtTreeSet,
                                 tree = tree,
-                                label = "分岔樹高",
+                                type = "分岔樹高",
                                 modifier = inputTextModifier
                             )
                         }
@@ -285,14 +283,6 @@ fun HtDBHView(
                 }
             }
         }
-
-//        CheckAddButton(
-//            dbhSet = dbhTreeSet,
-//            htSet = measHtTreeSet,
-//            visHtSet = visHtTreeSet,
-//            measHtSet = forkHtTreeSet,
-//            onNextButtonClick = onNextButtonClick
-//        )
     }
 }
 
@@ -301,7 +291,7 @@ fun LazyColumnInputTextField(
     textContent: MutableState<String>,
     unaddressedTreeSet: MutableState<MutableSet<String>>,
     tree: Tree,
-    label: String,
+    type: String,
     modifier: Modifier
 ) {
     val context = LocalContext.current
@@ -309,11 +299,12 @@ fun LazyColumnInputTextField(
         value = textContent.value,
         onValueChange = {
             textContent.value = it
+
             val newTarget = it.toDoubleOrNull()
             if (newTarget != null) {
                 if (newTarget > 0) {
                     unaddressedTreeSet.value.remove(tree.SampleNum.toString())
-                    when(label) {
+                    when(type) {
                         "DBH" -> tree.DBH = newTarget
                         "目視樹高" -> tree.VisHeight = newTarget
                         "測量樹高" -> tree.MeasHeight = newTarget
@@ -323,12 +314,13 @@ fun LazyColumnInputTextField(
                     unaddressedTreeSet.value.add(tree.SampleNum.toString())
                 }
             } else {
+                unaddressedTreeSet.value.add(tree.SampleNum.toString())
                 showMessage(context,"請輸入正確的數字")
             }
         },
         label = {
             Text(
-                label,
+                type,
                 style = TextStyle(
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Bold

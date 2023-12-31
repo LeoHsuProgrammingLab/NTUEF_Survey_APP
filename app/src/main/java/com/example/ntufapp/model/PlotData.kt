@@ -3,6 +3,7 @@ package com.example.ntufapp.model
 import android.annotation.TargetApi
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.example.ntufapp.data.ntufappInfo.Companion.defaultTreeNum
 import java.time.LocalDate
 import kotlin.math.abs
 
@@ -74,6 +75,16 @@ data class PlotData(
         for (tree in PlotTrees) {
             tree.reset()
         }
+    }
+
+    fun initPlotTrees() {
+        for (i in 0 until defaultTreeNum) {
+            PlotTrees.add(Tree(SampleNum = i + 1))
+        }
+    }
+
+    fun getPlotTreesNum(): Int {
+        return PlotTrees.size
     }
 }
 

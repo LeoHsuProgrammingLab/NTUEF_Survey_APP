@@ -9,13 +9,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ntufapp.data.DataSource
 import com.example.ntufapp.layout.showMessage
-import com.example.ntufapp.model.PlotData
 import com.example.ntufapp.model.Tree
 import com.example.ntufapp.ui.theme.md_theme_light_primary
 
@@ -77,8 +74,6 @@ fun ChipsTreeCondition(//https://semicolonspace.com/jetpack-compose-filterchip/
                                 selectedItems.clear()
                                 selectedItems.add(item)
                             }
-//                            Toast.makeText(contextForToast, selectedItems.joinToString(), Toast.LENGTH_SHORT)
-//                                .show()
                         },
                         label = {
                             Text(

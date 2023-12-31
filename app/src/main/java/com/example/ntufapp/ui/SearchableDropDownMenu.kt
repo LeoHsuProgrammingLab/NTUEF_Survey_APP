@@ -26,8 +26,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.ntufapp.R
+import com.example.ntufapp.data.ntufappInfo.Companion.dTag
 import com.example.ntufapp.data.ntufappInfo.Companion.tag
 import com.example.ntufapp.layout.showMessage
 import com.example.ntufapp.model.PlotData
@@ -53,7 +56,7 @@ import com.example.ntufapp.ui.theme.dropDownMenuModifier
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun SearchableDropdownMenu(
-    optionsInput: MutableList<String>,
+    totalTreesNumList: MutableList<String>,
     defaultString: String = "",
     label: String = "搜尋",
     dialogType: String = "Tree",
@@ -61,10 +64,9 @@ fun SearchableDropdownMenu(
     onChoose: (String) -> Unit,
     onAdd: (String) -> Unit
 ) {
-    val allOptions = remember { mutableStateOf(optionsInput) }
     val searchText = remember { mutableStateOf(defaultString) }
     val validSearchText = remember { mutableStateOf(defaultString) }
-    val filteredOptions = remember { mutableStateOf(allOptions.value) }
+    val filteredOptions = remember { mutableStateListOf<String>() }
     val showDialogue = remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -76,34 +78,38 @@ fun SearchableDropdownMenu(
         expanded = dropdownExpanded.value,
         onExpandedChange = {
             dropdownExpanded.value = !dropdownExpanded.value
-            if (searchText.value !in allOptions.value) {
+            if (searchText.value !in totalTreesNumList) {
                 searchText.value = validSearchText.value
             } else {
                 validSearchText.value = searchText.value
             }
-            filteredOptions.value = filterOptions(allOptions.value, searchText.value) as MutableList<String>
+            filteredOptions.clear()
+            filteredOptions.addAll(totalTreesNumList)
             onChoose(searchText.value)
             addExpanded.value = false
-            Log.i(tag, "dropdownExpanded.value: ${dropdownExpanded.value}")
+            Log.i(dTag, "dropdownExpanded.value: ${dropdownExpanded.value}")
         }
     ) {
         val curContext = LocalContext.current
         OutlinedTextField(
             value = searchText.value,
             onValueChange = { text ->
-                filterOptions(allOptions.value, text).let { filteredOptions.value = it as MutableList<String> }
+                filterOptions(totalTreesNumList, text).let {
+                    filteredOptions.clear()
+                    filteredOptions.addAll(it)
+                }
                 searchText.value = text
-                if (searchText.value in allOptions.value) {
+                if (searchText.value in totalTreesNumList) {
                     onChoose(searchText.value)
                     validSearchText.value = searchText.value
                 } else if (searchText.value.isEmpty()) {
                     onChoose("1")
                 } else {
                     onChoose(validSearchText.value)
-                    showMessage(curContext, "您搜尋的樹不存在!")
                     searchText.value = validSearchText.value
+                    showMessage(curContext, "您搜尋的樹不存在!")
                 }
-                Log.i(tag, "dropdown searchText.value: ${searchText.value}")
+                Log.i(dTag, "dropdown searchText.value: ${searchText.value}")
             },
             label = {
                 Text(
@@ -145,7 +151,7 @@ fun SearchableDropdownMenu(
             },
             modifier = dropDownMenuModifier
         ) {
-            if (filteredOptions.value.isEmpty()) {
+            if (filteredOptions.isEmpty()) {
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.no_result)) },
                     onClick = {},
@@ -153,7 +159,7 @@ fun SearchableDropdownMenu(
                 )
                 DropdownDivider()
             } else {
-                filteredOptions.value.forEach { option ->
+                filteredOptions.forEach { option ->
                     DropdownMenuItem(
                         text = { Text(option) },
                         onClick = {
@@ -186,10 +192,10 @@ fun SearchableDropdownMenu(
                     onCancelClick = { showDialogue.value = false },
                     onNextButtonClick = {
                         showDialogue.value = false
-                        allOptions.value.add(it)
+                        totalTreesNumList.add(it)
                         onAdd(it)
                     },
-                    curSize = allOptions.value.size
+                    curSize = totalTreesNumList.size
                 )
             }
         }
