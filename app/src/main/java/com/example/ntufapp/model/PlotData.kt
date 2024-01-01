@@ -105,6 +105,14 @@ fun compareTwoPlots(oldPlot: PlotData, newPlot: PlotData, threshold: Double, tar
     return targetSet
 }
 
+fun createTreeQuotaPair(invalidSet: MutableSet<Tree>): MutableMap<Int, Int> {
+    val quotaPair = mutableMapOf<Int, Int>()
+    for (tree in invalidSet) {
+        quotaPair[tree.SampleNum] = 3
+    }
+    return quotaPair
+}
+
 fun checkThreshold(old: Double, new: Double, threshold: Double): Boolean {
     return if (old > 0.0) {
         (abs(old - new) / old) > threshold
