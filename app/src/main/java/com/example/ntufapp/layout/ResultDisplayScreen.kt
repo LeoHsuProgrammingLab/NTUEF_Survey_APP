@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Tab
@@ -44,6 +45,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ntufapp.data.ntufappInfo.Companion.changeDataQuota
@@ -54,6 +56,7 @@ import com.example.ntufapp.model.PlotData
 import com.example.ntufapp.model.Tree
 import com.example.ntufapp.model.checkThreshold
 import com.example.ntufapp.model.compareTwoPlots
+import com.example.ntufapp.model.createTreeQuotaPair
 import com.example.ntufapp.ui.WindowInfo
 import com.example.ntufapp.ui.rememberWindowInfo
 import com.example.ntufapp.ui.theme.Shapes
@@ -162,6 +165,10 @@ fun TabbedValidationResult(
         val inValidMeasHtSet = remember { mutableStateOf(compareTwoPlots(oldPlotData, newPlotData, htThreshold, stringList[0])) }
         val inValidVisHtSet = remember { mutableStateOf(compareTwoPlots(oldPlotData, newPlotData, htThreshold, stringList[1])) }
         val inValidForkHtSet = remember { mutableStateOf(compareTwoPlots(oldPlotData, newPlotData, htThreshold, stringList[2])) }
+        val inValidDBHQuota = remember { mutableStateOf(createTreeQuotaPair(inValidDBHSet.value)) }
+        val inValidMeasHtQuota = remember { mutableStateOf(createTreeQuotaPair(inValidMeasHtSet.value)) }
+        val inValidVisHtQuota = remember { mutableStateOf(createTreeQuotaPair(inValidVisHtSet.value)) }
+        val inValidForkHtQuota = remember { mutableStateOf(createTreeQuotaPair(inValidForkHtSet.value)) }
 
         Box(
             modifier = modifier
@@ -175,6 +182,7 @@ fun TabbedValidationResult(
             when (tabSelected.value) {
                 0 -> {
                     ValidationLazyColumn(
+                        inValidTreeQuotaMap = inValidDBHQuota,
                         inValidTreeList = inValidMeasHtSet,
                         oldPlotData = oldPlotData,
                         type = stringList[0],
@@ -183,6 +191,7 @@ fun TabbedValidationResult(
                 }
                 1 -> {
                     ValidationLazyColumn(
+                        inValidTreeQuotaMap = inValidVisHtQuota,
                         inValidTreeList = inValidVisHtSet,
                         oldPlotData = oldPlotData,
                         type = stringList[1],
@@ -191,6 +200,7 @@ fun TabbedValidationResult(
                 }
                 2 -> {
                     ValidationLazyColumn(
+                        inValidTreeQuotaMap = inValidForkHtQuota,
                         inValidTreeList = inValidForkHtSet,
                         oldPlotData = oldPlotData,
                         type = stringList[2],
@@ -199,6 +209,7 @@ fun TabbedValidationResult(
                 }
                 3 -> {
                     ValidationLazyColumn(
+                        inValidTreeQuotaMap = inValidMeasHtQuota,
                         inValidTreeList = inValidDBHSet,
                         oldPlotData = oldPlotData,
                         type = stringList[3],
@@ -212,6 +223,7 @@ fun TabbedValidationResult(
 
 @Composable
 fun ValidationLazyColumn(
+    inValidTreeQuotaMap: MutableState<MutableMap<Int, Int>>,
     inValidTreeList: MutableState<MutableSet<Tree>>,
     oldPlotData: PlotData,
     type: String,
@@ -248,8 +260,7 @@ fun ValidationLazyColumn(
                 val treeMeasHt = remember { mutableStateOf(tree.MeasHeight.toString()) }
                 val treeVisHt = remember { mutableStateOf(tree.VisHeight.toString()) }
                 val treeForkHt = remember { mutableStateOf(tree.ForkHeight.toString()) }
-                val changeQuota = remember { mutableIntStateOf(changeDataQuota) }
-                Log.d(dTag, "changeQuota: ${changeQuota.value}")
+                val treeQuota = remember { mutableStateOf(inValidTreeQuotaMap.value[tree.SampleNum]) }
 
                 ValidationLazyColumnInputTextField(
                     modifier = Modifier
@@ -261,7 +272,7 @@ fun ValidationLazyColumn(
                         "Meas" -> treeMeasHt
                         else -> treeForkHt
                     },
-                    changeQuota = changeQuota
+                    changeQuota = inValidTreeQuotaMap.value[tree.SampleNum]!!
                 )
 
                 OutlinedButton(
@@ -295,15 +306,17 @@ fun ValidationLazyColumn(
                             if(checkThreshold(oldValue, newValue, threshold)) {
                                 inValidTreeList.value.remove(tree)
                             }
-                            if (changeQuota.value > 0) {
-                                changeQuota.value -= 1
+                            // Update the quota
+                            if (treeQuota.value!! > 0) {
+                                treeQuota.value = treeQuota.value!! - 1
+                                inValidTreeQuotaMap.value[tree.SampleNum] = inValidTreeQuotaMap.value[tree.SampleNum]!! - 1
                             }
                         } else {
                             showMessage(context, "請輸入欲修改之數字")
                         }
                     }
                 ) {
-                    Text("修改(剩餘${changeQuota.value}次)", style = TextStyle(color = Color.Red))
+                    Text("修改(剩餘${treeQuota.value}次)", style = TextStyle(color = Color.Red))
                 }
             }
         }
@@ -314,16 +327,17 @@ fun ValidationLazyColumn(
 fun ValidationLazyColumnInputTextField(
     modifier: Modifier = Modifier,
     textContent: MutableState<String>,
-    changeQuota: MutableState<Int>
+    changeQuota: Int
 ) {
     TextField(
         value = textContent.value,
-        readOnly = (changeQuota.value == 0),
+        readOnly = (changeQuota == 0),
         onValueChange = { textContent.value = it },
         modifier = modifier,
         label = {
             Text("本次調查", fontSize = 16.sp)
         },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         textStyle = TextStyle(fontSize = 13.sp)
     )
 }
