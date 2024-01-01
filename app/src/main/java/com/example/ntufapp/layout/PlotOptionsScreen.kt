@@ -27,10 +27,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ntufapp.R
 import com.example.ntufapp.model.PlotData
-import com.example.ntufapp.ui.ConfirmDialogue
-import com.example.ntufapp.ui.ManualInputNewPlotDialogue
-import com.example.ntufapp.ui.NewSurveyUploadChoiceDialogue
+import com.example.ntufapp.ui.ConfirmDialog
+import com.example.ntufapp.ui.ManualInputNewPlotDialog
+import com.example.ntufapp.ui.NewSurveyUploadChoiceDialog
 import com.example.ntufapp.ui.UploadFileDialog
+import com.example.ntufapp.ui.theme.LayoutDivider
+import com.example.ntufapp.utils.parseJsonToMetaData
 import com.google.gson.Gson
 import java.io.BufferedReader
 
@@ -54,7 +56,7 @@ fun PlotOptionsScreen(
             modifier = Modifier.size(200.dp, 200.dp)
 //                        .border(2.dp, Color.Black, CircleShape)
         )
-        Divider(modifier = Modifier.padding(vertical = 8.dp))
+        LayoutDivider()
         Row{
             val context = LocalContext.current
             val selectedFileUri = remember { mutableStateOf<Uri?>(null) }
@@ -85,7 +87,7 @@ fun PlotOptionsScreen(
                             selectedFileUri.value = uri
                             try {
                                 plotData.value  = parseJsonToMetaData(uri, context)!!
-                                if(plotData.value.ManageUnit == "") {
+                                if(plotData.value.ManageUnit == "" || plotData.value.PlotTrees.size == 0) {
                                     Toast.makeText(context, "你上傳了錯誤的檔案(.json)！", Toast.LENGTH_SHORT).show()
                                 } else {
                                     showOldUploadData.value = true
@@ -103,7 +105,7 @@ fun PlotOptionsScreen(
             }
 
             if(showOldUploadData.value) {
-                ConfirmDialogue(
+                ConfirmDialog(
                     metaData = plotData.value,
                     onDismiss = { showOldUploadData.value = false },
                     onCancelClick = { showOldUploadData.value = false },
@@ -128,7 +130,7 @@ fun PlotOptionsScreen(
             }
 
             if (showNewPlotUploadChoices.value) {
-                NewSurveyUploadChoiceDialogue(
+                NewSurveyUploadChoiceDialog(
                     onDismiss = { showNewPlotUploadChoices.value = false },
                     onUploadTypeClick = {uploadType ->
                         if (uploadType == "JSON") {
@@ -170,7 +172,7 @@ fun PlotOptionsScreen(
             }
 
             if (showNewUploadData.value) {
-                ConfirmDialogue(
+                ConfirmDialog(
                     metaData = plotData.value,
                     onDismiss = { showNewUploadData.value = false },
                     onCancelClick = { showNewUploadData.value = false },
@@ -180,28 +182,12 @@ fun PlotOptionsScreen(
 
             // Manual Input New Plot
             if (showNewPlotManualInput.value) {
-                ManualInputNewPlotDialogue(onDismiss = { showNewPlotManualInput.value = false }, onSendClick = { onNextButtonClick(it, surveyType.value) })
+                ManualInputNewPlotDialog(
+                    onDismiss = { showNewPlotManualInput.value = false },
+                    onSendClick = { onNextButtonClick(it, surveyType.value) }
+                )
             }
 
         }
-    }
-}
-
-fun showMessage(context: Context, s: String) {
-    Toast.makeText(context, s, Toast.LENGTH_SHORT).show()
-}
-
-fun parseJsonToMetaData(uri: Uri, context: Context): PlotData? {
-    val inputStream = context.contentResolver.openInputStream(uri)
-    val jsonString = inputStream?.bufferedReader()?.use(BufferedReader::readText)
-
-    return try {
-        Gson().fromJson(jsonString, PlotData::class.java)
-    } catch (e: Exception) {
-        // Handle parsing errors here
-        null
-    } finally {
-        // Close the InputStream after use
-        inputStream?.close()
     }
 }

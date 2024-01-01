@@ -1,7 +1,6 @@
 package com.example.ntufapp.ui
 
 import android.util.Log
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,7 +14,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -25,14 +23,11 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -45,13 +40,11 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.ntufapp.R
 import com.example.ntufapp.data.ntufappInfo.Companion.dTag
-import com.example.ntufapp.data.ntufappInfo.Companion.tag
-import com.example.ntufapp.layout.showMessage
-import com.example.ntufapp.model.PlotData
 import com.example.ntufapp.ui.theme.DropdownDivider
 import com.example.ntufapp.ui.theme.Shapes
 import com.example.ntufapp.ui.theme.dropDownItemModifier
 import com.example.ntufapp.ui.theme.dropDownMenuModifier
+import com.example.ntufapp.utils.showMessage
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -67,7 +60,7 @@ fun SearchableDropdownMenu(
     val searchText = remember { mutableStateOf(defaultString) }
     val validSearchText = remember { mutableStateOf(defaultString) }
     val filteredOptions = remember { mutableStateListOf<String>() }
-    val showDialogue = remember { mutableStateOf(false) }
+    val showDialog = remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
     val dropdownExpanded = remember { mutableStateOf(false) }
@@ -130,7 +123,7 @@ fun SearchableDropdownMenu(
             },
             keyboardOptions = KeyboardOptions.Default.copy(
                 imeAction = ImeAction.Search,
-                keyboardType = KeyboardType.Text
+                keyboardType = KeyboardType.Number
             ),
             readOnly = readOnly,
             singleLine = true,
@@ -182,16 +175,16 @@ fun SearchableDropdownMenu(
                         contentDescription = "Add Icon",
                     )
                 },
-                onClick = { showDialogue.value = true }
+                onClick = { showDialog.value = true }
             )
 
-            if(showDialogue.value) {
-                AddDialogue(
+            if(showDialog.value) {
+                AddDialog(
                     type = dialogType,
-                    onDismiss = { showDialogue.value = false },
-                    onCancelClick = { showDialogue.value = false },
+                    onDismiss = { showDialog.value = false },
+                    onCancelClick = { showDialog.value = false },
                     onNextButtonClick = {
-                        showDialogue.value = false
+                        showDialog.value = false
                         totalTreesNumList.add(it)
                         onAdd(it)
                     },
@@ -254,7 +247,7 @@ fun SearchableDropdownMenu2(
                 },
                 keyboardOptions = KeyboardOptions.Default.copy(
                     imeAction = ImeAction.Search,
-                    keyboardType = KeyboardType.Text
+                    keyboardType = KeyboardType.Number
                 ),
                 keyboardActions = KeyboardActions(
                     onSearch = {
@@ -297,7 +290,7 @@ fun SearchableDropdownMenu2(
 }
 
 @Composable
-fun AddDialogue(
+fun AddDialog(
     type: String = "tree",
     onDismiss: () -> Unit,
     onCancelClick: () -> Unit,

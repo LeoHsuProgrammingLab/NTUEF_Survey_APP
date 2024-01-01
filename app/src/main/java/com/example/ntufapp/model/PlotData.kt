@@ -1,8 +1,5 @@
 package com.example.ntufapp.model
 
-import android.annotation.TargetApi
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.example.ntufapp.data.ntufappInfo.Companion.defaultTreeNum
 import java.time.LocalDate
 import kotlin.math.abs
@@ -88,36 +85,34 @@ data class PlotData(
     }
 }
 
-fun compare2Plots(oldPlot: PlotData, newPlot: PlotData, threshold: Double, target: String): MutableSet<Tree> {
+fun compareTwoPlots(oldPlot: PlotData, newPlot: PlotData, threshold: Double, target: String): MutableSet<Tree> {
     val targetSet = mutableSetOf<Tree>()
 
     for(i in 0 until oldPlot.PlotTrees.size) {
-        val tree = newPlot.searchTree(oldPlot.PlotTrees[i].SampleNum)
-
-        when(target) {
-            "DBH" -> {
-                if(abs(oldPlot.PlotTrees[i].DBH - tree!!.DBH) > threshold) {
-                    tree.DBH = oldPlot.PlotTrees[i].DBH
-                }
-            }
-            "Meas" -> {
-                if(abs(oldPlot.PlotTrees[i].MeasHeight - tree!!.MeasHeight) > threshold) {
-                    tree.MeasHeight = oldPlot.PlotTrees[i].MeasHeight
-                }
-            }
-            "Vis" -> {
-                if(abs(oldPlot.PlotTrees[i].VisHeight - tree!!.VisHeight) > threshold) {
-                    tree.VisHeight = oldPlot.PlotTrees[i].VisHeight
-                }
-            }
-            "Fork" -> {
-                if(abs(oldPlot.PlotTrees[i].ForkHeight - tree!!.ForkHeight) > threshold) {
-                    tree.ForkHeight = oldPlot.PlotTrees[i].ForkHeight
-                }
-            }
+        val newTree = newPlot.searchTree(oldPlot.PlotTrees[i].SampleNum)
+        val needReaffirm = when(target) {
+            "DBH" -> checkThreshold(oldPlot.PlotTrees[i].DBH, newTree!!.DBH, threshold)
+            "Meas" -> checkThreshold(oldPlot.PlotTrees[i].MeasHeight, newTree!!.MeasHeight, threshold)
+            "Vis" -> checkThreshold(oldPlot.PlotTrees[i].VisHeight, newTree!!.VisHeight, threshold)
+            "Fork" -> checkThreshold(oldPlot.PlotTrees[i].ForkHeight, newTree!!.ForkHeight, threshold)
+            else -> false
         }
-        targetSet.add(tree!!)
+        if (needReaffirm) {
+            targetSet.add(newTree!!)
+        }
     }
 
     return targetSet
+}
+
+fun checkThreshold(old: Double, new: Double, threshold: Double): Boolean {
+    return if (old > 0.0) {
+        (abs(old - new) / old) > threshold
+    } else {
+        true
+    }
+}
+
+fun checkThresholdByInterval(old: Double, new: Double, threshold: Double): Boolean {
+    return abs(old - new) > threshold
 }

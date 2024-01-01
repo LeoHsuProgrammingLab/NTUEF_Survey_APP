@@ -37,5 +37,4 @@ class TreeViewModel: ViewModel() {
     fun compare() {
         /*TODO: compare the visHeight, measHeight, forkHeight, DBH, and send the alarm*/
     }
-
 }

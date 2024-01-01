@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.DropdownMenuItem
@@ -45,10 +46,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ntufapp.data.ntufappInfo.Companion.tag
-import com.example.ntufapp.layout.showMessage
 import com.example.ntufapp.model.PlotData
 import com.example.ntufapp.model.Tree
 import com.example.ntufapp.ui.theme.CustomizedDivider
@@ -56,6 +57,7 @@ import com.example.ntufapp.ui.theme.DropdownDivider
 import com.example.ntufapp.ui.theme.LowerShapes
 import com.example.ntufapp.ui.theme.Shapes
 import com.example.ntufapp.ui.theme.UpperShapes
+import com.example.ntufapp.ui.theme.circleThreeDigitsModifier
 import com.example.ntufapp.ui.theme.dropDownItemModifier
 import com.example.ntufapp.ui.theme.dropDownMenuModifier
 import com.example.ntufapp.ui.theme.inputTextModifier
@@ -63,6 +65,7 @@ import com.example.ntufapp.ui.theme.lightBorder
 import com.example.ntufapp.ui.theme.md_theme_light_inverseOnSurface
 import com.example.ntufapp.ui.theme.md_theme_light_primary
 import com.example.ntufapp.ui.theme.md_theme_light_primaryContainer
+import com.example.ntufapp.utils.showMessage
 import kotlinx.coroutines.launch
 
 
@@ -146,6 +149,7 @@ fun HtDBHView(
                                 )
                             )
                         },
+                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                         leadingIcon = {
                             Icon(imageVector = Icons.Filled.Search, contentDescription = null)
                         },
@@ -227,11 +231,7 @@ fun HtDBHView(
                             val treeForkHt = remember { mutableStateOf(tree.ForkHeight.toString()) }
 
                             ListItem(
-                                modifier = Modifier
-                                    .padding(horizontal = 10.dp, vertical = 5.dp)
-                                    .size(70.dp)
-                                    .clip(CircleShape)
-                                    .background(md_theme_light_inverseOnSurface),
+                                modifier = circleThreeDigitsModifier,
                                 headlineContent = {
                                     Text(
                                         text = String.format("%03d", tree.SampleNum),
@@ -327,6 +327,7 @@ fun LazyColumnInputTextField(
                 )
             )
         },
+        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
         modifier = modifier,
         textStyle = TextStyle(fontSize = 18.sp),
     )

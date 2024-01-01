@@ -98,7 +98,7 @@ fun TreeSpeciesWidget(
         }
 
         if (showDialog.value) {
-            AdjustSpeciesDialogue(
+            AdjustSpeciesDialog(
                 onDismiss = {showDialog.value = false },
                 onCancelClick = { showDialog.value = false },
                 onNextButtonClick = {
