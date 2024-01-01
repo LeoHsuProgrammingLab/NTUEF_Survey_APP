@@ -1,5 +1,6 @@
 package com.example.ntufapp.router
 
+import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -15,15 +16,17 @@ import com.example.ntufapp.viewModel.TreeViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import com.example.ntufapp.data.ntufappInfo.Companion.dTag
 import com.example.ntufapp.layout.NewSurveyScreen
 import com.example.ntufapp.layout.ResultDisplayScreen
+import com.example.ntufapp.layout.SaveJsonScreen
 
 enum class Screens {
     Start,
     ReSurvey,
     NewSurvey,
     ResultDisplay,
-    Visualization
+    SaveJson
 }
 
 @Composable
@@ -45,13 +48,11 @@ fun NTUEFApp(
             composable(route = Screens.Start.name) {
                 PlotOptionsScreen(
                     onNextButtonClick = {plotData, surveyType ->
-
-                        viewModel.setNewData(plotData)
+                        viewModel.setNewData(plotData) // set the NewPlotData as the input json file and reset all trees
                         if (surveyType == "ReSurvey") {
-                            viewModel.setOldData(plotData)
+                            viewModel.setOldData(plotData) // set the OldPlotData as the input json file
                             navController.navigate(Screens.ReSurvey.name)
                         } else {
-
                             navController.navigate(Screens.NewSurvey.name)
                         }
                     }
@@ -61,7 +62,7 @@ fun NTUEFApp(
             composable(route = Screens.ReSurvey.name) {
                 ReSurveyScreen(
                     onNextButtonClick = {
-                        navController.navigate(Screens.ResultDisplay.name)
+                        navController.navigate("${Screens.ResultDisplay}/source=${Screens.ReSurvey.name}")
                     },
                     oldPlotData = resultState.first, // old plot data
                     newPlotData = resultState.second //new plot data
@@ -71,27 +72,39 @@ fun NTUEFApp(
             composable(route = Screens.NewSurvey.name) {
                 NewSurveyScreen(
                     onNextButtonClick = {
-                        navController.navigate(Screens.ResultDisplay.name)
+                        navController.navigate("${Screens.ResultDisplay}/source=${Screens.NewSurvey.name}")
                     },
                     newPlotData = resultState.second
                 )
             }
 
-            composable(route = Screens.ResultDisplay.name) {
+            composable(route = "${Screens.ResultDisplay}/source={source}") {backStackEntry ->
+                val source = backStackEntry.arguments?.getString("source")
+                Log.i(dTag, "source: $source")
+
                 ResultDisplayScreen(
                     oldPlotData = resultState.first,
                     newPlotData = resultState.second,
-                    onBackButtonClick = {
-                        navController.navigate(Screens.ReSurvey.name)
-                    },
+//                    onBackButtonClick = {
+//                        when (source) {
+//                            "ReSurvey" -> navController.navigate(Screens.ReSurvey.name)
+//                            "NewSurvey" -> navController.navigate(Screens.NewSurvey.name)
+//                        }
+//                    },
                     onNextButtonClick = {
-                        navController.navigate(Screens.Visualization.name)
+                        navController.navigate(Screens.SaveJson.name)
                     }
                 )
             }
 
-            composable(route = Screens.Visualization.name) {
-
+            composable(route = Screens.SaveJson.name) {
+                SaveJsonScreen(
+                    newPlotData = resultState.second,
+                    onBackButtonClick = {
+                        resultState.first.resetAllTrees()
+                        navController.navigate(Screens.Start.name)
+                    }
+                )
             }
         }
     }

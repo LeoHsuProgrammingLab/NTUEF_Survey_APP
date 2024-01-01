@@ -21,6 +21,11 @@ fun DropdownDivider() {
 }
 
 @Composable
+fun LayoutDivider() {
+    Divider(modifier = Modifier.padding(vertical = 8.dp))
+}
+
+@Composable
 fun IntervalDivider() {
     Divider(
         color = Color.Black,

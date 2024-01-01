@@ -15,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ntufapp.model.PlotData
 
 @Composable
 fun CheckAddButton(
@@ -30,14 +29,14 @@ fun CheckAddButton(
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.Bottom
     ) {
-        val showDialogue = remember { mutableStateOf(false) }
+        val showDialog = remember { mutableStateOf(false) }
 
         OutlinedButton(
             onClick = {
                 if (dbhSet.value.size == 0 || measHtSet.value.size == 0 || visHtSet.value.size == 0 || forkHtSet.value.size == 0) {
                     onNextButtonClick()
                 } else {
-                    showDialogue.value = true
+                    showDialog.value = true
                 }
             },
             modifier = Modifier
@@ -47,14 +46,14 @@ fun CheckAddButton(
             Text("完成此次調查", fontSize = 18.sp)
         }
 
-        if (showDialogue.value) {
-            SurveyConfirmDialogue(
+        if (showDialog.value) {
+            SurveyConfirmDialog(
                 dbhSetSize = dbhSet.value.size,
                 measHtSetSize = measHtSet.value.size,
                 visHtSetSize = visHtSet.value.size,
                 forkHtSetSize = forkHtSet.value.size,
-                onDismiss = { showDialogue.value = false },
-                onCancelClick = { showDialogue.value = false },
+                onDismiss = { showDialog.value = false },
+                onCancelClick = { showDialog.value = false },
                 onNextButtonClick = onNextButtonClick
             )
         }

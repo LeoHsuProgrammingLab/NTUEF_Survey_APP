@@ -2,16 +2,18 @@ package com.example.ntufapp.ui
 
 import android.net.Uri
 import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -24,6 +26,7 @@ import androidx.compose.ui.window.Dialog
 import com.example.ntufapp.data.DataSource
 import com.example.ntufapp.model.PlotData
 import com.example.ntufapp.ui.theme.Shapes
+import com.example.ntufapp.utils.showMessage
 
 @Composable
 fun UploadFileDialog( // Plot Options Screen
@@ -75,7 +78,7 @@ fun UploadFileDialog( // Plot Options Screen
 
 @Composable
 // https://medium.com/@rooparshkalia/single-choice-dialog-with-jetpack-compose-d021650d31ca
-fun ConfirmDialogue( // Plot Options Screen
+fun ConfirmDialog( // Plot Options Screen
     metaData: PlotData,
     onDismiss: () -> Unit,
     onCancelClick: () -> Unit,
@@ -117,7 +120,7 @@ fun ConfirmDialogue( // Plot Options Screen
 }
 
 @Composable
-fun NewSurveyUploadChoiceDialogue(
+fun NewSurveyUploadChoiceDialog(
     onDismiss: () -> Unit,
     onUploadTypeClick: (String) -> Unit,
 ){
@@ -152,10 +155,53 @@ fun NewSurveyUploadChoiceDialogue(
 }
 
 @Composable
-fun ManualInputNewPlotDialogue(
+fun SaveJsonDialog(
+    onDismiss: () -> Unit, 
+    onSaveClick: (String) -> Unit,
+    onCancelClick: () -> Unit
+) {
+    Dialog(
+        onDismissRequest = {
+            onDismiss.invoke()
+        }
+    ) {
+        val text = remember { mutableStateOf("") }
+        Surface(shape = Shapes.small) {
+            Column(modifier = Modifier.padding(10.dp)) {
+                OutlinedTextField(
+                    value = text.value,
+                    onValueChange = {
+                        text.value = it
+                    },
+                    label = { Text("請輸入檔名") }
+                )
+                Row(horizontalArrangement = Arrangement.SpaceEvenly) {
+                    OutlinedButton(
+                        onClick = onCancelClick
+                    ) {
+                        Text("取消")
+                    }
+                    OutlinedButton(
+                        onClick = {
+                            if(text.value != "") {
+                                onSaveClick(text.value)
+                            }
+                        }
+                    ) {
+                        Text("命名")
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ManualInputNewPlotDialog(
     onDismiss: () -> Unit,
     onSendClick: (PlotData) -> Unit,
 ) {
+    val context = LocalContext.current
      val plotData = remember {
         mutableStateOf(PlotData())
     }
@@ -196,18 +242,34 @@ fun ManualInputNewPlotDialogue(
                     Button(
                         modifier = Modifier.padding(10.dp),
                         onClick ={
-                            plotData.value.ManageUnit = manageUnit.value
-                            plotData.value.SubUnit = subUnit.value
-                            plotData.value.PlotName = plotName.value
-                            plotData.value.PlotNum = plotNum.value.toInt()
-                            plotData.value.PlotType = plotType.value
-                            plotData.value.PlotArea = plotArea.value.toDouble()
-                            plotData.value.Altitude = altitude.value.toDouble()
-                            plotData.value.Slope = slope.value.toDouble()
-                            plotData.value.Aspect = aspect.value
-                            plotData.value.TWD97_X = TWD97_X.value
-                            plotData.value.TWD97_Y = TWD97_Y.value
-                            onSendClick(plotData.value)
+                            if (
+                                manageUnit.value != "" &&
+                                subUnit.value != "" &&
+                                plotName.value != "" &&
+                                (plotNum.value.toIntOrNull() != null) &&
+                                plotType.value != "" &&
+                                (plotArea.value.toDoubleOrNull() ?: Double.NaN).isNaN().not() && // cool syntax
+                                (altitude.value.toDoubleOrNull() ?: Double.NaN).isNaN().not() &&
+                                (slope.value.toDoubleOrNull() != null) &&
+                                aspect.value != "" &&
+                                TWD97_X.value != "" &&
+                                TWD97_Y.value != ""
+                            ) {
+                                plotData.value.ManageUnit = manageUnit.value
+                                plotData.value.SubUnit = subUnit.value
+                                plotData.value.PlotName = plotName.value
+                                plotData.value.PlotNum = plotNum.value.toInt()
+                                plotData.value.PlotType = plotType.value
+                                plotData.value.PlotArea = plotArea.value.toDouble()
+                                plotData.value.Altitude = altitude.value.toDouble()
+                                plotData.value.Slope = slope.value.toDouble()
+                                plotData.value.Aspect = aspect.value
+                                plotData.value.TWD97_X = TWD97_X.value
+                                plotData.value.TWD97_Y = TWD97_Y.value
+                                onSendClick(plotData.value)
+                            } else {
+                                showMessage(context, "請輸入正確且完整的樣區資料")
+                            }
                         }
                     ) {
                         Text("下一步")
@@ -220,7 +282,7 @@ fun ManualInputNewPlotDialogue(
 
 
 @Composable
-fun AdjustSpeciesDialogue( // Survey Screen
+fun AdjustSpeciesDialog( // Survey Screen
     onDismiss: () -> Unit,
     onCancelClick: () -> Unit,
     onNextButtonClick: (String) -> Unit
@@ -270,7 +332,7 @@ fun AdjustSpeciesDialogue( // Survey Screen
 }
 
 @Composable
-fun SurveyConfirmDialogue( // Survey Screen
+fun SurveyConfirmDialog( // Survey Screen
     dbhSetSize: Int,
     measHtSetSize: Int,
     visHtSetSize: Int,
