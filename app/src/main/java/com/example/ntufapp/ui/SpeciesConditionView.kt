@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ntufapp.model.PlotData
@@ -40,6 +41,7 @@ fun SpeciesConditionView(
                 totalTreesNumList,
                 label = "請選擇樣樹",
                 defaultString = "1",
+                keyboardType = KeyboardType.Number,
                 onChoose = {
                     curTreeNum.value = it
                     curTree.value = newPlotData.searchTree(curTreeNum.value.toInt())

@@ -54,6 +54,7 @@ fun SearchableDropdownMenu(
     label: String = "搜尋",
     dialogType: String = "Tree",
     readOnly: Boolean = false,
+    keyboardType: KeyboardType,
     onChoose: (String) -> Unit,
     onAdd: (String) -> Unit
 ) {
@@ -123,7 +124,7 @@ fun SearchableDropdownMenu(
             },
             keyboardOptions = KeyboardOptions.Default.copy(
                 imeAction = ImeAction.Search,
-                keyboardType = KeyboardType.Number
+                keyboardType = keyboardType
             ),
             readOnly = readOnly,
             singleLine = true,
@@ -247,7 +248,7 @@ fun SearchableDropdownMenu2(
                 },
                 keyboardOptions = KeyboardOptions.Default.copy(
                     imeAction = ImeAction.Search,
-                    keyboardType = KeyboardType.Number
+                    keyboardType = KeyboardType.Text
                 ),
                 keyboardActions = KeyboardActions(
                     onSearch = {

@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ntufapp.model.PlotData
@@ -53,9 +54,9 @@ fun MetaDateView(newPlotData: PlotData) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            SearchableDropdownMenu(newPlotData.Surveyor, defaultString = "名單", label = "樣區調查人員", dialogType = "Name", readOnly = true, onChoose = {}, onAdd = {})
+            SearchableDropdownMenu(newPlotData.Surveyor, defaultString = "名單", label = "樣區調查人員", dialogType = "Name", readOnly = true, onChoose = {}, onAdd = {}, keyboardType = KeyboardType.Number)
             IntervalDivider()
-            SearchableDropdownMenu(newPlotData.HtSurveyor, defaultString = "名單", label = "樹高調查人員", dialogType = "Name", readOnly = true, onChoose = {} ) {}
+            SearchableDropdownMenu(newPlotData.HtSurveyor, defaultString = "名單", label = "樹高調查人員", dialogType = "Name", readOnly = true, onChoose = {}, keyboardType = KeyboardType.Number ) {}
         }
     }
 

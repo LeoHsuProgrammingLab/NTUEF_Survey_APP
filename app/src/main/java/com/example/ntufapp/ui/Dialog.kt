@@ -7,7 +7,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FileDownload
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -173,7 +177,8 @@ fun SaveJsonDialog(
                     onValueChange = {
                         text.value = it
                     },
-                    label = { Text("請輸入檔名") }
+                    label = { Text("請輸入檔名") },
+                    leadingIcon = { Icon(imageVector = Icons.Filled.FileDownload, contentDescription = null) }
                 )
                 Row(horizontalArrangement = Arrangement.SpaceEvenly) {
                     OutlinedButton(
@@ -287,9 +292,8 @@ fun AdjustSpeciesDialog( // Survey Screen
     onCancelClick: () -> Unit,
     onNextButtonClick: (String) -> Unit
 ){
-    val treeSpecies = remember {
-        mutableStateOf("")
-    }
+    val context = LocalContext.current
+    val treeSpecies = remember { mutableStateOf("") }
 
     Dialog(
         onDismissRequest = {
@@ -320,10 +324,12 @@ fun AdjustSpeciesDialog( // Survey Screen
                         onClick = {
                             if(treeSpecies.value != "") {
                                 onNextButtonClick(treeSpecies.value)
+                            } else {
+                                showMessage(context, "請選擇樹種!")
                             }
                         }
                     ) {
-                        Text("修改")
+                        Text("確認樹種")
                     }
                 }
             }
