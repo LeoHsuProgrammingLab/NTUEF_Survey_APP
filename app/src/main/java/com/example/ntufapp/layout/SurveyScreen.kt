@@ -1,27 +1,15 @@
 package com.example.ntufapp.layout
 
 import android.util.Log
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.example.ntufapp.data.ntufappInfo.Companion.dTag
 import com.example.ntufapp.data.ntufappInfo.Companion.defaultTreeNum
 import com.example.ntufapp.model.PlotData
-import com.example.ntufapp.ui.CheckAddButton
-import com.example.ntufapp.ui.HtDBHView
-import com.example.ntufapp.ui.MetaDateView
-import com.example.ntufapp.ui.SpeciesConditionView
 import com.example.ntufapp.ui.SurveyView
 
 //ref: https://www.youtube.com/watch?v=8XJfLaAOxD0&ab_channel=AndroidDevelopers
@@ -41,7 +29,7 @@ fun ReSurveyScreen(
         treeNumList.add((i + 1).toString())
     }
     // Save every tree's number in ReSurvey Layout
-    val totalTreesNumList = remember { mutableStateListOf<String>(*treeNumList.toTypedArray()) }
+    val totalTreesNumList = remember { mutableStateListOf(*treeNumList.toTypedArray()) }
 
     SurveyView(totalTreesNumList = totalTreesNumList, newPlotData = newPlotDataState.value, onNextButtonClick = onNextButtonClick)
 }

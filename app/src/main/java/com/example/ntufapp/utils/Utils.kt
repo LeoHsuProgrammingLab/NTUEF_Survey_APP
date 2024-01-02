@@ -83,16 +83,7 @@ fun saveJsonFile(plotData: PlotData, fileName: String, context: Context) {
     Log.d("saveJsonFile", "file: ${file.absoluteFile} ")
 
     try {
-        if (!file.exists()) {
-            file.createNewFile()
-            Log.d("saveJsonFile", "file created")
-        } else {
-            val fileOutputStream = FileOutputStream(file)
-            fileOutputStream.write(myJson.toString().toByteArray())
-            fileOutputStream.close()
-            Log.d("saveJsonFile", "file saved")
-        }
-
+        writeToJson(context, file, myJson)
         showMessage(context, "儲存成功！${file.absoluteFile}")
     } catch (e: IOException) {
         e.printStackTrace()
@@ -105,6 +96,9 @@ fun checkPermission(context: Context): Boolean {
     return permission == android.content.pm.PackageManager.PERMISSION_GRANTED
 }
 
-fun writeToFile(context: Context, fileName: String, ) {
-
+fun writeToJson(context: Context, outputFile: File, jsonString: String) {
+    val fileOutputStream = FileOutputStream(outputFile)
+    fileOutputStream.write(jsonString.toByteArray())
+    fileOutputStream.close()
+    Log.d("writeToJson", "file saved")
 }

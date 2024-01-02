@@ -39,7 +39,11 @@ fun SurveyView(
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            SpeciesConditionView(curTreeNum = curTreeNum, totalTreesNumList = totalTreesNumList, newPlotData = newPlotData)
+            SpeciesConditionView(
+                totalTreesNumList = totalTreesNumList,
+                curTreeNum = curTreeNum,
+                newPlotData = newPlotData
+            )
             HtDBHView(
                 totalTreesNumList = totalTreesNumList,
                 numPlotTrees = numPlotTrees,
