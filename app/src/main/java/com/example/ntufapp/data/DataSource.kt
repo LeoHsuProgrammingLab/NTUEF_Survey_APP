@@ -22,13 +22,6 @@ object DataSource {
     )
 
     val SpeciesList = listOf(
-        "櫸木",
-        "烏心石",
-        "樟樹",
-        "光臘樹",
-        "楓香",
-        "榔榆",
-        "墨點櫻桃",
         "柳杉",
         "台灣杉",
         "香杉",
@@ -36,7 +29,14 @@ object DataSource {
         "杉木",
         "紅檜",
         "扁柏",
-        "二葉松"
+        "二葉松",
+        "櫸木",
+        "烏心石",
+        "樟樹",
+        "光臘樹",
+        "楓香",
+        "榔榆",
+        "墨點櫻桃"
     )
 
     val TreeMultiConditionList = listOf(

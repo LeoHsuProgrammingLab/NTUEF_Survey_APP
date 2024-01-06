@@ -52,7 +52,7 @@ fun CheckAddButton(
                 measHtSetSize = measHtSet.value.size,
                 visHtSetSize = visHtSet.value.size,
                 forkHtSetSize = forkHtSet.value.size,
-                onDismiss = { showDialog.value = false },
+                onDismiss = {},
                 onCancelClick = { showDialog.value = false },
                 onNextButtonClick = onNextButtonClick
             )

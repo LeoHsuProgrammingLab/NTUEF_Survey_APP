@@ -81,7 +81,7 @@ fun PlotOptionsScreen(
             if(showOldPlotUpload.value) {
                 UploadFileDialog(
                     selectedFileUri = selectedFileUri.value,
-                    onDismiss = { showOldPlotUpload.value = false },
+                    onDismiss = {},
                     onSendClick = { uri ->
                         if(uri != null) {
                             selectedFileUri.value = uri
@@ -107,7 +107,7 @@ fun PlotOptionsScreen(
             if(showOldUploadData.value) {
                 ConfirmDialog(
                     metaData = plotData.value,
-                    onDismiss = { showOldUploadData.value = false },
+                    onDismiss = {},
                     onCancelClick = { showOldUploadData.value = false },
                     onNextButtonClick = {
                         surveyType.value = "ReSurvey"
@@ -131,7 +131,7 @@ fun PlotOptionsScreen(
 
             if (showNewPlotUploadChoices.value) {
                 NewSurveyUploadChoiceDialog(
-                    onDismiss = { showNewPlotUploadChoices.value = false },
+                    onDismiss = {},
                     onUploadTypeClick = {uploadType ->
                         if (uploadType == "JSON") {
                             showNewPlotUpload.value = true
@@ -148,7 +148,7 @@ fun PlotOptionsScreen(
             if (showNewPlotUpload.value) {
                 UploadFileDialog(
                     selectedFileUri = selectedFileUri.value,
-                    onDismiss = { showNewPlotUpload.value = false },
+                    onDismiss = {},
                     onSendClick = { uri ->
                         if(uri != null) {
                             selectedFileUri.value = uri
@@ -174,7 +174,7 @@ fun PlotOptionsScreen(
             if (showNewUploadData.value) {
                 ConfirmDialog(
                     metaData = plotData.value,
-                    onDismiss = { showNewUploadData.value = false },
+                    onDismiss = {},
                     onCancelClick = { showNewUploadData.value = false },
                     onNextButtonClick = { onNextButtonClick(it, surveyType.value) }
                 )
@@ -183,7 +183,7 @@ fun PlotOptionsScreen(
             // Manual Input New Plot
             if (showNewPlotManualInput.value) {
                 ManualInputNewPlotDialog(
-                    onDismiss = { showNewPlotManualInput.value = false },
+                    onDismiss = {},
                     onSendClick = { onNextButtonClick(it, surveyType.value) }
                 )
             }

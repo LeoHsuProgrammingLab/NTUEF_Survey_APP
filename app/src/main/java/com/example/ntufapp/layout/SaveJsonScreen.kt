@@ -76,7 +76,7 @@ fun SaveJsonScreen(
 
                 if (showDialog.value) {
                     SaveJsonDialog(
-                        onDismiss = { showDialog.value = false },
+                        onDismiss = {},
                         onSaveClick = {
                             showDialog.value = false
                             saveJsonFile(newPlotData, it, context)

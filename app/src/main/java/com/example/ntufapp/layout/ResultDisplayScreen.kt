@@ -43,11 +43,13 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ntufapp.R
 import com.example.ntufapp.data.ntufappInfo.Companion.changeDataQuota
 import com.example.ntufapp.data.ntufappInfo.Companion.dTag
 import com.example.ntufapp.data.ntufappInfo.Companion.dbhThreshold
@@ -110,7 +112,7 @@ fun ResultDisplayScreen(
                 onClick = { onNextButtonClick() },
                 modifier = buttonModifier
             ) {
-                Text("下一步", fontSize = 18.sp)
+                Text(stringResource(id = (R.string.next)), fontSize = 18.sp)
             }
         }
     }

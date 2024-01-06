@@ -182,7 +182,7 @@ fun SearchableDropdownMenu(
             if(showDialog.value) {
                 AddDialog(
                     type = dialogType,
-                    onDismiss = { showDialog.value = false },
+                    onDismiss = { /*showDialog.value = false*/ },
                     onCancelClick = { showDialog.value = false },
                     onNextButtonClick = {
                         showDialog.value = false
@@ -316,14 +316,14 @@ fun AddDialog(
                                 modifier = modifier,
                                 onClick = onCancelClick,
                             ) {
-                                Text("取消")
+                                Text(stringResource(id = (R.string.cancel)))
                             }
 
                             Button(
                                 modifier = modifier,
                                 onClick = { onNextButtonClick((curSize + 1).toString()) }
                             ) {
-                                Text("下一步")
+                                Text(stringResource(id = (R.string.next)))
                             }
                         }
                     }
@@ -346,7 +346,7 @@ fun AddDialog(
                                 modifier = modifier,
                                 onClick = onCancelClick,
                             ) {
-                                Text("取消")
+                                Text(stringResource(id = (R.string.cancel)))
                             }
 
                             Button(
@@ -355,7 +355,7 @@ fun AddDialog(
                                     onNextButtonClick((curSize + 1).toString())
                                 }
                             ) {
-                                Text("下一步")
+                                Text(stringResource(id = (R.string.next)))
                             }
                         }
                     }

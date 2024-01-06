@@ -22,11 +22,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.ntufapp.R
 import com.example.ntufapp.data.DataSource
 import com.example.ntufapp.model.PlotData
 import com.example.ntufapp.ui.theme.Shapes
@@ -65,7 +67,7 @@ fun UploadFileDialog( // Plot Options Screen
                         modifier = Modifier.padding(10.dp),
                         onClick = onCancelClick,
                     ) {
-                        Text("取消")
+                        Text(stringResource(id = (R.string.cancel)))
                     }
 
                     Button(
@@ -104,18 +106,20 @@ fun ConfirmDialog( // Plot Options Screen
 
                 Spacer(modifier = Modifier.padding(10.dp))
                 Row{
+                    // cancel button
                     Button(
                         modifier = Modifier.padding(10.dp),
                         onClick = onCancelClick,
                     ) {
-                        Text("取消")
+                        Text(stringResource(id = (R.string.cancel)))
                     }
-                    
+
+                    // next button
                     Button(
                         modifier = Modifier.padding(10.dp),
                         onClick = { onNextButtonClick(metaData) }
                     ) {
-                        Text("下一步")
+                        Text(stringResource(id = (R.string.next)))
                     }
                 }
             }
@@ -184,7 +188,7 @@ fun SaveJsonDialog(
                     OutlinedButton(
                         onClick = onCancelClick
                     ) {
-                        Text("取消")
+                        Text(stringResource(id = (R.string.cancel)))
                     }
                     OutlinedButton(
                         onClick = {
@@ -243,10 +247,12 @@ fun ManualInputNewPlotDialog(
                 TextField(value = TWD97_X.value, onValueChange = { text: String -> TWD97_X.value = text }, label = { Text("TWD97_X")})
                 TextField(value = TWD97_Y.value, onValueChange = { text: String -> TWD97_Y.value = text }, label = { Text("TWD97_Y")})
 
-                Row{
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
                     Button(
                         modifier = Modifier.padding(10.dp),
-                        onClick ={
+                        onClick = {
                             if (
                                 manageUnit.value != "" &&
                                 subUnit.value != "" &&
@@ -277,7 +283,13 @@ fun ManualInputNewPlotDialog(
                             }
                         }
                     ) {
-                        Text("下一步")
+                        Text(stringResource(id = (R.string.next)))
+                    }
+                    Button(
+                        modifier = Modifier.padding(10.dp),
+                        onClick = { onDismiss.invoke() }
+                    ) {
+                        Text(stringResource(id = (R.string.cancel)))
                     }
                 }
             }
@@ -296,9 +308,7 @@ fun AdjustSpeciesDialog( // Survey Screen
     val treeSpecies = remember { mutableStateOf("") }
 
     Dialog(
-        onDismissRequest = {
-            onDismiss.invoke()
-        }
+        onDismissRequest = { onDismiss.invoke() }
     ) {
         Surface(shape = Shapes.small) {
             Column(modifier = Modifier.padding(10.dp)) {
@@ -316,7 +326,7 @@ fun AdjustSpeciesDialog( // Survey Screen
                         modifier = Modifier.padding(10.dp),
                         onClick = onCancelClick,
                     ) {
-                        Text("取消")
+                        Text(stringResource(id = (R.string.cancel)))
                     }
 
                     Button(
