@@ -3,8 +3,11 @@ package com.example.ntufapp.utils
 import android.content.Context
 import android.net.Uri
 import android.os.Environment
+import android.provider.OpenableColumns
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import com.example.ntufapp.data.ntufappInfo.Companion.outputDirName
 import com.example.ntufapp.model.PlotData
 import com.google.gson.Gson
@@ -88,6 +91,21 @@ fun saveJsonFile(plotData: PlotData, fileName: String, context: Context) {
     } catch (e: IOException) {
         e.printStackTrace()
     }
+}
+
+fun getFileName(context: Context, uri: Uri?): String {
+    if (uri == null) {
+        return ""
+    }
+
+    val cursor = context.contentResolver.query(uri, null, null, null, null)
+    cursor?.use {
+        val nameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+        if (it.moveToFirst() && nameIndex != -1) {
+            return it.getString(nameIndex)
+        }
+    }
+    return ""
 }
 
 // Research
