@@ -236,28 +236,24 @@ fun HtDBHView(
                                 unaddressedTreeSet = dbhTreeSet,
                                 tree = tree,
                                 type = "DBH",
-                                modifier = inputTextModifier
                             )
 
                             LazyColumnInputTextField(
                                 unaddressedTreeSet = measHtTreeSet,
                                 tree = tree,
                                 type = "測量樹高",
-                                modifier = inputTextModifier
                             )
 
                             LazyColumnInputTextField(
                                 unaddressedTreeSet = visHtTreeSet,
                                 tree = tree,
                                 type = "目視樹高",
-                                modifier = inputTextModifier
                             )
 
                             LazyColumnInputTextField(
                                 unaddressedTreeSet = forkHtTreeSet,
                                 tree = tree,
                                 type = "分岔樹高",
-                                modifier = inputTextModifier
                             )
                         }
                         DropdownDivider()
@@ -274,31 +270,34 @@ fun LazyColumnInputTextField(
     unaddressedTreeSet: MutableState<MutableSet<String>>,
     tree: Tree,
     type: String,
-    modifier: Modifier
 ) {
     val context = LocalContext.current
     val textContent = remember { mutableStateOf(defaultText) }
+
+    fun updateTree(newValue: Double?) {
+        if (newValue != null) {
+            if (newValue > 0) {
+                unaddressedTreeSet.value.remove(tree.SampleNum.toString())
+                when(type) {
+                    "DBH" -> tree.DBH = newValue
+                    "目視樹高" -> tree.VisHeight = newValue
+                    "測量樹高" -> tree.MeasHeight = newValue
+                    "分岔樹高" -> tree.ForkHeight = newValue
+                }
+            } else {
+                unaddressedTreeSet.value.add(tree.SampleNum.toString())
+            }
+        } else {
+            unaddressedTreeSet.value.add(tree.SampleNum.toString())
+            showMessage(context,"請輸入正確的數字")
+        }
+    }
+
     TextField(
         value = textContent.value,
         onValueChange = {
             textContent.value = it
-            val newValue = it.toDoubleOrNull()
-            if (newValue != null) {
-                if (newValue > 0) {
-                    unaddressedTreeSet.value.remove(tree.SampleNum.toString())
-                    when(type) {
-                        "DBH" -> tree.DBH = newValue
-                        "目視樹高" -> tree.VisHeight = newValue
-                        "測量樹高" -> tree.MeasHeight = newValue
-                        "分岔樹高" -> tree.ForkHeight = newValue
-                    }
-                } else {
-                    unaddressedTreeSet.value.add(tree.SampleNum.toString())
-                }
-            } else {
-                unaddressedTreeSet.value.add(tree.SampleNum.toString())
-                showMessage(context,"請輸入正確的數字")
-            }
+            updateTree(it.toDoubleOrNull())
         },
         label = {
             Text(
@@ -311,8 +310,8 @@ fun LazyColumnInputTextField(
         },
         placeholder = { Text("請輸入數字") },
         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-        modifier = modifier,
         textStyle = TextStyle(fontSize = 18.sp),
+        modifier = inputTextModifier,
     )
 }
 
