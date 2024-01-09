@@ -51,8 +51,7 @@ fun SurveyView(
                 measHtTreeSet = measHtTreeSet,
                 forkHtTreeSet = forkHtTreeSet,
                 visHtTreeSet = visHtTreeSet,
-                newPlotData,
-                onNextButtonClick
+                newPlotData
             )
         }
         CheckAddButton(dbhSet = dbhTreeSet, measHtSet = measHtTreeSet, visHtSet = visHtTreeSet, forkHtSet = forkHtTreeSet) {

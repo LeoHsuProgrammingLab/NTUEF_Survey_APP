@@ -20,10 +20,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ntufapp.R
 import com.example.ntufapp.data.DataSource
 import com.example.ntufapp.model.Tree
 import com.example.ntufapp.ui.theme.md_theme_light_primary
@@ -192,7 +194,7 @@ fun ChipsTreeCondition(//https://semicolonspace.com/jetpack-compose-filterchip/
                             }
                         }
                     ) {
-                        Text("新增")
+                        Text(stringResource(id = R.string.input))
                     }
             }
         }

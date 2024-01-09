@@ -108,15 +108,15 @@ fun getFileName(context: Context, uri: Uri?): String {
     return ""
 }
 
-// Research
-fun checkPermission(context: Context): Boolean {
-    val permission = context.checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-    return permission == android.content.pm.PackageManager.PERMISSION_GRANTED
-}
-
 fun writeToJson(context: Context, outputFile: File, jsonString: String) {
     val fileOutputStream = FileOutputStream(outputFile)
     fileOutputStream.write(jsonString.toByteArray())
     fileOutputStream.close()
     Log.d("writeToJson", "file saved")
+}
+
+// Research
+fun checkPermission(context: Context): Boolean {
+    val permission = context.checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    return permission == android.content.pm.PackageManager.PERMISSION_GRANTED
 }

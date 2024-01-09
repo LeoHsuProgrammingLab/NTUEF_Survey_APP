@@ -9,4 +9,5 @@
     <string name="no_result">"查無此資料"</string>
     <string name="next">"下一步"</string>
     <string name="cancel">"取消"</string>
+    <string name="input">"輸入"</string>
 </resources>

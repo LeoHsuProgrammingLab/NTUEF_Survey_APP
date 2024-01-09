@@ -15,11 +15,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ntufapp.R
 import com.example.ntufapp.model.PlotData
 import com.example.ntufapp.model.Tree
 
@@ -96,7 +98,7 @@ fun TreeSpeciesWidget(
             modifier = Modifier.width(90.dp),
             onClick = { showDialog.value = true }
         ) {
-            Text("修改")
+            Text(stringResource(id = R.string.input))
         }
 
         if (showDialog.value) {

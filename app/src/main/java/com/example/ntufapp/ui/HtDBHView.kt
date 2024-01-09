@@ -1,7 +1,6 @@
 package com.example.ntufapp.ui
 
 import android.util.Log
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -11,15 +10,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -41,28 +37,25 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ntufapp.data.ntufappInfo.Companion.tag
 import com.example.ntufapp.model.PlotData
 import com.example.ntufapp.model.Tree
 import com.example.ntufapp.ui.theme.CustomizedDivider
 import com.example.ntufapp.ui.theme.DropdownDivider
 import com.example.ntufapp.ui.theme.LowerShapes
 import com.example.ntufapp.ui.theme.Shapes
-import com.example.ntufapp.ui.theme.UpperShapes
 import com.example.ntufapp.ui.theme.circleThreeDigitsModifier
 import com.example.ntufapp.ui.theme.dropDownItemModifier
 import com.example.ntufapp.ui.theme.dropDownMenuModifier
 import com.example.ntufapp.ui.theme.inputTextModifier
 import com.example.ntufapp.ui.theme.lightBorder
-import com.example.ntufapp.ui.theme.md_theme_light_inverseOnSurface
 import com.example.ntufapp.ui.theme.md_theme_light_primary
 import com.example.ntufapp.ui.theme.md_theme_light_primaryContainer
 import com.example.ntufapp.utils.showMessage
@@ -77,8 +70,7 @@ fun HtDBHView(
     measHtTreeSet: MutableState<MutableSet<String>>,
     forkHtTreeSet: MutableState<MutableSet<String>>,
     visHtTreeSet: MutableState<MutableSet<String>>,
-    newPlotData: PlotData,
-    onNextButtonClick: () -> Unit
+    newPlotData: PlotData
 ) {
     // update the current tree numbers
     if (totalTreesNumList.size > numPlotTrees.value) {
@@ -120,7 +112,6 @@ fun HtDBHView(
                 .border(lightBorder, Shapes.medium)
         ) {
             Column {
-
                 val targetId = remember { mutableIntStateOf(1) }
 
                 // Search Block
@@ -225,29 +216,23 @@ fun HtDBHView(
                             modifier = Modifier.padding(10.dp),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            val treeDBH = remember { mutableStateOf(tree.DBH.toString()) }
-                            val treeMeasHt = remember { mutableStateOf(tree.MeasHeight.toString()) }
-                            val treeVisHt = remember { mutableStateOf(tree.VisHeight.toString()) }
-                            val treeForkHt = remember { mutableStateOf(tree.ForkHeight.toString()) }
-
                             ListItem(
                                 modifier = circleThreeDigitsModifier,
                                 headlineContent = {
+                                    // https://stackoverflow.com/questions/63719072/jetpack-compose-centering-text
                                     Text(
                                         text = String.format("%03d", tree.SampleNum),
+                                        textAlign = TextAlign.Center,
                                         style = TextStyle(
                                             fontSize = 18.sp,
                                             fontWeight = FontWeight.Bold
                                         ),
-                                        modifier = Modifier
-                                            .wrapContentWidth(Alignment.CenterHorizontally)
-                                            .wrapContentHeight(Alignment.CenterVertically)
+                                        modifier = Modifier.wrapContentHeight(Alignment.CenterVertically)
                                     )
                                 }
                             )
 
                             LazyColumnInputTextField(
-                                textContent = treeDBH,
                                 unaddressedTreeSet = dbhTreeSet,
                                 tree = tree,
                                 type = "DBH",
@@ -255,7 +240,6 @@ fun HtDBHView(
                             )
 
                             LazyColumnInputTextField(
-                                textContent = treeMeasHt,
                                 unaddressedTreeSet = measHtTreeSet,
                                 tree = tree,
                                 type = "測量樹高",
@@ -263,7 +247,6 @@ fun HtDBHView(
                             )
 
                             LazyColumnInputTextField(
-                                textContent = treeVisHt,
                                 unaddressedTreeSet = visHtTreeSet,
                                 tree = tree,
                                 type = "目視樹高",
@@ -271,7 +254,6 @@ fun HtDBHView(
                             )
 
                             LazyColumnInputTextField(
-                                textContent = treeForkHt,
                                 unaddressedTreeSet = forkHtTreeSet,
                                 tree = tree,
                                 type = "分岔樹高",
@@ -288,27 +270,27 @@ fun HtDBHView(
 
 @Composable
 fun LazyColumnInputTextField(
-    textContent: MutableState<String>,
+    defaultText: String = "",
     unaddressedTreeSet: MutableState<MutableSet<String>>,
     tree: Tree,
     type: String,
     modifier: Modifier
 ) {
     val context = LocalContext.current
+    val textContent = remember { mutableStateOf(defaultText) }
     TextField(
         value = textContent.value,
         onValueChange = {
             textContent.value = it
-
-            val newTarget = it.toDoubleOrNull()
-            if (newTarget != null) {
-                if (newTarget > 0) {
+            val newValue = it.toDoubleOrNull()
+            if (newValue != null) {
+                if (newValue > 0) {
                     unaddressedTreeSet.value.remove(tree.SampleNum.toString())
                     when(type) {
-                        "DBH" -> tree.DBH = newTarget
-                        "目視樹高" -> tree.VisHeight = newTarget
-                        "測量樹高" -> tree.MeasHeight = newTarget
-                        "分岔樹高" -> tree.ForkHeight = newTarget
+                        "DBH" -> tree.DBH = newValue
+                        "目視樹高" -> tree.VisHeight = newValue
+                        "測量樹高" -> tree.MeasHeight = newValue
+                        "分岔樹高" -> tree.ForkHeight = newValue
                     }
                 } else {
                     unaddressedTreeSet.value.add(tree.SampleNum.toString())
@@ -327,6 +309,7 @@ fun LazyColumnInputTextField(
                 )
             )
         },
+        placeholder = { Text("請輸入數字") },
         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
         modifier = modifier,
         textStyle = TextStyle(fontSize = 18.sp),
