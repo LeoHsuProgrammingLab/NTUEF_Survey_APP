@@ -74,7 +74,8 @@ fun ResultDisplayScreen(
     oldPlotData: PlotData,
     newPlotData: PlotData,
 //    onBackButtonClick: () -> Unit,
-    onNextButtonClick: () -> Unit
+    onNextButtonClick: () -> Unit,
+    from: String
 ) {
     for (i in oldPlotData.PlotTrees.indices) {
         Log.d(dTag, "oldPlotData.PlotTrees[$i]: ${oldPlotData.PlotTrees[i]}")
@@ -82,17 +83,20 @@ fun ResultDisplayScreen(
     }
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val buttonModifier = Modifier
-            .padding(end = 16.dp)
+            .padding(top = 10.dp, end = 30.dp)
             .height(50.dp)
         // Main layout
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
-            TabbedValidationResult(oldPlotData = oldPlotData, newPlotData = newPlotData)
+            if (from == "ReSurvey") {
+                TabbedValidationResult(oldPlotData = oldPlotData, newPlotData = newPlotData)
+            }
             ScatterPlot(plotData = newPlotData)
         }
 

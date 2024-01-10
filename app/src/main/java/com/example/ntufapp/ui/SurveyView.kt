@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.ntufapp.model.PlotData
@@ -23,10 +24,11 @@ fun SurveyView(
         modifier = Modifier
             .padding(10.dp)
             .fillMaxWidth(),
-        verticalArrangement = Arrangement.SpaceEvenly
+        verticalArrangement = Arrangement.SpaceEvenly,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         MetaDateView(newPlotData = newPlotData)
-        val curTreeNum = remember { mutableStateOf("1") }
+        val currentTreeNum = remember { mutableStateOf("1") }
         val numPlotTrees = remember { mutableIntStateOf(totalTreesNumList.size) }
         val dbhTreeSet = remember { mutableStateOf(totalTreesNumList.toMutableSet()) }
         val measHtTreeSet = remember { mutableStateOf(totalTreesNumList.toMutableSet()) }
@@ -41,7 +43,7 @@ fun SurveyView(
         ) {
             SpeciesConditionView(
                 totalTreesNumList = totalTreesNumList,
-                curTreeNum = curTreeNum,
+                currentTreeNum = currentTreeNum,
                 newPlotData = newPlotData
             )
             HtDBHView(

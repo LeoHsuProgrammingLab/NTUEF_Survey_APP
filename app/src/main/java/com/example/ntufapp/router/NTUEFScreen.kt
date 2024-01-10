@@ -93,7 +93,8 @@ fun NTUEFApp(
 //                    },
                     onNextButtonClick = {
                         navController.navigate(Screens.SaveJson.name)
-                    }
+                    },
+                    from = source?: ""
                 )
             }
 

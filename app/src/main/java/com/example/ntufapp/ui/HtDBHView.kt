@@ -98,170 +98,166 @@ fun HtDBHView(
 
     val curItemId = remember { mutableStateOf("1") }
 
-    Column(
+    Box(
         modifier = Modifier
+            .padding(horizontal = 20.dp, vertical = 10.dp)
             .width(700.dp)
-            .height(350.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+            .height(height)
+            .background(md_theme_light_primaryContainer, Shapes.medium)
+            .border(lightBorder, Shapes.medium),
+        contentAlignment = Alignment.Center
     ) {
-        Box(
-            modifier = Modifier
-                .padding(start = 20.dp, end = 20.dp, top = 10.dp, bottom = 5.dp)
-                .background(md_theme_light_primaryContainer, Shapes.medium)
-                .border(lightBorder, Shapes.medium)
-        ) {
-            Column {
-                val targetId = remember { mutableIntStateOf(1) }
+        Column {
+            val targetId = remember { mutableIntStateOf(1) }
 
-                // Search Block
-                Row(
-                    modifier = Modifier
-                        .height(70.dp)
-                        .padding(5.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically
-                ){
-                    OutlinedTextField(
-                        value = curItemId.value,
-                        onValueChange = {
-                            curItemId.value = it
-                            targetId.value = it.toIntOrNull()?: 1
-                            coroutineScope.launch {
-                                lazyListState.scrollToItem(targetId.value - 1)
-                            }
-                        },
-                        label = {
-                            Text(
-                                text = "查看樣樹",
-                                style = TextStyle(
-                                    fontSize = 13.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
+            // Search Block
+            Row(
+                modifier = Modifier
+                    .height(70.dp)
+                    .padding(5.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                OutlinedTextField(
+                    value = curItemId.value,
+                    onValueChange = {
+                        curItemId.value = it
+                        targetId.value = it.toIntOrNull()?: 1
+                        coroutineScope.launch {
+                            lazyListState.scrollToItem(targetId.value - 1)
+                        }
+                    },
+                    label = {
+                        Text(
+                            text = "查看樣樹",
+                            style = TextStyle(
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold
                             )
-                        },
-                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                        leadingIcon = {
-                            Icon(imageVector = Icons.Filled.Search, contentDescription = null)
-                        },
-                        textStyle = TextStyle(fontSize = 16.sp),
-                        modifier = Modifier
-                            .padding(horizontal = 10.dp)
-                            .width(100.dp)
-                    )
-
-                    ExposedUnaddressedTreeList(
-                        treeSet = dbhTreeSet,
-                        label = "剩餘DBH",
-                        widthType = "medium",
-                        onChoose = {
-                            targetId.value = it.toInt()
-                            coroutineScope.launch {
-                                lazyListState.scrollToItem(targetId.value - 1)
-                            }
-                        }
-                    )
-
-                    ExposedUnaddressedTreeList(
-                        treeSet = measHtTreeSet,
-                        label = "剩餘樹高",
-                        widthType = "medium",
-                        onChoose = {
-                            targetId.value = it.toInt()
-                            coroutineScope.launch {
-                                lazyListState.scrollToItem(targetId.value - 1)
-                            }
-                        }
-                    )
-
-                    ExposedUnaddressedTreeList(
-                        treeSet = visHtTreeSet,
-                        label = "剩餘目視樹高",
-                        widthType = "large",
-                        onChoose = {
-                            targetId.value = it.toInt()
-                            coroutineScope.launch {
-                                lazyListState.scrollToItem(targetId.value - 1)
-                            }
-                        }
-                    )
-
-                    ExposedUnaddressedTreeList(
-                        treeSet = forkHtTreeSet,
-                        label = "剩餘分岔樹高",
-                        widthType = "large",
-                        onChoose = {
-                            targetId.value = it.toInt()
-                            coroutineScope.launch {
-                                lazyListState.scrollToItem(targetId.value - 1)
-                            }
-                        }
-                    )
-                }
-
-                CustomizedDivider()
-
-                // Progress Block
-                LazyColumn(
-                    state = lazyListState,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            color = md_theme_light_primary,
-                            shape = LowerShapes.medium
                         )
-                ) {
-                    itemsIndexed(newPlotData.PlotTrees) { idx, tree ->
-                        Row(
-                            modifier = Modifier.padding(10.dp),
-                            horizontalArrangement = Arrangement.SpaceEvenly
-                        ) {
-                            ListItem(
-                                modifier = circleThreeDigitsModifier,
-                                headlineContent = {
-                                    // https://stackoverflow.com/questions/63719072/jetpack-compose-centering-text
-                                    Text(
-                                        text = String.format("%03d", tree.SampleNum),
-                                        textAlign = TextAlign.Center,
-                                        style = TextStyle(
-                                            fontSize = 18.sp,
-                                            fontWeight = FontWeight.Bold
-                                        ),
-                                        modifier = Modifier.wrapContentHeight(Alignment.CenterVertically)
-                                    )
-                                }
-                            )
+                    },
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                    leadingIcon = {
+                        Icon(imageVector = Icons.Filled.Search, contentDescription = null)
+                    },
+                    textStyle = TextStyle(fontSize = 16.sp),
+                    modifier = Modifier
+                        .padding(horizontal = 10.dp)
+                        .width(100.dp)
+                )
 
-                            LazyColumnInputTextField(
-                                unaddressedTreeSet = dbhTreeSet,
-                                tree = tree,
-                                type = "DBH",
-                            )
-
-                            LazyColumnInputTextField(
-                                unaddressedTreeSet = measHtTreeSet,
-                                tree = tree,
-                                type = "測量樹高",
-                            )
-
-                            LazyColumnInputTextField(
-                                unaddressedTreeSet = visHtTreeSet,
-                                tree = tree,
-                                type = "目視樹高",
-                            )
-
-                            LazyColumnInputTextField(
-                                unaddressedTreeSet = forkHtTreeSet,
-                                tree = tree,
-                                type = "分岔樹高",
-                            )
+                ExposedUnaddressedTreeList(
+                    treeSet = dbhTreeSet,
+                    label = "剩餘DBH",
+                    widthType = "medium",
+                    onChoose = {
+                        targetId.value = it.toInt()
+                        coroutineScope.launch {
+                            lazyListState.scrollToItem(targetId.value - 1)
                         }
-                        DropdownDivider()
                     }
+                )
+
+                ExposedUnaddressedTreeList(
+                    treeSet = measHtTreeSet,
+                    label = "剩餘樹高",
+                    widthType = "medium",
+                    onChoose = {
+                        targetId.value = it.toInt()
+                        coroutineScope.launch {
+                            lazyListState.scrollToItem(targetId.value - 1)
+                        }
+                    }
+                )
+
+                ExposedUnaddressedTreeList(
+                    treeSet = visHtTreeSet,
+                    label = "剩餘目視樹高",
+                    widthType = "large",
+                    onChoose = {
+                        targetId.value = it.toInt()
+                        coroutineScope.launch {
+                            lazyListState.scrollToItem(targetId.value - 1)
+                        }
+                    }
+                )
+
+                ExposedUnaddressedTreeList(
+                    treeSet = forkHtTreeSet,
+                    label = "剩餘分岔樹高",
+                    widthType = "large",
+                    onChoose = {
+                        targetId.value = it.toInt()
+                        coroutineScope.launch {
+                            lazyListState.scrollToItem(targetId.value - 1)
+                        }
+                    }
+                )
+            }
+
+            CustomizedDivider()
+
+            // Progress Block
+            LazyColumn(
+                state = lazyListState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        color = md_theme_light_primary,
+                        shape = LowerShapes.medium
+                    )
+            ) {
+                itemsIndexed(newPlotData.PlotTrees) { idx, tree ->
+                    Row(
+                        modifier = Modifier.padding(10.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        ListItem(
+                            modifier = circleThreeDigitsModifier,
+                            headlineContent = {
+                                // https://stackoverflow.com/questions/63719072/jetpack-compose-centering-text
+                                Text(
+                                    text = String.format("%03d", tree.SampleNum),
+                                    textAlign = TextAlign.Center,
+                                    style = TextStyle(
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold
+                                    ),
+                                    modifier = Modifier.wrapContentHeight(Alignment.CenterVertically)
+                                )
+                            }
+                        )
+
+                        LazyColumnInputTextField(
+                            unaddressedTreeSet = dbhTreeSet,
+                            tree = tree,
+                            type = "DBH",
+                        )
+
+                        LazyColumnInputTextField(
+                            unaddressedTreeSet = measHtTreeSet,
+                            tree = tree,
+                            type = "測量樹高",
+                        )
+
+                        LazyColumnInputTextField(
+                            unaddressedTreeSet = visHtTreeSet,
+                            tree = tree,
+                            type = "目視樹高",
+                        )
+
+                        LazyColumnInputTextField(
+                            unaddressedTreeSet = forkHtTreeSet,
+                            tree = tree,
+                            type = "分岔樹高",
+                        )
+                    }
+                    DropdownDivider()
                 }
             }
         }
     }
+
 }
 
 @Composable

@@ -1,9 +1,12 @@
 package com.example.ntufapp.ui
 
 import android.util.Log
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
@@ -24,60 +27,89 @@ import androidx.compose.ui.unit.sp
 import com.example.ntufapp.R
 import com.example.ntufapp.model.PlotData
 import com.example.ntufapp.model.Tree
+import com.example.ntufapp.ui.theme.IntervalDivider
+import com.example.ntufapp.ui.theme.Shapes
+import com.example.ntufapp.ui.theme.lightBorder
 
 @Composable
 fun SpeciesConditionView(
-    curTreeNum: MutableState<String>,
+    currentTreeNum: MutableState<String>,
     totalTreesNumList: MutableList<String>,
     newPlotData: PlotData
 ) {
-    val curTree = remember { mutableStateOf(newPlotData.searchTree(curTreeNum.value.toInt())) }
+    val currentTree = remember { mutableStateOf(newPlotData.searchTree(currentTreeNum.value.toInt())) }
     val modifier = Modifier.width(450.dp)
-    Column(
-        verticalArrangement = Arrangement.Center
+    // Adjust the height
+    val windowInfo = rememberWindowInfo()
+    val height =  when (windowInfo.screenHeightInfo) {
+        WindowInfo.WindowType.Compact -> 300.dp
+        WindowInfo.WindowType.Medium -> 350.dp
+        WindowInfo.WindowType.Expanded -> 420.dp
+        else -> 400.dp
+    }
+
+    Box(
+        modifier = Modifier
+            .padding(10.dp)
+            .height(height)
+            .border(lightBorder, Shapes.medium),
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            SearchableDropdownMenu(
-                totalTreesNumList,
-                label = "請選擇樣樹",
-                defaultString = "1",
-                keyboardType = KeyboardType.Number,
-                onChoose = {
-                    curTreeNum.value = it
-                    curTree.value = newPlotData.searchTree(curTreeNum.value.toInt())
-                },
-                onAdd = {
-                    newPlotData.PlotTrees.add(Tree(SampleNum = it.toInt()))
-                    curTreeNum.value = it
-                    curTree.value = newPlotData.searchTree(curTreeNum.value.toInt())
-                    Log.i("PlotTreeView", "newPlotData.getPlotTreesSize(): ${newPlotData.PlotTrees.size}")
-                }
+        Column(
+            verticalArrangement = Arrangement.Center
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                SearchableAddMenu(
+                    totalTreesNumList,
+                    label = "請選擇樣樹",
+                    defaultString = "1",
+                    keyboardType = KeyboardType.Number,
+                    onChoose = {
+                        currentTreeNum.value = it
+                        currentTree.value = newPlotData.searchTree(currentTreeNum.value.toInt())
+                    },
+                    onAdd = {
+                        newPlotData.PlotTrees.add(Tree(SampleNum = it.toInt()))
+                        currentTreeNum.value = it
+                        currentTree.value = newPlotData.searchTree(currentTreeNum.value.toInt())
+                        Log.i(
+                            "PlotTreeView",
+                            "newPlotData.getPlotTreesSize(): ${newPlotData.PlotTrees.size}"
+                        )
+                    },
+                    modifier = Modifier
+                        .padding(5.dp)
+                        .width(180.dp)
+                        .height(75.dp)
+                )
+                TreeSpeciesWidget(currentTree = currentTree.value!!)
+            }
+            TreeConditionChips(
+                currentTreeNum = currentTree.value!!,
+                reRenderCurrentTree = { it.clear() },
+                modifier = modifier
             )
 
-            TreeSpeciesWidget(curTree = curTree.value!!)
         }
-
-        ChipsTreeCondition(curTree = curTree.value!!, modifier = modifier)
     }
 }
 
 @Composable
 fun TreeSpeciesWidget(
-    curTree: Tree,
+    currentTree: Tree,
 ) {
     val showDialog = remember { mutableStateOf(false) }
-    val curTreeSpecies = remember { mutableStateOf(curTree.Species) }
-    curTreeSpecies.value = curTree.Species
+    val currentTreeSpecies = remember { mutableStateOf(currentTree.Species) }
+    currentTreeSpecies.value = currentTree.Species
 
     Row(
         modifier = Modifier
             .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 5.dp),
         verticalAlignment = Alignment.CenterVertically
-    ){
+    ) {
         TextField(
-            value = curTreeSpecies.value,
+            value = currentTreeSpecies.value,
             onValueChange = {},
             readOnly = true,
             label = {
@@ -107,8 +139,8 @@ fun TreeSpeciesWidget(
                 onCancelClick = { showDialog.value = false },
                 onNextButtonClick = {
                     showDialog.value = false
-                    curTreeSpecies.value = it
-                    curTree.Species = it
+                    currentTreeSpecies.value = it
+                    currentTree.Species = it
                 }
             )
         }

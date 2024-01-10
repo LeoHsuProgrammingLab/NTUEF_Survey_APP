@@ -48,15 +48,18 @@ import com.example.ntufapp.utils.showMessage
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun SearchableDropdownMenu(
-    totalTreesNumList: MutableList<String>,
+// Can add new choices to the list
+// Searchable with texts and use the dropdown menu to show the filtered options
+fun SearchableAddMenu(
+    totalItemsList: MutableList<String>,
     defaultString: String = "",
     label: String = "搜尋",
     dialogType: String = "Tree",
     readOnly: Boolean = false,
     keyboardType: KeyboardType,
     onChoose: (String) -> Unit,
-    onAdd: (String) -> Unit
+    onAdd: (String) -> Unit,
+    modifier: Modifier
 ) {
     val searchText = remember { mutableStateOf(defaultString) }
     val validSearchText = remember { mutableStateOf(defaultString) }
@@ -65,132 +68,127 @@ fun SearchableDropdownMenu(
     val keyboardController = LocalSoftwareKeyboardController.current
 
     val dropdownExpanded = remember { mutableStateOf(false) }
-    val addExpanded = remember { mutableStateOf(false) }
 
-
-    ExposedDropdownMenuBox(
-        expanded = dropdownExpanded.value,
-        onExpandedChange = {
-            dropdownExpanded.value = !dropdownExpanded.value
-            if (searchText.value !in totalTreesNumList) {
-                searchText.value = validSearchText.value
-            } else {
-                validSearchText.value = searchText.value
-            }
-            filteredOptions.clear()
-            filteredOptions.addAll(totalTreesNumList)
-            onChoose(searchText.value)
-            addExpanded.value = false
-            Log.i(dTag, "dropdownExpanded.value: ${dropdownExpanded.value}")
-        }
+    Column(
+        modifier = Modifier
+            .width(200.dp)
+            .padding(vertical = 5.dp)
     ) {
-        val curContext = LocalContext.current
-        OutlinedTextField(
-            value = searchText.value,
-            onValueChange = { text ->
-                filterOptions(totalTreesNumList, text).let {
-                    filteredOptions.clear()
-                    filteredOptions.addAll(it)
-                }
-                searchText.value = text
-                if (searchText.value in totalTreesNumList) {
-                    onChoose(searchText.value)
-                    validSearchText.value = searchText.value
-                } else if (searchText.value.isEmpty()) {
-                    onChoose("1")
-                } else {
-                    onChoose(validSearchText.value)
-                    searchText.value = validSearchText.value
-                    showMessage(curContext, "您搜尋的樹不存在!")
-                }
-                Log.i(dTag, "dropdown searchText.value: ${searchText.value}")
-            },
-            label = {
-                Text(
-                    text = label,
-                    style = TextStyle(
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-            },
-            leadingIcon = {
-                Icon(imageVector = Icons.Filled.Search, contentDescription = null)
-            },
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(
-                    expanded = dropdownExpanded.value
-                )
-            },
-            keyboardOptions = KeyboardOptions.Default.copy(
-                imeAction = ImeAction.Search,
-                keyboardType = keyboardType
-            ),
-            readOnly = readOnly,
-            singleLine = true,
-            textStyle = TextStyle(
-                fontSize = 18.sp
-            ),
-            modifier = Modifier
-                .width(150.dp)
-                .height(75.dp)
-                .menuAnchor() // super important
-                .focusable(true)
-        )
-        // DropdownMenu
-        ExposedDropdownMenu(
+        ExposedDropdownMenuBox(
             expanded = dropdownExpanded.value,
-            onDismissRequest = {
-                dropdownExpanded.value = false
-            },
-            modifier = dropDownMenuModifier
+            onExpandedChange = {
+                dropdownExpanded.value = !dropdownExpanded.value
+                if (searchText.value !in totalItemsList) {
+                    searchText.value = validSearchText.value
+                } else {
+                    validSearchText.value = searchText.value
+                }
+                filteredOptions.reset(totalItemsList)
+                onChoose(searchText.value)
+            }
         ) {
-            if (filteredOptions.isEmpty()) {
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.no_result)) },
-                    onClick = {},
-                    modifier = dropDownItemModifier
-                )
-                DropdownDivider()
-            } else {
-                filteredOptions.forEach { option ->
+            val curContext = LocalContext.current
+            OutlinedTextField(
+                value = searchText.value,
+                onValueChange = { text ->
+                    filterOptions(totalItemsList, text).let {
+                        filteredOptions.reset(it)
+                    }
+                    searchText.value = text
+                    if (searchText.value in totalItemsList) {
+                        onChoose(searchText.value)
+                        validSearchText.value = searchText.value
+                    } else if (searchText.value.isEmpty()) {
+                        onChoose("1")
+                        validSearchText.value = "1"
+                    } else {
+                        onChoose(validSearchText.value)
+                        searchText.value = validSearchText.value
+                        showMessage(curContext, "您搜尋的樹不存在!")
+                    }
+                },
+                label = {
+                    Text(
+                        text = label,
+                        style = TextStyle(
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                },
+                leadingIcon = {
+                    Icon(imageVector = Icons.Filled.Search, contentDescription = "searchable")
+                },
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(
+                        expanded = dropdownExpanded.value
+                    )
+                },
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Search,
+                    keyboardType = keyboardType
+                ),
+                readOnly = readOnly,
+                textStyle = TextStyle(
+                    fontSize = 18.sp
+                ),
+                modifier = modifier
+                    .menuAnchor() // super important
+                    .focusable(true),
+            )
+            // DropdownMenu
+            ExposedDropdownMenu(
+                expanded = dropdownExpanded.value,
+                onDismissRequest = {},
+                modifier = dropDownMenuModifier
+            ) {
+                if (filteredOptions.isEmpty()) {
                     DropdownMenuItem(
-                        text = { Text(option) },
-                        onClick = {
-                            validSearchText.value = option
-                            searchText.value = option
-                            dropdownExpanded.value = false
-                            onChoose(option)
-                        },
+                        text = { Text(stringResource(R.string.no_result)) },
+                        onClick = {},
                         modifier = dropDownItemModifier
                     )
                     DropdownDivider()
+                } else {
+                    filteredOptions.forEach { option ->
+                        DropdownMenuItem(
+                            text = { Text(option) },
+                            onClick = {
+                                validSearchText.value = option
+                                searchText.value = option
+                                dropdownExpanded.value = false
+                                onChoose(option)
+                            },
+                            modifier = dropDownItemModifier
+                        )
+                        DropdownDivider()
+                    }
                 }
-            }
 
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.add)) },
-                trailingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Add, // Replace with your desired icon
-                        contentDescription = "Add Icon",
-                    )
-                },
-                onClick = { showDialog.value = true }
-            )
-
-            if(showDialog.value) {
-                AddDialog(
-                    type = dialogType,
-                    onDismiss = { /*showDialog.value = false*/ },
-                    onCancelClick = { showDialog.value = false },
-                    onNextButtonClick = {
-                        showDialog.value = false
-                        totalTreesNumList.add(it)
-                        onAdd(it)
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.add)) },
+                    trailingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Add, // Replace with your desired icon
+                            contentDescription = "Add Icon",
+                        )
                     },
-                    curSize = totalTreesNumList.size
+                    onClick = { showDialog.value = true }
                 )
+
+                if (showDialog.value) {
+                    AddDialog(
+                        type = dialogType,
+                        onDismiss = { /*showDialog.value = false*/ },
+                        onCancelClick = { showDialog.value = false },
+                        onNextButtonClick = {
+                            showDialog.value = false
+                            totalItemsList.add(it)
+                            onAdd(it)
+                        },
+                        curSize = totalItemsList.size
+                    )
+                }
             }
         }
     }
@@ -199,18 +197,15 @@ fun SearchableDropdownMenu(
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
-fun SearchableDropdownMenu2(
-    optionsInput: MutableList<String>,
+fun SearchableChooseMenu(
+    totalItemsList: MutableList<String>,
     defaultString: String = "",
     label: String = "搜尋",
     readOnly: Boolean = false,
     onChoose: (String) -> Unit,
 ) {
-    val options = remember {
-        mutableStateOf(optionsInput)
-    }
+    val speciesOptions = remember { mutableStateListOf<String>() }
     val searchText = remember { mutableStateOf(defaultString) }
-    val filteredOptions = remember { mutableStateOf(options.value) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
     val dropdownExpanded = remember { mutableStateOf(false) }
@@ -226,17 +221,16 @@ fun SearchableDropdownMenu2(
             onExpandedChange = {
                 dropdownExpanded.value = !dropdownExpanded.value
                 addExpanded.value = false
+                speciesOptions.reset(filterOptions(totalItemsList, searchText.value))
             }
         ) {
             OutlinedTextField(
                 value = searchText.value,
                 readOnly = readOnly,
-                label = {Text(label)},
+                label = { Text(label) },
                 onValueChange = { text ->
-                    filterOptions(options.value, text).let {
-                        filteredOptions.value = it as MutableList<String>
-                    }
                     searchText.value = text
+                    speciesOptions.reset(filterOptions(totalItemsList, text))
                 },
                 leadingIcon = {
                     Icon(imageVector = Icons.Filled.Search, contentDescription = null)
@@ -250,17 +244,13 @@ fun SearchableDropdownMenu2(
                     imeAction = ImeAction.Search,
                     keyboardType = KeyboardType.Text
                 ),
-                keyboardActions = KeyboardActions(
-                    onSearch = {
-                        keyboardController?.hide()
-                    }
-                ),
                 singleLine = true,
                 textStyle = TextStyle(fontSize = 13.sp),
                 modifier = Modifier
                     .width(180.dp)
                     .height(80.dp)
                     .menuAnchor()
+                    .focusable(true),
             )
             // DropdownMenu
             ExposedDropdownMenu(
@@ -268,7 +258,7 @@ fun SearchableDropdownMenu2(
                 onDismissRequest = { dropdownExpanded.value = false },
                 modifier = Modifier.height(200.dp)
             ) {
-                filteredOptions.value.forEach { option ->
+                speciesOptions.forEach { option ->
                     DropdownMenuItem(
                         text = {
                             Text(option)
@@ -365,5 +355,13 @@ fun AddDialog(
 }
 
 fun filterOptions(options: List<String>, query: String): List<String> {
+    if (query.isEmpty()) {
+        return options
+    }
     return options.filter { it.contains(query, ignoreCase = true) }
+}
+
+fun MutableList<String>.reset(options: List<String>) {
+    clear()
+    addAll(options)
 }

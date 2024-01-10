@@ -182,13 +182,14 @@ fun SaveJsonDialog(
     onCancelClick: () -> Unit
 ) {
     Dialog(
-        onDismissRequest = {
-            onDismiss.invoke()
-        }
+        onDismissRequest = { onDismiss.invoke() }
     ) {
         val text = remember { mutableStateOf("") }
         Surface(shape = Shapes.small) {
-            Column(modifier = Modifier.padding(10.dp)) {
+            Column(
+                modifier = Modifier.padding(10.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 OutlinedTextField(
                     value = text.value,
                     onValueChange = {
@@ -197,7 +198,10 @@ fun SaveJsonDialog(
                     label = { Text("請輸入檔名") },
                     leadingIcon = { Icon(imageVector = Icons.Filled.FileDownload, contentDescription = null) }
                 )
-                Row(horizontalArrangement = Arrangement.SpaceEvenly) {
+
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
                     OutlinedButton(
                         onClick = onCancelClick
                     ) {
@@ -211,6 +215,27 @@ fun SaveJsonDialog(
                         }
                     ) {
                         Text("命名")
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun SaveJsonShowOutputDialog() {
+    Dialog(
+        onDismissRequest = {}
+    ) {
+        Surface(shape = Shapes.small) {
+            Column(modifier = Modifier.padding(10.dp)) {
+                Text("檔案已儲存至下列路徑")
+                Text("Android/data/com.example.ntufapp/files/Download")
+                Row(horizontalArrangement = Arrangement.SpaceEvenly) {
+                    Button(
+                        onClick = {}
+                    ) {
+                        Text("確認")
                     }
                 }
             }
@@ -322,17 +347,20 @@ fun AdjustSpeciesDialog( // Survey Screen
         onDismissRequest = { onDismiss.invoke() }
     ) {
         Surface(shape = Shapes.small) {
-            Column(modifier = Modifier.padding(10.dp)) {
-                SearchableDropdownMenu2(
-                    optionsInput = DataSource.SpeciesList as MutableList<String>,
+            Column(
+                modifier = Modifier.padding(10.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                SearchableChooseMenu(
+                    totalItemsList = DataSource.SpeciesList as MutableList<String>,
                     onChoose = {
                         treeSpecies.value = it
                     }
                 )
-
                 Spacer(modifier = Modifier.padding(10.dp))
-
-                Row{
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ){
                     Button(
                         modifier = Modifier.padding(10.dp),
                         onClick = onCancelClick,

@@ -50,13 +50,34 @@ fun MetaDateView(newPlotData: PlotData) {
         }
 
         Column(
-            modifier = Modifier.padding(5.dp),
+            modifier = Modifier.padding(10.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            SearchableDropdownMenu(newPlotData.Surveyor, defaultString = "名單", label = "樣區調查人員", dialogType = "Name", readOnly = true, onChoose = {}, onAdd = {}, keyboardType = KeyboardType.Number)
+            val modifier = Modifier
+                .height(60.dp)
+            SearchableAddMenu(
+                newPlotData.Surveyor,
+                defaultString = "名單",
+                label = "樣區調查人員",
+                dialogType = "Name",
+                readOnly = true,
+                onChoose = {}, onAdd = {},
+                keyboardType = KeyboardType.Number,
+                modifier = modifier
+            )
             IntervalDivider()
-            SearchableDropdownMenu(newPlotData.HtSurveyor, defaultString = "名單", label = "樹高調查人員", dialogType = "Name", readOnly = true, onChoose = {}, keyboardType = KeyboardType.Number ) {}
+            SearchableAddMenu(
+                newPlotData.HtSurveyor,
+                defaultString = "名單",
+                label = "樹高調查人員",
+                dialogType = "Name",
+                readOnly = true,
+                onChoose = {},
+                onAdd = {},
+                keyboardType = KeyboardType.Number,
+                modifier = modifier
+            )
         }
     }
 
@@ -65,7 +86,7 @@ fun MetaDateView(newPlotData: PlotData) {
 
 @Composable
 fun MetaDataRow(info1: Pair<String, String>, info2: Pair<String, String>, info3: Pair<String, String>, info4: Pair<String, String>) {
-    Row(modifier = Modifier.padding(5.dp)) {
+    Row(modifier = Modifier.padding(horizontal = 5.dp)) {
         MetaDataBlock(blockName = info1.first, blockVal = info1.second)
         MetaDataBlock(blockName = info2.first, blockVal = info2.second)
         MetaDataBlock(blockName = info3.first, blockVal = info3.second)

@@ -1,6 +1,5 @@
 package com.example.ntufapp.ui
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
@@ -40,7 +38,7 @@ import com.example.ntufapp.ui.theme.md_theme_light_primaryContainer
 
 @Composable
 fun InputProgressView(
-    curTreeNum: String,
+    currentTreeNum: String,
     newPlotData: PlotData
 ) {
     val dbhState = remember {
@@ -65,25 +63,25 @@ fun InputProgressView(
                 InputRow(label = "DBH",
                     onClick = {
                         dbhState.doubleValue = it
-                        newPlotData.searchTree(curTreeNum.toInt())!!.DBH = it
+                        newPlotData.searchTree(currentTreeNum.toInt())!!.DBH = it
                     }
                 )
                 InputRow(label = "目視樹高",
                     onClick = {
                         visHtState.doubleValue = it
-                        newPlotData.searchTree(curTreeNum.toInt())!!.VisHeight = it
+                        newPlotData.searchTree(currentTreeNum.toInt())!!.VisHeight = it
                     }
                 )
                 InputRow(label = "量測樹高",
                     onClick = {
                         htState.doubleValue = it
-                        newPlotData.searchTree(curTreeNum.toInt())!!.MeasHeight = it
+                        newPlotData.searchTree(currentTreeNum.toInt())!!.MeasHeight = it
                     }
                 )
                 InputRow(label = "分岔樹高",
                     onClick = {
                         forkHtState.doubleValue = it
-                        newPlotData.searchTree(curTreeNum.toInt())!!.ForkHeight = it
+                        newPlotData.searchTree(currentTreeNum.toInt())!!.ForkHeight = it
                     }
                 )
             }

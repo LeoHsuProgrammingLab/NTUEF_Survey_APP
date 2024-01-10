@@ -54,7 +54,6 @@ fun NewSurveyScreen(
     }
 
     val totalTreesNumList = remember { mutableStateListOf(*treeNumList.toTypedArray()) }
-    Log.d(dTag, "NewSurveyScreen: totalTreesNumList: ${totalTreesNumList.size}")
 
     SurveyView(totalTreesNumList = totalTreesNumList, newPlotData = newPlotDataState.value, onNextButtonClick = onNextButtonClick)
 }
