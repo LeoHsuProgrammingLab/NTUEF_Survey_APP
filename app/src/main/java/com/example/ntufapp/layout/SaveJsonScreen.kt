@@ -69,21 +69,24 @@ fun SaveJsonScreen(
                 }
                 OutlinedButton(
                     modifier = modifier,
-                    onClick = { showDialog.value = true }
+                    onClick = {
+                        saveJsonFile(context, newPlotData, toCSV = true)
+                        showDialog.value = true
+                    }
                 ) {
                     Text(text = "儲存樣區資料", fontSize = 20.sp)
                 }
 
-                if (showDialog.value) {
-                    SaveJsonDialog(
-                        onDismiss = {},
-                        onSaveClick = {
-                            showDialog.value = false
-                            saveJsonFile(newPlotData, it, context)
-                        },
-                        onCancelClick = { showDialog.value = false }
-                    )
-                }
+//                if (showDialog.value) {
+//                    SaveJsonDialog(
+//                        onDismiss = {},
+//                        onSaveClick = {
+//                            showDialog.value = false
+//                            saveJsonFile(context, newPlotData, toCSV = true)
+//                        },
+//                        onCancelClick = { showDialog.value = false }
+//                    )
+//                }
             }
         }
     }

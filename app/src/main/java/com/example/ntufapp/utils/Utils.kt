@@ -8,6 +8,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import com.example.ntufapp.data.DataSource.columnName
 import com.example.ntufapp.data.ntufappInfo.Companion.outputDirName
 import com.example.ntufapp.model.PlotData
 import com.google.gson.Gson
@@ -44,7 +45,7 @@ fun parseJsonToMetaData(uri: Uri, context: Context): PlotData? {
     }
 }
 
-fun saveJsonFile(plotData: PlotData, fileName: String, context: Context) {
+fun saveJsonFile(context: Context, plotData: PlotData, fileName: String = "", toCSV: Boolean) {
     // Research
 //    val permission = checkPermission(context)
 //    if (!permission) {
@@ -57,40 +58,121 @@ fun saveJsonFile(plotData: PlotData, fileName: String, context: Context) {
 //        Log.d("saveJsonFile", "permission granted")
 //    }
 
-    // Check if the string is valid
-    var validFileName: String
-    if (fileName.isNotEmpty()) {
-        validFileName = "$fileName.json"
-    } else {
-        showMessage(context, "儲存失敗：請輸入檔名！")
-        return
-    }
-
-    val dirName = outputDirName
     // Read the data
     val gson = Gson()
     val myJson = gson.toJson(plotData)
 
+    // Check if the string is valid
+    var validFilename: String
+    if (fileName.isNotEmpty()) {
+        validFilename = if (toCSV) {
+            "$fileName.csv"
+        } else {
+            "$fileName.json"
+        }
+    } else {
+        val formattedFilename = plotData.ManageUnit + plotData.PlotName + "_" + plotData.PlotNum
+        validFilename = if (toCSV) {
+            "$formattedFilename.csv"
+        } else {
+            "$formattedFilename.json"
+        }
+    }
+
     val documentsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
+    val dirName = outputDirName
     // The below is the app-specific directory, and it may be invisible to the user.
     // val documentsDir = context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
 
+    // Create the directory if it doesn't exist
     val appDir = File(documentsDir, dirName)
     if (!appDir.exists()) {
-        Log.d("saveJsonFile", "appDir does not exist")
         if(!appDir.mkdir()) {
-            Log.d("saveJsonFile", "mkdir failed")
+            showMessage(context, "儲存失敗：無法建立資料夾！")
         }
     }
-    val file = File(appDir, validFileName)
-    Log.d("saveJsonFile", "file: ${file.absoluteFile} ")
+    // Create the file path
+    var file = File(appDir, validFilename)
+    var count = 1
+    while (file.exists()) {
+        val postfixStart = validFilename.lastIndexOf(".")
+        Log.d("saveJsonFile", "postfixStart: $postfixStart")
+        file = File(appDir, "${validFilename.substring(0, postfixStart)}_${count}${validFilename.substring(postfixStart)}")
+        count++
+    }
 
     try {
-        writeToJson(context, file, myJson)
+        if (toCSV) {
+            val flattenedPlotData = flattenPlotData(plotData)
+            writeToCSV(file, flattenedPlotData)
+        } else {
+            writeToJson(file, myJson)
+        }
         showMessage(context, "儲存成功！${file.absoluteFile}")
     } catch (e: IOException) {
+        showMessage(context, "儲存失敗：${e.message}")
         e.printStackTrace()
     }
+}
+
+fun flattenPlotData(plotData: PlotData): List<List<String>> {
+    val flattenedPlotData = mutableListOf<List<String>>()
+
+    // Add the header
+    val header = mutableListOf<String>()
+    columnName.forEach {
+        header.add(it)
+    }
+    flattenedPlotData.add(header)
+
+    // Add the data
+    plotData.PlotTrees.forEach { tree ->
+        val row = listOf(
+            plotData.Date,
+            plotData.ManageUnit,
+            plotData.SubUnit,
+            plotData.PlotNum,
+            plotData.PlotName,
+            plotData.PlotArea.toString(),
+            plotData.PlotType,
+            plotData.TWD97_X,
+            plotData.TWD97_Y,
+            plotData.Altitude.toString(),
+            plotData.Slope.toString(),
+            plotData.Aspect,
+            plotData.Surveyor.joinToString(";"),
+            plotData.HtSurveyor.joinToString(";"),
+            tree.SampleNum.toString(),
+            tree.Species,
+            tree.DBH.toString(),
+            tree.State.joinToString(";"),
+            tree.MeasHeight.toString(),
+            tree.VisHeight.toString(),
+            tree.ForkHeight.toString()
+        )
+
+        flattenedPlotData.add(row)
+    }
+    return flattenedPlotData
+}
+
+fun writeToCSV(outputFile: File, flattenedPlotData: List<List<String>>) {
+    val fileOutputStream = FileOutputStream(outputFile)
+    val bufferedWriter = BufferedWriter(fileOutputStream.writer())
+
+    flattenedPlotData.forEach { row ->
+        bufferedWriter.write(row.joinToString(","))
+        bufferedWriter.newLine()
+    }
+
+    bufferedWriter.close()
+    fileOutputStream.close()
+}
+
+fun writeToJson(outputFile: File, jsonString: String) {
+    val fileOutputStream = FileOutputStream(outputFile)
+    fileOutputStream.write(jsonString.toByteArray())
+    fileOutputStream.close()
 }
 
 fun getFileName(context: Context, uri: Uri?): String {
@@ -106,13 +188,6 @@ fun getFileName(context: Context, uri: Uri?): String {
         }
     }
     return ""
-}
-
-fun writeToJson(context: Context, outputFile: File, jsonString: String) {
-    val fileOutputStream = FileOutputStream(outputFile)
-    fileOutputStream.write(jsonString.toByteArray())
-    fileOutputStream.close()
-    Log.d("writeToJson", "file saved")
 }
 
 // Research

@@ -105,9 +105,7 @@ fun ConfirmDialog( // Plot Options Screen
     onNextButtonClick: (PlotData) -> Unit
 ){
     Dialog(
-        onDismissRequest = {
-            onDismiss.invoke()
-        }
+        onDismissRequest = { onDismiss.invoke() }
     ) {
         val context = LocalContext.current
 
@@ -223,27 +221,6 @@ fun SaveJsonDialog(
 }
 
 @Composable
-fun SaveJsonShowOutputDialog() {
-    Dialog(
-        onDismissRequest = {}
-    ) {
-        Surface(shape = Shapes.small) {
-            Column(modifier = Modifier.padding(10.dp)) {
-                Text("檔案已儲存至下列路徑")
-                Text("Android/data/com.example.ntufapp/files/Download")
-                Row(horizontalArrangement = Arrangement.SpaceEvenly) {
-                    Button(
-                        onClick = {}
-                    ) {
-                        Text("確認")
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
 fun ManualInputNewPlotDialog(
     onDismiss: () -> Unit,
     onSendClick: (PlotData) -> Unit,
@@ -274,7 +251,7 @@ fun ManualInputNewPlotDialog(
                 TextField(value = manageUnit.value, onValueChange = { text: String -> manageUnit.value = text }, label = { Text("營林區")})
                 TextField(value = subUnit.value, onValueChange = { text: String -> subUnit.value = text }, label = { Text("林班地")})
                 TextField(value = plotName.value, onValueChange = { text: String -> plotName.value = text }, label = { Text("樣區名稱")})
-                TextField(value = plotNum.value, onValueChange = { text: String -> plotNum.value = text }, label = { Text("樣區編號")})
+                TextField(value = plotNum.value, onValueChange = { text: String -> plotNum.value = text }, label = { Text("樣區編號")}, placeholder = {Text("請輸入數字")})
                 TextField(value = plotType.value, onValueChange = { text: String -> plotType.value = text }, label = { Text("樣區型態")})
                 TextField(value = plotArea.value, onValueChange = { text: String -> plotArea.value = text }, label = { Text("樣區面積")})
                 TextField(value = altitude.value, onValueChange = { text: String -> altitude.value = text }, label = { Text("樣區海拔")})
@@ -286,6 +263,12 @@ fun ManualInputNewPlotDialog(
                 Row(
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
+                    Button(
+                        modifier = Modifier.padding(10.dp),
+                        onClick = { onDismiss.invoke() }
+                    ) {
+                        Text(stringResource(id = (R.string.cancel)))
+                    }
                     Button(
                         modifier = Modifier.padding(10.dp),
                         onClick = {
@@ -305,7 +288,7 @@ fun ManualInputNewPlotDialog(
                                 plotData.value.ManageUnit = manageUnit.value
                                 plotData.value.SubUnit = subUnit.value
                                 plotData.value.PlotName = plotName.value
-                                plotData.value.PlotNum = plotNum.value.toInt()
+                                plotData.value.PlotNum = plotNum.value
                                 plotData.value.PlotType = plotType.value
                                 plotData.value.PlotArea = plotArea.value.toDouble()
                                 plotData.value.Altitude = altitude.value.toDouble()
@@ -320,12 +303,6 @@ fun ManualInputNewPlotDialog(
                         }
                     ) {
                         Text(stringResource(id = (R.string.next)))
-                    }
-                    Button(
-                        modifier = Modifier.padding(10.dp),
-                        onClick = { onDismiss.invoke() }
-                    ) {
-                        Text(stringResource(id = (R.string.cancel)))
                     }
                 }
             }

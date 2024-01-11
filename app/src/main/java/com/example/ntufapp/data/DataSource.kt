@@ -1,6 +1,30 @@
 package com.example.ntufapp.data
 
 object DataSource {
+    val columnName = listOf(
+        "調查日期",
+        "營林區",
+        "林班",
+        "樣區編號",
+        "樣區名稱",
+        "樣區面積",
+        "樣區型態",
+        "TWD97_X",
+        "TWD97_Y",
+        "海拔",
+        "坡度",
+        "坡向",
+        "調查人員",
+        "樹高調查人員",
+        "樣樹編號",
+        "樹種",
+        "胸徑",
+        "生長狀態",
+        "樹高",
+        "目視樹高",
+        "分岔樹高"
+    )
+
     val SurveyorList = listOf(
         "John",
         "Leo",

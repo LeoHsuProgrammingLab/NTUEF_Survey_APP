@@ -10,7 +10,7 @@ data class PlotData(
     var SubUnit: String = "", //1-55
 
     var PlotName: String = "",
-    var PlotNum: Int = 0,
+    var PlotNum: String = "0",
     var PlotType: String = "",
 
     var PlotArea: Double = 0.0,
