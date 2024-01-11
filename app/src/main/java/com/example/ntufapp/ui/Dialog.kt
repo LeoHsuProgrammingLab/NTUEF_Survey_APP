@@ -105,6 +105,89 @@ fun UploadFileDialog( // Plot Options Screen
 }
 
 @Composable
+fun AddDialog(
+    type: String = "tree",
+    onDismiss: () -> Unit,
+    onCancelClick: () -> Unit,
+    onNextButtonClick: (String) -> Unit,
+    curSize: Int
+){
+    val modifier = Modifier.padding(10.dp)
+    when(type) {
+        "Tree" ->
+            Dialog(
+                onDismissRequest = {
+                    onDismiss.invoke()
+                }
+            ) {
+                Surface(shape = Shapes.small) {
+                    Column(modifier = modifier) {
+                        Text(text = "您預計新增第 ${curSize + 1} 棵樹")
+                        Spacer(modifier = modifier)
+
+                        Row{
+                            Button(
+                                modifier = modifier,
+                                onClick = onCancelClick,
+                            ) {
+                                Text(stringResource(id = (R.string.cancel)))
+                            }
+
+                            Button(
+                                modifier = modifier,
+                                onClick = { onNextButtonClick((curSize + 1).toString()) }
+                            ) {
+                                Text(stringResource(id = (R.string.next)))
+                            }
+                        }
+                    }
+                }
+            }
+        "Name" ->
+            Dialog(
+                onDismissRequest = {
+                    onDismiss.invoke()
+                }
+            ) {
+                Surface(shape = Shapes.small) {
+                    Column(modifier = modifier) {
+                        val surveyorName = remember { mutableStateOf("") }
+                        Text(text = "您預計新增第 ${curSize + 1} 位調查人員")
+
+                        OutlinedTextField(
+                            value = surveyorName.value,
+                            onValueChange = {
+                                surveyorName.value = it
+                            },
+                            placeholder = { Text("請輸入調查人員姓名") },
+                        )
+
+                        Spacer(modifier = modifier)
+
+                        Row{
+                            Button(
+                                modifier = modifier,
+                                onClick = onCancelClick,
+                            ) {
+                                Text(stringResource(id = (R.string.cancel)))
+                            }
+
+                            Button(
+                                modifier = modifier,
+                                onClick = {
+                                    onNextButtonClick(surveyorName.value)
+                                }
+                            ) {
+                                Text(stringResource(id = (R.string.next)))
+                            }
+                        }
+                    }
+                }
+            }
+    }
+}
+
+@Composable
 // https://medium.com/@rooparshkalia/single-choice-dialog-with-jetpack-compose-d021650d31ca
 fun ConfirmDialog( // Plot Options Screen
     metaData: PlotData,

@@ -87,7 +87,7 @@ fun SearchableAddMenu(
                 onChoose(searchText.value)
             }
         ) {
-            val curContext = LocalContext.current
+            val context = LocalContext.current
             OutlinedTextField(
                 value = searchText.value,
                 onValueChange = { text ->
@@ -104,7 +104,7 @@ fun SearchableAddMenu(
                     } else {
                         onChoose(validSearchText.value)
                         searchText.value = validSearchText.value
-                        showMessage(curContext, "您搜尋的樹不存在!")
+                        showMessage(context, "您搜尋的樹不存在!")
                     }
                 },
                 label = {
@@ -134,7 +134,7 @@ fun SearchableAddMenu(
                 ),
                 modifier = modifier
                     .menuAnchor() // super important
-                    .focusable(true),
+                    .focusable(true), // for keyboard to work in the dropdown menu
             )
             // DropdownMenu
             ExposedDropdownMenu(
@@ -277,80 +277,6 @@ fun SearchableChooseMenu(
                 }
             }
         }
-    }
-}
-
-@Composable
-fun AddDialog(
-    type: String = "tree",
-    onDismiss: () -> Unit,
-    onCancelClick: () -> Unit,
-    onNextButtonClick: (String) -> Unit,
-    curSize: Int
-){
-    val modifier = Modifier.padding(10.dp)
-    when(type) {
-        "Tree" ->
-            Dialog(
-                onDismissRequest = {
-                    onDismiss.invoke()
-                }
-            ) {
-                Surface(shape = Shapes.small) {
-                    Column(modifier = modifier) {
-                        Text(text = "您預計新增第 ${curSize + 1} 棵樹")
-                        Spacer(modifier = modifier)
-
-                        Row{
-                            Button(
-                                modifier = modifier,
-                                onClick = onCancelClick,
-                            ) {
-                                Text(stringResource(id = (R.string.cancel)))
-                            }
-
-                            Button(
-                                modifier = modifier,
-                                onClick = { onNextButtonClick((curSize + 1).toString()) }
-                            ) {
-                                Text(stringResource(id = (R.string.next)))
-                            }
-                        }
-                    }
-                }
-            }
-        "Name" ->
-            Dialog(
-                onDismissRequest = {
-                    onDismiss.invoke()
-                }
-            ) {
-                Surface(shape = Shapes.small) {
-                    Column(modifier = modifier) {
-                        // TODO: DropDownMenu
-
-                        Spacer(modifier = modifier)
-
-                        Row{
-                            Button(
-                                modifier = modifier,
-                                onClick = onCancelClick,
-                            ) {
-                                Text(stringResource(id = (R.string.cancel)))
-                            }
-
-                            Button(
-                                modifier = modifier,
-                                onClick = {
-                                    onNextButtonClick((curSize + 1).toString())
-                                }
-                            ) {
-                                Text(stringResource(id = (R.string.next)))
-                            }
-                        }
-                    }
-                }
-            }
     }
 }
 

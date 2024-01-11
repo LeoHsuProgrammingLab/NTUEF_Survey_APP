@@ -50,12 +50,12 @@ fun MetaDateView(newPlotData: PlotData) {
         }
 
         Column(
-            modifier = Modifier.padding(10.dp),
+            modifier = Modifier.padding(5.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             val modifier = Modifier
-                .height(60.dp)
+                .height(65.dp)
             SearchableAddMenu(
                 newPlotData.Surveyor,
                 defaultString = "名單",
@@ -66,7 +66,6 @@ fun MetaDateView(newPlotData: PlotData) {
                 keyboardType = KeyboardType.Number,
                 modifier = modifier
             )
-            IntervalDivider()
             SearchableAddMenu(
                 newPlotData.HtSurveyor,
                 defaultString = "名單",
