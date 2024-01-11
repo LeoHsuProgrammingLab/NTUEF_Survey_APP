@@ -28,6 +28,7 @@ import com.example.ntufapp.utils.showMessage
 @Composable
 fun SaveScreen(
     newPlotData: PlotData,
+    outputFilename: String,
     onBackButtonClick: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -64,7 +65,7 @@ fun SaveScreen(
                 OutlinedButton(
                     modifier = modifier,
                     onClick = {
-                        saveFile(context, newPlotData, toCSV = true)
+                        saveFile(context, newPlotData, filename = outputFilename, toCSV = true)
                         showDialog.value = true
                     }
                 ) {

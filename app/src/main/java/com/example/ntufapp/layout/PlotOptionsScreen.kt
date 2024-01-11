@@ -39,7 +39,7 @@ import java.io.BufferedReader
 
 @Composable
 fun PlotOptionsScreen(
-    onNextButtonClick: (PlotData, String) -> Unit
+    onNextButtonClick: (PlotData, String, String) -> Unit
 ) {
     val tag = "PlotOptions"
 
@@ -65,11 +65,11 @@ fun PlotOptionsScreen(
             val filePickerLauncher = rememberLauncherForActivityResult(
                 ActivityResultContracts.GetContent()) { uri: Uri? ->
                 selectedFileUri.value = uri
-                Log.d(tag, "selectedFileUri: ${selectedFileUri.value}")
                 buttonText.value = getFileName(context, uri).takeIf { it.isNotEmpty() } ?: "請選擇JSON檔案"
             }
             val plotData = remember { mutableStateOf(PlotData()) }
             val surveyType = remember { mutableStateOf("") }
+            val outputFilename = remember { mutableStateOf("") }
 
             // Old Plot Survey
             val showOldPlotUpload = remember { mutableStateOf(false) }
@@ -99,6 +99,7 @@ fun PlotOptionsScreen(
                                     Toast.makeText(context, "你匯入了錯誤的檔案(.json)！", Toast.LENGTH_SHORT).show()
                                 } else {
                                     showOldUploadData.value = true
+                                    outputFilename.value = getFileName(context, uri)
                                 }
                             } catch (e: Exception) {
                                 Log.e(tag, "Exception during JSON parsing: ${e.message}")
@@ -120,7 +121,7 @@ fun PlotOptionsScreen(
                     onCancelClick = { showOldUploadData.value = false },
                     onNextButtonClick = {
                         surveyType.value = "ReSurvey"
-                        onNextButtonClick(it, surveyType.value)
+                        onNextButtonClick(it, surveyType.value, outputFilename.value)
                     }
                 )
             }
@@ -151,7 +152,6 @@ fun PlotOptionsScreen(
                     },
                 )
             }
-
             // Upload New Plot by JSON
             val dismissNewDialog = {
                 showNewPlotUpload.value = false
@@ -170,6 +170,7 @@ fun PlotOptionsScreen(
                                     Toast.makeText(context, "你匯入了錯誤的檔案(.json)！", Toast.LENGTH_SHORT).show()
                                 } else {
                                     showNewUploadData.value = true
+                                    outputFilename.value = getFileName(context, uri)
                                 }
                             } catch (e: Exception) {
                                 Log.e(tag, "Exception during JSON parsing: ${e.message}")
@@ -189,7 +190,7 @@ fun PlotOptionsScreen(
                     metaData = plotData.value,
                     onDismiss = {},
                     onCancelClick = { showNewUploadData.value = false },
-                    onNextButtonClick = { onNextButtonClick(it, surveyType.value) }
+                    onNextButtonClick = { onNextButtonClick(it, surveyType.value, outputFilename.value) }
                 )
             }
 
@@ -197,7 +198,7 @@ fun PlotOptionsScreen(
             if (showNewPlotManualInput.value) {
                 ManualInputNewPlotDialog(
                     onDismiss = { showNewPlotManualInput.value = false },
-                    onSendClick = { onNextButtonClick(it, surveyType.value) }
+                    onSendClick = { onNextButtonClick(it, surveyType.value, "") }
                 )
             }
         }

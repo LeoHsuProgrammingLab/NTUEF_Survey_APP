@@ -12,7 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.ntufapp.layout.PlotOptionsScreen
 import com.example.ntufapp.layout.ReSurveyScreen
 import com.example.ntufapp.ui.NTUEFTopBar
-import com.example.ntufapp.viewModel.TreeViewModel
+import com.example.ntufapp.viewModel.SurveyViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -32,7 +32,7 @@ enum class Screens {
 @Composable
 fun NTUEFApp(
     navController: NavHostController = rememberNavController(),
-    viewModel: TreeViewModel = viewModel()
+    viewModel: SurveyViewModel = viewModel()
 ) {
     Scaffold(
         topBar = { NTUEFTopBar() }
@@ -47,7 +47,7 @@ fun NTUEFApp(
         ) {
             composable(route = Screens.Start.name) {
                 PlotOptionsScreen(
-                    onNextButtonClick = {plotData, surveyType ->
+                    onNextButtonClick = {plotData, surveyType, outputFilename ->
                         viewModel.setNewData(plotData) // set the NewPlotData as the input json file and reset all trees
                         if (surveyType == "ReSurvey") {
                             viewModel.setOldData(plotData) // set the OldPlotData as the input json file
@@ -55,6 +55,7 @@ fun NTUEFApp(
                         } else {
                             navController.navigate(Screens.NewSurvey.name)
                         }
+                        viewModel.fileName = outputFilename
                     }
                 )
             }
@@ -85,6 +86,7 @@ fun NTUEFApp(
                 ResultDisplayScreen(
                     oldPlotData = resultState.first,
                     newPlotData = resultState.second,
+                    from = source?: "",
 //                    onBackButtonClick = {
 //                        when (source) {
 //                            "ReSurvey" -> navController.navigate(Screens.ReSurvey.name)
@@ -93,14 +95,14 @@ fun NTUEFApp(
 //                    },
                     onNextButtonClick = {
                         navController.navigate(Screens.SaveJson.name)
-                    },
-                    from = source?: ""
+                    }
                 )
             }
 
             composable(route = Screens.SaveJson.name) {
                 SaveScreen(
                     newPlotData = resultState.second,
+                    outputFilename = viewModel.fileName,
                     onBackButtonClick = {
                         resultState.first.resetAllTrees()
                         navController.navigate(Screens.Start.name)

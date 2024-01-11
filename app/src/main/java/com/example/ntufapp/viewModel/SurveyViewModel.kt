@@ -8,9 +8,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 
-class TreeViewModel: ViewModel() {
+class SurveyViewModel: ViewModel() {
     private val _resultState = MutableStateFlow(Pair(PlotData(), PlotData()))
     val resultState: StateFlow<Pair<PlotData, PlotData>> = _resultState.asStateFlow()
+    var fileName: String = ""
 
     fun setOldData(oldPlot: PlotData){
         _resultState.update { currentState ->

@@ -48,18 +48,18 @@ fun parseJsonToMetaData(uri: Uri, context: Context): PlotData? {
 }
 
 
-fun saveFile(context: Context, plotData: PlotData, fileName: String = "", toCSV: Boolean) {
+fun saveFile(context: Context, plotData: PlotData, filename: String = "", toCSV: Boolean) {
     // Read the data
     val gson = Gson()
     val myJson = gson.toJson(plotData)
 
     // Check if the string is valid
     var validFilename: String
-    if (fileName.isNotEmpty()) {
+    if (filename.isNotEmpty()) {
         validFilename = if (toCSV) {
-            "$fileName.csv"
+            filename.replaceAfter(".", "csv")
         } else {
-            "$fileName.json"
+            filename
         }
     } else {
         val formattedFilename = plotData.ManageUnit + plotData.PlotName + "_" + plotData.PlotNum
@@ -85,12 +85,11 @@ fun saveFile(context: Context, plotData: PlotData, fileName: String = "", toCSV:
     // Create the file path
     var file = File(appDir, validFilename)
     var count = 1
-//    while (file.exists()) {
-//        val postfixStart = validFilename.lastIndexOf(".")
-//        Log.d("saveJsonFile", "postfixStart: $postfixStart")
-//        file = File(appDir, "${validFilename.substring(0, postfixStart)}_${count}${validFilename.substring(postfixStart)}")
-//        count++
-//    }
+    while (file.exists()) {
+        val postfixStart = validFilename.lastIndexOf(".")
+        file = File(appDir, "${validFilename.substring(0, postfixStart)}_${count}${validFilename.substring(postfixStart)}")
+        count++
+    }
 
     try {
         if (toCSV) {
