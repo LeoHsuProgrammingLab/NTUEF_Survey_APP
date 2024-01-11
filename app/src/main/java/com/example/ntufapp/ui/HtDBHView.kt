@@ -228,25 +228,33 @@ fun HtDBHView(
                             }
                         )
 
+                        val dbh = remember{ mutableStateOf(tree.DBH.toString()) }
                         LazyColumnInputTextField(
+                            textContent = dbh,
                             unaddressedTreeSet = dbhTreeSet,
                             tree = tree,
                             type = "DBH",
                         )
 
+                        val measHeight = remember{ mutableStateOf(tree.MeasHeight.toString()) }
                         LazyColumnInputTextField(
+                            textContent = measHeight,
                             unaddressedTreeSet = measHtTreeSet,
                             tree = tree,
                             type = "測量樹高",
                         )
 
+                        val visHeight = remember{ mutableStateOf(tree.VisHeight.toString()) }
                         LazyColumnInputTextField(
+                            textContent = visHeight,
                             unaddressedTreeSet = visHtTreeSet,
                             tree = tree,
                             type = "目視樹高",
                         )
 
+                        val forkHeight = remember{ mutableStateOf(tree.ForkHeight.toString()) }
                         LazyColumnInputTextField(
+                            textContent = forkHeight,
                             unaddressedTreeSet = forkHtTreeSet,
                             tree = tree,
                             type = "分岔樹高",
@@ -262,13 +270,16 @@ fun HtDBHView(
 
 @Composable
 fun LazyColumnInputTextField(
-    defaultText: String = "",
+    textContent: MutableState<String>,
     unaddressedTreeSet: MutableState<MutableSet<String>>,
     tree: Tree,
     type: String,
 ) {
     val context = LocalContext.current
-    val textContent = remember { mutableStateOf(defaultText) }
+    if (textContent.value == "0.0") {
+        textContent.value = ""
+    }
+    Log.d("LazyColumnInputTextField", "tree.SampleNum: ${tree.SampleNum}, ${textContent.value}")
 
     fun updateTree(newValue: Double?) {
         if (newValue != null) {
@@ -292,6 +303,12 @@ fun LazyColumnInputTextField(
     TextField(
         value = textContent.value,
         onValueChange = {
+            if (it.isNotEmpty()) {
+                textContent.value = it
+                updateTree(it.toDoubleOrNull())
+            } else {
+                Log.d("LazyColumnInputTextField", "it is empty")
+            }
             textContent.value = it
             updateTree(it.toDoubleOrNull())
         },
@@ -362,9 +379,9 @@ fun ExposedUnaddressedTreeList(
             onDismissRequest = { dropdownExpanded.value = false },
             modifier = dropDownMenuModifier
         ) {
-            treeSet.value.sortedWith(Comparator {
-                str1, str2 -> str1.toInt() - str2.toInt()
-            }).forEach { option ->
+            treeSet.value.sortedWith(
+                Comparator { str1, str2 -> str1.toInt() - str2.toInt() }
+            ).forEach { option ->
                 DropdownMenuItem(
                     text = {
                         Text(option)

@@ -120,6 +120,13 @@ fun flattenPlotData(plotData: PlotData): List<List<String>> {
     // Add the data
     plotData.PlotTrees.forEach { tree ->
         val row = listOf(
+            tree.SampleNum.toString(),
+            tree.Species,
+            tree.DBH.toString(),
+            tree.State.joinToString(";"),
+            tree.MeasHeight.toString(),
+            tree.VisHeight.toString(),
+            tree.ForkHeight.toString(),
             plotData.Date,
             plotData.ManageUnit,
             plotData.SubUnit,
@@ -134,13 +141,6 @@ fun flattenPlotData(plotData: PlotData): List<List<String>> {
             plotData.Aspect,
             plotData.Surveyor.joinToString(";"),
             plotData.HtSurveyor.joinToString(";"),
-            tree.SampleNum.toString(),
-            tree.Species,
-            tree.DBH.toString(),
-            tree.State.joinToString(";"),
-            tree.MeasHeight.toString(),
-            tree.VisHeight.toString(),
-            tree.ForkHeight.toString()
         )
 
         flattenedPlotData.add(row)

@@ -267,9 +267,9 @@ fun ManualInputNewPlotDialog(
                 TextField(value = plotName.value, onValueChange = { text: String -> plotName.value = text }, label = { Text("樣區名稱")})
                 TextField(value = plotNum.value, onValueChange = { text: String -> plotNum.value = text }, label = { Text("樣區編號")})
                 TextField(value = plotType.value, onValueChange = { text: String -> plotType.value = text }, label = { Text("樣區型態")})
-                TextField(value = plotArea.value, onValueChange = { text: String -> plotArea.value = text }, label = { Text("樣區面積")})
-                TextField(value = altitude.value, onValueChange = { text: String -> altitude.value = text }, label = { Text("樣區海拔")})
-                TextField(value = slope.value, onValueChange = { text: String -> slope.value = text }, label = { Text("樣區坡度")})
+                TextField(value = plotArea.value, onValueChange = { text: String -> plotArea.value = text }, label = { Text("樣區面積(m2)")}, placeholder = { Text("請輸入數字")})
+                TextField(value = altitude.value, onValueChange = { text: String -> altitude.value = text }, label = { Text("樣區海拔(m)")}, placeholder = { Text("請輸入數字")})
+                TextField(value = slope.value, onValueChange = { text: String -> slope.value = text }, label = { Text("樣區坡度")}, placeholder = { Text("請輸入數字")})
                 TextField(value = aspect.value, onValueChange = { text: String -> aspect.value = text }, label = { Text("樣區坡向")})
                 TextField(value = TWD97_X.value, onValueChange = { text: String -> TWD97_X.value = text }, label = { Text("TWD97_X")})
                 TextField(value = TWD97_Y.value, onValueChange = { text: String -> TWD97_Y.value = text }, label = { Text("TWD97_Y")})
@@ -290,7 +290,7 @@ fun ManualInputNewPlotDialog(
                                 manageUnit.value != "" &&
                                 subUnit.value != "" &&
                                 plotName.value != "" &&
-                                (plotNum.value.toIntOrNull() != null) &&
+                                plotNum.value != "" &&
                                 plotType.value != "" &&
                                 (plotArea.value.toDoubleOrNull() ?: Double.NaN).isNaN().not() && // cool syntax
                                 (altitude.value.toDoubleOrNull() ?: Double.NaN).isNaN().not() &&

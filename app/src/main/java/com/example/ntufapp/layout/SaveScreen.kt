@@ -48,8 +48,8 @@ fun SaveScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             val showDialog = remember { mutableStateOf(false) }
-            val permissionGranted = remember { mutableStateOf(false) }
-            ExternalStoragePermissionHandler { permissionGranted.value = true }
+//            val permissionGranted = remember { mutableStateOf(false) }
+//            ExternalStoragePermissionHandler { permissionGranted.value = true }
 
             Row(
                 modifier = modifier,
