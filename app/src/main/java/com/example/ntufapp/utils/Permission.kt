@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.LocalContext
 const val REQUEST_CODE_PICK_DIR = 1
 
 @Composable
+// In your Content composable, call ExternalStoragePermissionHandler with your content when permission is granted.
 fun ExternalStoragePermissionHandler(onPermissionGranted: () -> Unit) {
     val context = LocalContext.current as ComponentActivity
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -38,4 +39,4 @@ fun ExternalStoragePermissionHandler(onPermissionGranted: () -> Unit) {
     }
 }
 
-// In your Content composable, call ExternalStoragePermissionHandler with your content when permission is granted.
+

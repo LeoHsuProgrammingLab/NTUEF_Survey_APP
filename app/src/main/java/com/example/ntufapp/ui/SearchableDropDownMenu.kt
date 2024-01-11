@@ -179,7 +179,7 @@ fun SearchableAddMenu(
                 if (showDialog.value) {
                     AddDialog(
                         type = dialogType,
-                        onDismiss = { /*showDialog.value = false*/ },
+                        onDismiss = {},
                         onCancelClick = { showDialog.value = false },
                         onNextButtonClick = {
                             showDialog.value = false

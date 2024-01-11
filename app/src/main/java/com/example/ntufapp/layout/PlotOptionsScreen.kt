@@ -5,6 +5,8 @@ import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.Image
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -17,8 +19,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -32,6 +36,7 @@ import com.example.ntufapp.ui.ManualInputNewPlotDialog
 import com.example.ntufapp.ui.NewSurveyUploadChoiceDialog
 import com.example.ntufapp.ui.UploadFileDialog
 import com.example.ntufapp.ui.theme.LayoutDivider
+import com.example.ntufapp.utils.DisableBackButtonHandler
 import com.example.ntufapp.utils.getFileName
 import com.example.ntufapp.utils.parseJsonToMetaData
 import com.google.gson.Gson
@@ -41,6 +46,7 @@ import java.io.BufferedReader
 fun PlotOptionsScreen(
     onNextButtonClick: (PlotData, String, String) -> Unit
 ) {
+    DisableBackButtonHandler(backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher!!)
     val tag = "PlotOptions"
 
     Column(

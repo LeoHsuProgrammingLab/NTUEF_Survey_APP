@@ -116,16 +116,16 @@ fun AddDialog(
     when(type) {
         "Tree" ->
             Dialog(
-                onDismissRequest = {
-                    onDismiss.invoke()
-                }
+                onDismissRequest = { onDismiss.invoke() }
             ) {
                 Surface(shape = Shapes.small) {
                     Column(modifier = modifier) {
                         Text(text = "您預計新增第 ${curSize + 1} 棵樹")
                         Spacer(modifier = modifier)
 
-                        Row{
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
                             Button(
                                 modifier = modifier,
                                 onClick = onCancelClick,
@@ -145,9 +145,7 @@ fun AddDialog(
             }
         "Name" ->
             Dialog(
-                onDismissRequest = {
-                    onDismiss.invoke()
-                }
+                onDismissRequest = { onDismiss.invoke() }
             ) {
                 Surface(shape = Shapes.small) {
                     Column(modifier = modifier) {
@@ -164,7 +162,9 @@ fun AddDialog(
 
                         Spacer(modifier = modifier)
 
-                        Row{
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
                             Button(
                                 modifier = modifier,
                                 onClick = onCancelClick,

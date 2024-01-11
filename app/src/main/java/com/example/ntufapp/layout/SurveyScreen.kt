@@ -1,6 +1,7 @@
 package com.example.ntufapp.layout
 
 import android.util.Log
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -11,6 +12,7 @@ import com.example.ntufapp.data.ntufappInfo.Companion.dTag
 import com.example.ntufapp.data.ntufappInfo.Companion.defaultTreeNum
 import com.example.ntufapp.model.PlotData
 import com.example.ntufapp.ui.SurveyView
+import com.example.ntufapp.utils.DisableBackButtonHandler
 
 //ref: https://www.youtube.com/watch?v=8XJfLaAOxD0&ab_channel=AndroidDevelopers
 // live-edit for compose
@@ -21,6 +23,8 @@ fun ReSurveyScreen(
     newPlotData: PlotData,
     onNextButtonClick: () -> Unit,
 ) {
+    DisableBackButtonHandler(backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher!!)
+
     // Save the final return data
     val newPlotDataState = remember { mutableStateOf(newPlotData) }
     newPlotDataState.value.setToday()
@@ -39,6 +43,8 @@ fun NewSurveyScreen(
     newPlotData: PlotData,
     onNextButtonClick: () -> Unit
 ) {
+    DisableBackButtonHandler(backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher!!)
+
     // Save the final return data
     val newPlotDataState = remember { mutableStateOf(newPlotData) }
 

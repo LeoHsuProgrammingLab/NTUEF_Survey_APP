@@ -2,6 +2,7 @@ package com.example.ntufapp.layout
 
 import android.content.Context
 import android.util.Log
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -65,6 +66,7 @@ import com.example.ntufapp.ui.theme.Shapes
 import com.example.ntufapp.ui.theme.circleThreeDigitsModifier
 import com.example.ntufapp.ui.theme.lightBorder
 import com.example.ntufapp.ui.theme.md_theme_light_inverseOnSurface
+import com.example.ntufapp.utils.DisableBackButtonHandler
 import com.example.ntufapp.utils.maxThree
 import com.example.ntufapp.utils.minThree
 import com.example.ntufapp.utils.showMessage
@@ -77,10 +79,7 @@ fun ResultDisplayScreen(
     onNextButtonClick: () -> Unit,
     from: String
 ) {
-    for (i in oldPlotData.PlotTrees.indices) {
-        Log.d(dTag, "oldPlotData.PlotTrees[$i]: ${oldPlotData.PlotTrees[i]}")
-        Log.d(dTag, "newPlotData.PlotTrees[$i]: ${newPlotData.PlotTrees[i]}")
-    }
+    DisableBackButtonHandler(backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher!!)
 
     Column(
         modifier = Modifier.fillMaxSize(),
