@@ -7,6 +7,8 @@ import android.provider.OpenableColumns
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import com.example.ntufapp.data.DataSource.columnName
 import com.example.ntufapp.data.ntufappInfo.Companion.outputDirName
@@ -45,19 +47,8 @@ fun parseJsonToMetaData(uri: Uri, context: Context): PlotData? {
     }
 }
 
-fun saveJsonFile(context: Context, plotData: PlotData, fileName: String = "", toCSV: Boolean) {
-    // Research
-//    val permission = checkPermission(context)
-//    if (!permission) {
-//        // ask for permission
-//
-//
-//        showMessage(context, "儲存失敗：請先開啟儲存權限！")
-//        return
-//    } else {
-//        Log.d("saveJsonFile", "permission granted")
-//    }
 
+fun saveFile(context: Context, plotData: PlotData, fileName: String = "", toCSV: Boolean) {
     // Read the data
     val gson = Gson()
     val myJson = gson.toJson(plotData)
@@ -94,16 +85,17 @@ fun saveJsonFile(context: Context, plotData: PlotData, fileName: String = "", to
     // Create the file path
     var file = File(appDir, validFilename)
     var count = 1
-    while (file.exists()) {
-        val postfixStart = validFilename.lastIndexOf(".")
-        Log.d("saveJsonFile", "postfixStart: $postfixStart")
-        file = File(appDir, "${validFilename.substring(0, postfixStart)}_${count}${validFilename.substring(postfixStart)}")
-        count++
-    }
+//    while (file.exists()) {
+//        val postfixStart = validFilename.lastIndexOf(".")
+//        Log.d("saveJsonFile", "postfixStart: $postfixStart")
+//        file = File(appDir, "${validFilename.substring(0, postfixStart)}_${count}${validFilename.substring(postfixStart)}")
+//        count++
+//    }
 
     try {
         if (toCSV) {
             val flattenedPlotData = flattenPlotData(plotData)
+            Log.d("saveFile", "flattenedPlotData: $flattenedPlotData")
             writeToCSV(file, flattenedPlotData)
         } else {
             writeToJson(file, myJson)
@@ -157,6 +149,14 @@ fun flattenPlotData(plotData: PlotData): List<List<String>> {
 }
 
 fun writeToCSV(outputFile: File, flattenedPlotData: List<List<String>>) {
+
+    if (!outputFile.exists()) {
+        Log.d("saveFile", "outputFile does not exist")
+    } else {
+        outputFile.delete()
+        Log.d("saveFile", "outputFile exists")
+    }
+
     val fileOutputStream = FileOutputStream(outputFile)
     val bufferedWriter = BufferedWriter(fileOutputStream.writer())
 
@@ -164,6 +164,7 @@ fun writeToCSV(outputFile: File, flattenedPlotData: List<List<String>>) {
         bufferedWriter.write(row.joinToString(","))
         bufferedWriter.newLine()
     }
+    Log.d("saveFile", "outputFile: ${outputFile.absolutePath}")
 
     bufferedWriter.close()
     fileOutputStream.close()

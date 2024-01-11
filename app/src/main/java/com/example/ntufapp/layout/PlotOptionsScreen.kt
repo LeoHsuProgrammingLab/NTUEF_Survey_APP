@@ -139,7 +139,7 @@ fun PlotOptionsScreen(
 
             if (showNewPlotUploadChoices.value) {
                 NewSurveyUploadChoiceDialog(
-                    onDismiss = { showNewPlotUploadChoices.value = false},
+                    onDismiss = { showNewPlotUploadChoices.value = false },
                     onUploadTypeClick = {uploadType ->
                         if (uploadType == "JSON") {
                             showNewPlotUpload.value = true

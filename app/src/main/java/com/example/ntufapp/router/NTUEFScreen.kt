@@ -19,7 +19,7 @@ import androidx.compose.runtime.getValue
 import com.example.ntufapp.data.ntufappInfo.Companion.dTag
 import com.example.ntufapp.layout.NewSurveyScreen
 import com.example.ntufapp.layout.ResultDisplayScreen
-import com.example.ntufapp.layout.SaveJsonScreen
+import com.example.ntufapp.layout.SaveScreen
 
 enum class Screens {
     Start,
@@ -99,7 +99,7 @@ fun NTUEFApp(
             }
 
             composable(route = Screens.SaveJson.name) {
-                SaveJsonScreen(
+                SaveScreen(
                     newPlotData = resultState.second,
                     onBackButtonClick = {
                         resultState.first.resetAllTrees()

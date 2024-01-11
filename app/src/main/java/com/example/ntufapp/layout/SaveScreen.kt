@@ -1,10 +1,7 @@
 package com.example.ntufapp.layout
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,22 +16,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ntufapp.R
 import com.example.ntufapp.model.PlotData
-import com.example.ntufapp.ui.SaveJsonDialog
 import com.example.ntufapp.ui.theme.LayoutDivider
-import com.example.ntufapp.ui.theme.Shapes
-import com.example.ntufapp.ui.theme.lightBorder
-import com.example.ntufapp.ui.theme.md_theme_light_inverseOnSurface
-import com.example.ntufapp.utils.saveJsonFile
-import com.google.relay.compose.BoxScopeInstanceImpl.align
-import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
+import com.example.ntufapp.utils.ExternalStoragePermissionHandler
+import com.example.ntufapp.utils.saveFile
+import com.example.ntufapp.utils.showMessage
 
 @Composable
-fun SaveJsonScreen(
+fun SaveScreen(
     newPlotData: PlotData,
     onBackButtonClick: () -> Unit,
 ) {
@@ -56,6 +48,8 @@ fun SaveJsonScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             val showDialog = remember { mutableStateOf(false) }
+            val permissionGranted = remember { mutableStateOf(false) }
+            ExternalStoragePermissionHandler { permissionGranted.value = true }
 
             Row(
                 modifier = modifier,
@@ -70,7 +64,7 @@ fun SaveJsonScreen(
                 OutlinedButton(
                     modifier = modifier,
                     onClick = {
-                        saveJsonFile(context, newPlotData, toCSV = true)
+                        saveFile(context, newPlotData, toCSV = true)
                         showDialog.value = true
                     }
                 ) {
