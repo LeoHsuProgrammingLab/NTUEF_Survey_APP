@@ -318,6 +318,50 @@ fun SaveJsonDialog(
 }
 
 @Composable
+fun GeneralConfirmDialog(
+    reminder: String,
+    confirm: String,
+    leadingIcon: () -> Unit = {},
+    onDismiss: () -> Unit,
+    onConfirmClick: () -> Unit,
+    onCancelClick: () -> Unit
+) {
+    Dialog(
+        onDismissRequest = { onDismiss.invoke() }
+    ) {
+        val text = remember { mutableStateOf("") }
+        Surface(
+            shape = Shapes.small
+        ) {
+            Column(
+                modifier = Modifier.padding(10.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                val modifier = Modifier.padding(10.dp)
+                DialogHeader(header = reminder)
+                Spacer(modifier = modifier)
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    OutlinedButton(
+                        modifier = modifier,
+                        onClick = onCancelClick
+                    ) {
+                        Text(stringResource(id = (R.string.cancel)))
+                    }
+                    OutlinedButton(
+                        modifier = modifier,
+                        onClick = onConfirmClick
+                    ) {
+                        Text(confirm)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun ManualInputNewPlotDialog(
     onDismiss: () -> Unit,
     onSendClick: (PlotData) -> Unit,
@@ -512,6 +556,7 @@ fun SurveyConfirmDialog( // Survey Screen
 fun DialogHeader(header: String) {
     Text(
         text = header,
+        modifier = Modifier.padding(10.dp),
         style = TextStyle(
             fontWeight = FontWeight.Bold,
             fontSize = 18.sp

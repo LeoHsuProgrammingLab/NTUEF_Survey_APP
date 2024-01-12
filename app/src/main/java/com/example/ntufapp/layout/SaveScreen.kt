@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ntufapp.R
 import com.example.ntufapp.model.PlotData
+import com.example.ntufapp.ui.GeneralConfirmDialog
 import com.example.ntufapp.ui.theme.LayoutDivider
 import com.example.ntufapp.utils.DisableBackButtonHandler
 import com.example.ntufapp.utils.ExternalStoragePermissionHandler
@@ -53,7 +54,6 @@ fun SaveScreen(
             modifier = modifier,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            val showDialog = remember { mutableStateOf(false) }
 //            val permissionGranted = remember { mutableStateOf(false) }
 //            ExternalStoragePermissionHandler { permissionGranted.value = true }
 
@@ -61,9 +61,11 @@ fun SaveScreen(
                 modifier = modifier,
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
+                val showDialog = remember { mutableStateOf(false) }
+                val showBackDialogue = remember { mutableStateOf(false) }
                 OutlinedButton(
                     modifier = modifier,
-                    onClick = onBackButtonClick
+                    onClick = { showBackDialogue.value = true }
                 ) {
                     Text(text = "返回主頁", fontSize = 20.sp)
                 }
@@ -76,7 +78,15 @@ fun SaveScreen(
                 ) {
                     Text(text = "儲存樣區資料", fontSize = 20.sp)
                 }
-
+                if (showBackDialogue.value) {
+                    GeneralConfirmDialog(
+                        reminder = "確定要返回主頁嗎？\n返回主頁將會清除所有資料！",
+                        confirm = "確定",
+                        onDismiss = { /*TODO*/ },
+                        onConfirmClick = { onBackButtonClick() },
+                        onCancelClick = { showBackDialogue.value = false }
+                    )
+                }
 //                if (showDialog.value) {
 //                    SaveJsonDialog(
 //                        onDismiss = {},
