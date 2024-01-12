@@ -1,5 +1,6 @@
 package com.example.ntufapp.layout
 
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -33,8 +34,8 @@ fun SaveScreen(
     outputFilename: String,
     onBackButtonClick: () -> Unit,
 ) {
-    DisableBackButtonHandler(backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher!!)
-
+//    DisableBackButtonHandler()
+    BackHandler(enabled = true) {}
     val context = LocalContext.current
     val modifier = Modifier.padding(10.dp)
     Column(

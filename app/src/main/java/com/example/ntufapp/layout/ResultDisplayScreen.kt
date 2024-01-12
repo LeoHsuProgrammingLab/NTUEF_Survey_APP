@@ -2,6 +2,7 @@ package com.example.ntufapp.layout
 
 import android.content.Context
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.foundation.Canvas
@@ -79,7 +80,8 @@ fun ResultDisplayScreen(
     onNextButtonClick: () -> Unit,
     from: String
 ) {
-    DisableBackButtonHandler(backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher!!)
+//    DisableBackButtonHandler()
+    BackHandler(enabled = true) {}
 
     Column(
         modifier = Modifier.fillMaxSize(),

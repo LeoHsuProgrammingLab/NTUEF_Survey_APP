@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -46,7 +47,10 @@ import java.io.BufferedReader
 fun PlotOptionsScreen(
     onNextButtonClick: (PlotData, String, String) -> Unit
 ) {
-    DisableBackButtonHandler(backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher!!)
+//    DisableBackButtonHandler(from = "PlotOptionsScreen")
+    BackHandler(enabled = true) {}
+
+    Log.d("PlotOptionsScreen", "PlotOptionsScreen")
     val tag = "PlotOptions"
 
     Column(
