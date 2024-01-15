@@ -54,15 +54,12 @@ fun SpeciesConditionView(
     newPlotData: PlotData,
     surveyType: String = "NewSurvey"
 ) {
+    val coroutineScope = rememberCoroutineScope()
     Log.d("SpeciesConditionView", "currentTreeNum: ${currentTreeNum.value}")
-    for (i in totalTreesNumList.size downTo 1) {
-        if (speciesTreeSet.value.contains(i.toString())) {
-            break
-        } else {
-            Log.d("SpeciesConditionView", "i: $i")
-            conditionTreeSet.value.add(i.toString())
-            speciesTreeSet.value.add(i.toString())
-        }
+    val newestTreeNum = totalTreesNumList.size.toString()
+    if (!speciesTreeSet.value.contains(newestTreeNum)) {
+        conditionTreeSet.value.add(newestTreeNum)
+        speciesTreeSet.value.add(newestTreeNum)
     }
 
     val context = LocalContext.current
@@ -74,8 +71,6 @@ fun SpeciesConditionView(
         WindowInfo.WindowType.Medium -> 380.dp
         WindowInfo.WindowType.Expanded -> 420.dp
     }
-
-    val coroutineScope = rememberCoroutineScope()
 
     Box(
         modifier = Modifier
@@ -120,7 +115,7 @@ fun SpeciesConditionView(
                     modifier = unaddressedModifier,
                     onChoose = {
                         currentTreeNum.value = it
-                        coroutineScope.launch { }
+                        coroutineScope.launch{}
                     }
                 )
 
@@ -131,7 +126,7 @@ fun SpeciesConditionView(
                     modifier = unaddressedModifier,
                     onChoose = {
                         currentTreeNum.value = it
-                        coroutineScope.launch { }
+                        coroutineScope.launch{}
                     }
                 )
 
@@ -259,6 +254,9 @@ fun SpeciesConditionView(
                         treeCondition = treeCondition,
                         selectedItems = selectedItems,
                         onUpdateTreeSet = {
+                            val tempSet = conditionTreeSet.value.toMutableSet()
+                            tempSet.remove(currentTreeNum.value)
+                            conditionTreeSet.value = tempSet
                             conditionTreeSet.value.remove(currentTreeNum.value)
                         }
                     )
@@ -266,7 +264,9 @@ fun SpeciesConditionView(
                     TreeSpeciesWidget(
                         currentTree = currentTree.value,
                         onUpdateTreeSet = {
-                            conditionTreeSet.value.remove(currentTreeNum.value)
+                            val tempSet = speciesTreeSet.value.toMutableSet()
+                            tempSet.remove(currentTreeNum.value)
+                            speciesTreeSet.value = tempSet
                             showMessage(context, "您已新增樣樹${currentTree.value.SampleNum}之樹種\n${currentTree.value.Species}")
                         }
                     )
@@ -303,11 +303,12 @@ fun TreeSpeciesWidget(
                     )
                 )
             },
+            textStyle = TextStyle(fontSize = 18.sp),
             modifier = Modifier
                 .width(150.dp)
-                .padding(start = 10.dp, top = 10.dp, bottom = 10.dp, end = 5.dp),
-            textStyle = TextStyle(fontSize = 18.sp),
+                .padding(start = 10.dp, top = 5.dp, bottom = 5.dp, end = 5.dp),
         )
+
         Button(
             modifier = Modifier.width(80.dp),
             onClick = { showDialog.value = true }
@@ -357,7 +358,7 @@ fun TreeConditionWidget(
         ),
         modifier = Modifier
             .width(200.dp)
-            .padding(start = 5.dp, top = 10.dp, bottom = 5.dp, end = 5.dp)
+            .padding(start = 5.dp, top = 5.dp, bottom = 5.dp, end = 5.dp)
     )
 
     Button(
@@ -370,7 +371,7 @@ fun TreeConditionWidget(
             } else {
                 currentTree.State = selectedItems.toMutableList()
                 treeCondition.value = selectedItems.joinToString()
-
+                onUpdateTreeSet()
                 showMessage(context, "您已新增樣樹${currentTree.SampleNum}之生長狀態\n${currentTree.State.joinToString()}")
             //  Log.d("TreeConditionChips", "string: ${System.identityHashCode(selectedItems.joinToString()) }")
             //  Log.d("TreeConditionChips", "string: ${System.identityHashCode(selectedItems) }")
