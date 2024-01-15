@@ -1,8 +1,6 @@
-package com.example.ntufapp.ui
+package com.example.ntufapp.ui.widget
 
 import android.util.Log
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -31,13 +29,12 @@ import com.example.ntufapp.R
 import com.example.ntufapp.data.DataSource
 import com.example.ntufapp.model.Tree
 import com.example.ntufapp.ui.theme.IntervalDivider
-import com.example.ntufapp.ui.theme.md_theme_light_primary
 import com.example.ntufapp.utils.showMessage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TreeConditionChips(//https://semicolonspace.com/jetpack-compose-filterchip/
-    currentTreeNum: Tree,
+    currentTree: Tree,
     reRenderCurrentTree: (SnapshotStateList<String>) -> Unit,
     modifier: Modifier
 ) {
@@ -46,7 +43,6 @@ fun TreeConditionChips(//https://semicolonspace.com/jetpack-compose-filterchip/
     // 2. selectedItems changes
     // 3. treeCondition changes
     // *4. currentTreeNum.State changes won't trigger recomposition
-//    Log.d("TreeConditionChips", "curTreeNum.value: ${currentTreeNum.State.joinToString() }")
     val context = LocalContext.current
 
     val singleItemList = DataSource.TreeSingleConditionList // only one item can be selected
@@ -54,7 +50,7 @@ fun TreeConditionChips(//https://semicolonspace.com/jetpack-compose-filterchip/
     val squirrelItemList = DataSource.SquirrelConditionList // multiple items can be selected
 
     val treeCondition = remember { mutableStateOf("") }
-    treeCondition.value = currentTreeNum.State.joinToString()
+    treeCondition.value = currentTree.State.joinToString()
 
     val selectedItems = remember { mutableStateListOf<String>() }
     reRenderCurrentTree(selectedItems)
@@ -72,7 +68,7 @@ fun TreeConditionChips(//https://semicolonspace.com/jetpack-compose-filterchip/
                     selected = selectedItems.contains(item),
                     onClick = {
                         if (selectedItems.contains(item)) {
-                            Log.d("TreeConditionChips", "curTree: ${currentTreeNum.State.joinToString() }")
+                            Log.d("TreeConditionChips", "curTree: ${currentTree.State.joinToString() }")
                             selectedItems.remove(item)
                         } else {
                             Log.d("TreeConditionChips", "else")
@@ -165,27 +161,29 @@ fun TreeConditionChips(//https://semicolonspace.com/jetpack-compose-filterchip/
                 ),
                 modifier = Modifier
                     .width(200.dp)
-                    .padding(start = 5.dp, top = 10.dp, bottom = 10.dp, end = 10.dp)
+                    .padding(start = 5.dp, top = 10.dp, bottom = 10.dp, end = 5.dp)
             )
 
             Button(
                 modifier = Modifier
-                    .width(90.dp)
+                    .width(80.dp)
                     .padding(top = 10.dp, bottom = 10.dp),
                 onClick = {
                     if (selectedItems.isEmpty()) {
                         showMessage(context, "請選擇生長狀態")
                     } else {
-                        currentTreeNum.State = selectedItems.toMutableList()
+                        currentTree.State = selectedItems.toMutableList()
                         treeCondition.value = selectedItems.joinToString()
                         Log.d("TreeConditionChips", "string: ${System.identityHashCode(selectedItems.joinToString()) }")
                         Log.d("TreeConditionChips", "string: ${System.identityHashCode(selectedItems) }")
-                        showMessage(context, "您已新增樣樹${currentTreeNum.SampleNum}之生長狀態\n${currentTreeNum.State.joinToString()}")
+                        showMessage(context, "您已新增樣樹${currentTree.SampleNum}之生長狀態\n${currentTree.State.joinToString()}")
                     }
                 }
             ) {
                 Text(stringResource(id = R.string.input))
             }
+
+            TreeSpeciesWidget(currentTree = currentTree)
         }
     }
 

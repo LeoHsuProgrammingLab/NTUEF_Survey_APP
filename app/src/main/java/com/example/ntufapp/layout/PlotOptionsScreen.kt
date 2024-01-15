@@ -1,13 +1,10 @@
 package com.example.ntufapp.layout
 
-import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.Image
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -17,13 +14,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -32,16 +26,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ntufapp.R
 import com.example.ntufapp.model.PlotData
-import com.example.ntufapp.ui.ConfirmDialog
-import com.example.ntufapp.ui.ManualInputNewPlotDialog
-import com.example.ntufapp.ui.NewSurveyUploadChoiceDialog
-import com.example.ntufapp.ui.UploadFileDialog
+import com.example.ntufapp.ui.widget.ConfirmDialog
+import com.example.ntufapp.ui.widget.ManualInputNewPlotDialog
+import com.example.ntufapp.ui.widget.NewSurveyUploadChoiceDialog
+import com.example.ntufapp.ui.widget.UploadFileDialog
 import com.example.ntufapp.ui.theme.LayoutDivider
-import com.example.ntufapp.utils.DisableBackButtonHandler
 import com.example.ntufapp.utils.getFileName
 import com.example.ntufapp.utils.parseJsonToMetaData
-import com.google.gson.Gson
-import java.io.BufferedReader
 
 @Composable
 fun PlotOptionsScreen(

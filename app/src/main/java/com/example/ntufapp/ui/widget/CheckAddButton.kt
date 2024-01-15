@@ -1,4 +1,4 @@
-package com.example.ntufapp.ui
+package com.example.ntufapp.ui.widget
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -22,6 +22,7 @@ fun CheckAddButton(
     measHtSet: MutableState<MutableSet<String>>,
     visHtSet: MutableState<MutableSet<String>>,
     forkHtSet: MutableState<MutableSet<String>>,
+    surveyType: String = "ReSurvey",
     onNextButtonClick: () -> Unit
 ){
     Row(
@@ -47,15 +48,19 @@ fun CheckAddButton(
         }
 
         if (showDialog.value) {
-            SurveyConfirmDialog(
-                dbhSetSize = dbhSet.value.size,
-                measHtSetSize = measHtSet.value.size,
-                visHtSetSize = visHtSet.value.size,
-                forkHtSetSize = forkHtSet.value.size,
-                onDismiss = {},
-                onCancelClick = { showDialog.value = false },
-                onNextButtonClick = onNextButtonClick
-            )
+            if (surveyType == "NewSurvey") {
+
+            } else {
+                SurveyConfirmDialog(
+                    dbhSetSize = dbhSet.value.size,
+                    measHtSetSize = measHtSet.value.size,
+                    visHtSetSize = visHtSet.value.size,
+                    forkHtSetSize = forkHtSet.value.size,
+                    onDismiss = {},
+                    onCancelClick = { showDialog.value = false },
+                    onNextButtonClick = onNextButtonClick
+                )
+            }
         }
     }
 }

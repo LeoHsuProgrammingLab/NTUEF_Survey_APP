@@ -11,7 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.ntufapp.layout.PlotOptionsScreen
 import com.example.ntufapp.layout.ReSurveyScreen
-import com.example.ntufapp.ui.NTUEFTopBar
+import com.example.ntufapp.ui.widget.NTUEFTopBar
 import com.example.ntufapp.viewModel.SurveyViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState

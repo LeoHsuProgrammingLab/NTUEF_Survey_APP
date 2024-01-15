@@ -1,7 +1,6 @@
 package com.example.ntufapp.layout
 
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,12 +21,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ntufapp.R
 import com.example.ntufapp.model.PlotData
-import com.example.ntufapp.ui.GeneralConfirmDialog
+import com.example.ntufapp.ui.widget.GeneralConfirmDialog
 import com.example.ntufapp.ui.theme.LayoutDivider
-import com.example.ntufapp.utils.DisableBackButtonHandler
-import com.example.ntufapp.utils.ExternalStoragePermissionHandler
 import com.example.ntufapp.utils.saveFile
-import com.example.ntufapp.utils.showMessage
 
 @Composable
 fun SaveScreen(
@@ -72,12 +68,26 @@ fun SaveScreen(
                 OutlinedButton(
                     modifier = modifier,
                     onClick = {
+                        for (i in newPlotData.PlotTrees.size-1 downTo 0) {
+                            if (newPlotData.PlotTrees[i].State.size == 0 &&
+                                newPlotData.PlotTrees[i].DBH == 0.0 &&
+                                newPlotData.PlotTrees[i].MeasHeight == 0.0 &&
+                                newPlotData.PlotTrees[i].VisHeight == 0.0 &&
+                                newPlotData.PlotTrees[i].ForkHeight == 0.0 &&
+                                newPlotData.PlotTrees[i].Species == ""
+                            ) {
+                                newPlotData.PlotTrees.removeAt(i)
+                            } else {
+                                break
+                            }
+                        }
                         saveFile(context, newPlotData, filename = outputFilename, toCSV = true)
                         showDialog.value = true
                     }
                 ) {
                     Text(text = "儲存樣區資料", fontSize = 20.sp)
                 }
+
                 if (showBackDialogue.value) {
                     GeneralConfirmDialog(
                         reminder = "確定要返回主頁嗎？\n返回主頁將會清除所有資料！",

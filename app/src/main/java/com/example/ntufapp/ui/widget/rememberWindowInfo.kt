@@ -1,4 +1,4 @@
-package com.example.ntufapp.ui
+package com.example.ntufapp.ui.widget
 
 import android.util.Log
 import androidx.compose.runtime.Composable

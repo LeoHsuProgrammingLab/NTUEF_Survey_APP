@@ -69,10 +69,10 @@ object DataSource {
         "斷尾",
         "分岔",
         "傾斜",
-        "葉部病害",
-        "蟲害",
         "頂枯",
-        "附生植物"
+        "葉部病害",
+        "附生植物",
+        "蟲害",
     )
 
     val TreeSingleConditionList = listOf(

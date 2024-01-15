@@ -1,4 +1,4 @@
-package com.example.ntufapp.ui
+package com.example.ntufapp.ui.widget
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

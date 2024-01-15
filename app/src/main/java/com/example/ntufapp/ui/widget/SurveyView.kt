@@ -1,4 +1,4 @@
-package com.example.ntufapp.ui
+package com.example.ntufapp.ui.widget
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -6,13 +6,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.unit.dp
 import com.example.ntufapp.model.PlotData
 
@@ -31,11 +29,12 @@ fun SurveyView(
     ) {
         MetaDateView(newPlotData = newPlotData)
         val currentTreeNum = remember { mutableStateOf("1") }
-        val numPlotTrees = remember { mutableIntStateOf(totalTreesNumList.size) }
         val dbhTreeSet = remember { mutableStateOf(totalTreesNumList.toMutableSet()) }
         val measHtTreeSet = remember { mutableStateOf(totalTreesNumList.toMutableSet()) }
         val forkHtTreeSet = remember { mutableStateOf(totalTreesNumList.toMutableSet()) }
         val visHtTreeSet = remember { mutableStateOf(totalTreesNumList.toMutableSet()) }
+        val speciesTreeSet = remember { mutableStateOf(totalTreesNumList.toMutableSet()) }
+        val conditionTreeSet = remember { mutableStateOf(totalTreesNumList.toMutableSet()) }
 
         Row(
             modifier = Modifier
@@ -46,19 +45,26 @@ fun SurveyView(
             SpeciesConditionView(
                 totalTreesNumList = totalTreesNumList,
                 currentTreeNum = currentTreeNum,
+                speciesTreeSet = speciesTreeSet,
+                conditionTreeSet = conditionTreeSet,
                 newPlotData = newPlotData
             )
             HtDBHView(
                 totalTreesNumList = totalTreesNumList,
-                numPlotTrees = numPlotTrees,
                 dbhTreeSet = dbhTreeSet,
                 measHtTreeSet = measHtTreeSet,
                 forkHtTreeSet = forkHtTreeSet,
                 visHtTreeSet = visHtTreeSet,
-                newPlotData
+                newPlotData = newPlotData
             )
         }
-        CheckAddButton(dbhSet = dbhTreeSet, measHtSet = measHtTreeSet, visHtSet = visHtTreeSet, forkHtSet = forkHtTreeSet) {
+
+        CheckAddButton(
+            dbhSet = dbhTreeSet,
+            measHtSet = measHtTreeSet,
+            visHtSet = visHtTreeSet,
+            forkHtSet = forkHtTreeSet
+        ) {
             onNextButtonClick()
         }
     }

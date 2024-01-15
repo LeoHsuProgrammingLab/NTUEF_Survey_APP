@@ -1,4 +1,4 @@
-package com.example.ntufapp.ui
+package com.example.ntufapp.ui.widget
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -31,7 +31,7 @@ fun NTUEFTopBar() {
                 fontSize = 40.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.clip(MaterialTheme.shapes.small),
-                style = MaterialTheme.typography.displayMedium,
+                style = MaterialTheme.typography.displaySmall,
                 color = Color.White
             )
         },

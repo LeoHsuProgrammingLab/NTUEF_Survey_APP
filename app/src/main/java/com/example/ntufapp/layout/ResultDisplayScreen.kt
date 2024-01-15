@@ -1,9 +1,7 @@
 package com.example.ntufapp.layout
 
 import android.content.Context
-import android.util.Log
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -30,7 +28,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -52,8 +49,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ntufapp.R
-import com.example.ntufapp.data.ntufappInfo.Companion.changeDataQuota
-import com.example.ntufapp.data.ntufappInfo.Companion.dTag
 import com.example.ntufapp.data.ntufappInfo.Companion.dbhThreshold
 import com.example.ntufapp.data.ntufappInfo.Companion.htThreshold
 import com.example.ntufapp.model.PlotData
@@ -61,13 +56,12 @@ import com.example.ntufapp.model.Tree
 import com.example.ntufapp.model.checkThreshold
 import com.example.ntufapp.model.compareTwoPlots
 import com.example.ntufapp.model.createTreeQuotaPair
-import com.example.ntufapp.ui.WindowInfo
-import com.example.ntufapp.ui.rememberWindowInfo
+import com.example.ntufapp.ui.widget.WindowInfo
+import com.example.ntufapp.ui.widget.rememberWindowInfo
 import com.example.ntufapp.ui.theme.Shapes
 import com.example.ntufapp.ui.theme.circleThreeDigitsModifier
 import com.example.ntufapp.ui.theme.lightBorder
 import com.example.ntufapp.ui.theme.md_theme_light_inverseOnSurface
-import com.example.ntufapp.utils.DisableBackButtonHandler
 import com.example.ntufapp.utils.maxThree
 import com.example.ntufapp.utils.minThree
 import com.example.ntufapp.utils.showMessage

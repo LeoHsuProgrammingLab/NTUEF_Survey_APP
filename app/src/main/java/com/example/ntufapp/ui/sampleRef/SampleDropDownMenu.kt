@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.ntufapp.R
-import com.example.ntufapp.ui.filterOptions
+import com.example.ntufapp.ui.widget.filterOptions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

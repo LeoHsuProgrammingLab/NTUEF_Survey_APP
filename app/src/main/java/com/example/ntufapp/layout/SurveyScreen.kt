@@ -1,21 +1,15 @@
 package com.example.ntufapp.layout
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.ntufapp.data.ntufappInfo.Companion.dTag
 import com.example.ntufapp.data.ntufappInfo.Companion.defaultTreeNum
 import com.example.ntufapp.model.PlotData
-import com.example.ntufapp.ui.SurveyView
-import com.example.ntufapp.utils.DisableBackButtonHandler
-import io.reactivex.disposables.Disposable
+import com.example.ntufapp.ui.widget.SurveyView
 
 //ref: https://www.youtube.com/watch?v=8XJfLaAOxD0&ab_channel=AndroidDevelopers
 // live-edit for compose

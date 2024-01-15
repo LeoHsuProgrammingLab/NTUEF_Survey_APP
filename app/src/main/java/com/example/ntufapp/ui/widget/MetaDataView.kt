@@ -1,4 +1,4 @@
-package com.example.ntufapp.ui
+package com.example.ntufapp.ui.widget
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,14 +18,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ntufapp.model.PlotData
-import com.example.ntufapp.ui.theme.CustomizedDivider
-import com.example.ntufapp.ui.theme.IntervalDivider
 
 @Composable
 fun MetaDateView(newPlotData: PlotData) {
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .padding(5.dp),
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         val dateInfo = Pair("調查日期", newPlotData.Date)
@@ -50,7 +48,7 @@ fun MetaDateView(newPlotData: PlotData) {
         }
 
         Column(
-            modifier = Modifier.padding(5.dp),
+            modifier = Modifier.padding(end = 5.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -85,7 +83,9 @@ fun MetaDateView(newPlotData: PlotData) {
 
 @Composable
 fun MetaDataRow(info1: Pair<String, String>, info2: Pair<String, String>, info3: Pair<String, String>, info4: Pair<String, String>) {
-    Row(modifier = Modifier.padding(horizontal = 5.dp)) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
         MetaDataBlock(blockName = info1.first, blockVal = info1.second)
         MetaDataBlock(blockName = info2.first, blockVal = info2.second)
         MetaDataBlock(blockName = info3.first, blockVal = info3.second)

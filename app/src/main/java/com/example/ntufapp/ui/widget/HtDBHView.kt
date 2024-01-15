@@ -1,4 +1,4 @@
-package com.example.ntufapp.ui
+package com.example.ntufapp.ui.widget
 
 import android.util.Log
 import androidx.compose.foundation.background
@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -38,7 +37,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -65,29 +63,28 @@ import kotlinx.coroutines.launch
 @Composable
 fun HtDBHView(
     totalTreesNumList: MutableList<String>,
-    numPlotTrees: MutableState<Int>,
     dbhTreeSet: MutableState<MutableSet<String>>,
     measHtTreeSet: MutableState<MutableSet<String>>,
     forkHtTreeSet: MutableState<MutableSet<String>>,
     visHtTreeSet: MutableState<MutableSet<String>>,
     newPlotData: PlotData
 ) {
-    // update the current tree numbers
-    if (totalTreesNumList.size > numPlotTrees.value) {
-        for (i in totalTreesNumList.size downTo numPlotTrees.value + 1) {
+    for (i in totalTreesNumList.size downTo 1) {
+        if (dbhTreeSet.value.contains(i.toString())) {
+            break
+        } else {
             dbhTreeSet.value.add(i.toString())
             visHtTreeSet.value.add(i.toString())
             forkHtTreeSet.value.add(i.toString())
             measHtTreeSet.value.add(i.toString())
         }
-        numPlotTrees.value = totalTreesNumList.size
     }
 
     // Adjust the height
     val windowInfo = rememberWindowInfo()
     val height =  when (windowInfo.screenHeightInfo) {
         WindowInfo.WindowType.Compact -> 300.dp
-        WindowInfo.WindowType.Medium -> 350.dp
+        WindowInfo.WindowType.Medium -> 380.dp
         WindowInfo.WindowType.Expanded -> 420.dp
         else -> 400.dp
     }
@@ -100,8 +97,8 @@ fun HtDBHView(
 
     Box(
         modifier = Modifier
-            .padding(horizontal = 20.dp, vertical = 10.dp)
-            .width(700.dp)
+            .padding(5.dp)
+            .width(670.dp)
             .height(height)
             .background(md_theme_light_primaryContainer, Shapes.medium)
             .border(lightBorder, Shapes.medium),
@@ -117,7 +114,7 @@ fun HtDBHView(
                     .padding(5.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
-            ){
+            ) {
                 OutlinedTextField(
                     value = curItemId.value,
                     onValueChange = {
@@ -150,6 +147,7 @@ fun HtDBHView(
                     treeSet = dbhTreeSet,
                     label = "剩餘DBH",
                     widthType = "medium",
+                    modifier = Modifier,
                     onChoose = {
                         targetId.value = it.toInt()
                         coroutineScope.launch {
@@ -162,6 +160,7 @@ fun HtDBHView(
                     treeSet = measHtTreeSet,
                     label = "剩餘樹高",
                     widthType = "medium",
+                    modifier = Modifier,
                     onChoose = {
                         targetId.value = it.toInt()
                         coroutineScope.launch {
@@ -174,6 +173,7 @@ fun HtDBHView(
                     treeSet = visHtTreeSet,
                     label = "剩餘目視樹高",
                     widthType = "large",
+                    modifier = Modifier,
                     onChoose = {
                         targetId.value = it.toInt()
                         coroutineScope.launch {
@@ -186,6 +186,7 @@ fun HtDBHView(
                     treeSet = forkHtTreeSet,
                     label = "剩餘分岔樹高",
                     widthType = "large",
+                    modifier = Modifier,
                     onChoose = {
                         targetId.value = it.toInt()
                         coroutineScope.launch {
@@ -334,6 +335,7 @@ fun ExposedUnaddressedTreeList(
     treeSet: MutableState<MutableSet<String>>,
     label: String,
     widthType: String,
+    modifier: Modifier,
     onChoose: (String) -> Unit
 ) {
     val dropdownExpanded = remember { mutableStateOf(false) }
@@ -343,7 +345,7 @@ fun ExposedUnaddressedTreeList(
         onExpandedChange = {
             dropdownExpanded.value = !dropdownExpanded.value
         },
-        modifier = Modifier.padding(horizontal = 10.dp)
+        modifier = modifier.padding(horizontal = 10.dp)
     ) {
         OutlinedTextField(
             value = treeSet.value.size.toString(),
