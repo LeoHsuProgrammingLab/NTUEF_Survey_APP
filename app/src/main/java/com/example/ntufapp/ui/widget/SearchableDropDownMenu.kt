@@ -1,5 +1,6 @@
 package com.example.ntufapp.ui.widget
 
+import android.util.Log
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
@@ -174,8 +175,11 @@ fun SearchableAddMenu(
                         onCancelClick = { showDialog.value = false },
                         onNextButtonClick = {
                             showDialog.value = false
-                            totalItemsList.add(it)
+                            dropdownExpanded.value = false
                             onAdd(it)
+                            searchText.value = it
+                            onChoose(searchText.value)
+                            Log.d("SearchableAddMenu", "here!")
                         },
                         curSize = totalItemsList.size
                     )

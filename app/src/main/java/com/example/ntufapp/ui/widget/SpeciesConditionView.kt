@@ -21,6 +21,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,19 +40,31 @@ import com.example.ntufapp.ui.theme.IntervalDivider
 import com.example.ntufapp.ui.theme.Shapes
 import com.example.ntufapp.ui.theme.lightBorder
 import com.example.ntufapp.utils.showMessage
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SpeciesConditionView(
+    totalTreesNumList: MutableList<String>,
     currentTreeNum: MutableState<String>,
     speciesTreeSet: MutableState<MutableSet<String>>,
     conditionTreeSet: MutableState<MutableSet<String>>,
-    totalTreesNumList: MutableList<String>,
     newPlotData: PlotData,
     surveyType: String = "NewSurvey"
 ) {
+    Log.d("SpeciesConditionView", "currentTreeNum: ${currentTreeNum.value}")
+    for (i in totalTreesNumList.size downTo 1) {
+        if (speciesTreeSet.value.contains(i.toString())) {
+            break
+        } else {
+            Log.d("SpeciesConditionView", "i: $i")
+            conditionTreeSet.value.add(i.toString())
+            speciesTreeSet.value.add(i.toString())
+        }
+    }
+
     val context = LocalContext.current
     val modifier = Modifier.width(530.dp)
     // Adjust the height
@@ -62,8 +75,7 @@ fun SpeciesConditionView(
         WindowInfo.WindowType.Expanded -> 420.dp
     }
 
-    val currentTree = remember { mutableStateOf(Tree()) }
-    currentTree.value = newPlotData.PlotTrees.find { it.SampleNum == currentTreeNum.value.toInt() }!!
+    val coroutineScope = rememberCoroutineScope()
 
     Box(
         modifier = Modifier
@@ -74,8 +86,9 @@ fun SpeciesConditionView(
         Column(
             verticalArrangement = Arrangement.Center
         ) {
-
             Row(
+                modifier = Modifier
+                    .padding(5.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
@@ -89,15 +102,17 @@ fun SpeciesConditionView(
                         currentTreeNum.value = it
                     },
                     onAdd = {
+                        totalTreesNumList.add(it)
                         newPlotData.PlotTrees.add(Tree(SampleNum = it.toInt()))
                         currentTreeNum.value = it
+                        Log.d("SpeciesConditionView", "currentTreeNum?: ${currentTreeNum.value}")
                     },
                     modifier = Modifier
                         .height(75.dp)
-                        .padding(5.dp)
                         .width(150.dp)
                 )
-
+                // The ExposedUnaddressedTreeList is a composable function that displays the unaddressed trees
+                // It automatically recompose due to coroutineScope instead of conditionTreeSet.value.add()
                 ExposedUnaddressedTreeList(
                     treeSet = conditionTreeSet,
                     label = "剩餘生長狀況",
@@ -105,6 +120,7 @@ fun SpeciesConditionView(
                     modifier = unaddressedModifier,
                     onChoose = {
                         currentTreeNum.value = it
+                        coroutineScope.launch { }
                     }
                 )
 
@@ -115,6 +131,7 @@ fun SpeciesConditionView(
                     modifier = unaddressedModifier,
                     onChoose = {
                         currentTreeNum.value = it
+                        coroutineScope.launch { }
                     }
                 )
 
@@ -129,6 +146,8 @@ fun SpeciesConditionView(
             val multiItemList = DataSource.TreeMultiConditionList // multiple items can be selected
             val squirrelItemList = DataSource.SquirrelConditionList // multiple items can be selected
             val selectedItems = remember { mutableStateListOf<String>() }
+            val currentTree = remember { mutableStateOf(Tree()) }
+            currentTree.value = newPlotData.PlotTrees.find { it.SampleNum == currentTreeNum.value.toInt() }!!
             selectedItems.clear()
             selectedItems.addAll(currentTree.value.State)
 
@@ -235,47 +254,22 @@ fun SpeciesConditionView(
                     modifier = modifier,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    TextField(
-                        value = treeCondition.value,
-                        onValueChange = {},
-                        readOnly = true,
-                        label = {
-                            Text(
-                                text = "生長狀況",
-                                style = TextStyle(
-                                    fontSize = 13.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            )
-                        },
-                        textStyle = TextStyle(
-                            fontSize = 18.sp
-                        ),
-                        modifier = Modifier
-                            .width(200.dp)
-                            .padding(start = 5.dp, top = 10.dp, bottom = 5.dp, end = 5.dp)
+                    TreeConditionWidget(
+                        currentTree = currentTree.value,
+                        treeCondition = treeCondition,
+                        selectedItems = selectedItems,
+                        onUpdateTreeSet = {
+                            conditionTreeSet.value.remove(currentTreeNum.value)
+                        }
                     )
 
-                    Button(
-                        modifier = Modifier
-                            .width(80.dp)
-                            .padding(top = 10.dp, bottom = 10.dp),
-                        onClick = {
-                            if (selectedItems.isEmpty()) {
-                                showMessage(context, "請選擇生長狀態")
-                            } else {
-                                currentTree.value.State = selectedItems.toMutableList()
-                                treeCondition.value = selectedItems.joinToString()
-//                                Log.d("TreeConditionChips", "string: ${System.identityHashCode(selectedItems.joinToString()) }")
-//                                Log.d("TreeConditionChips", "string: ${System.identityHashCode(selectedItems) }")
-                                showMessage(context, "您已新增樣樹${currentTree.value.SampleNum}之生長狀態\n${currentTree.value.State.joinToString()}")
-                            }
+                    TreeSpeciesWidget(
+                        currentTree = currentTree.value,
+                        onUpdateTreeSet = {
+                            conditionTreeSet.value.remove(currentTreeNum.value)
+                            showMessage(context, "您已新增樣樹${currentTree.value.SampleNum}之樹種\n${currentTree.value.Species}")
                         }
-                    ) {
-                        Text(stringResource(id = R.string.input))
-                    }
-
-                    TreeSpeciesWidget(currentTree = currentTree.value)
+                    )
                 }
             }
         }
@@ -285,6 +279,7 @@ fun SpeciesConditionView(
 @Composable
 fun TreeSpeciesWidget(
     currentTree: Tree,
+    onUpdateTreeSet: () -> Unit
 ) {
     val showDialog = remember { mutableStateOf(false) }
     val currentTreeSpecies = remember { mutableStateOf(currentTree.Species) }
@@ -328,8 +323,60 @@ fun TreeSpeciesWidget(
                     showDialog.value = false
                     currentTreeSpecies.value = it
                     currentTree.Species = it
+                    onUpdateTreeSet()
                 }
             )
         }
+    }
+}
+
+@Composable
+fun TreeConditionWidget(
+    currentTree: Tree,
+    treeCondition: MutableState<String>,
+    selectedItems: MutableList<String>,
+    onUpdateTreeSet: () -> Unit
+) {
+    val context = LocalContext.current
+
+    TextField(
+        value = treeCondition.value,
+        onValueChange = {},
+        readOnly = true,
+        label = {
+            Text(
+                text = "生長狀況",
+                style = TextStyle(
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            )
+        },
+        textStyle = TextStyle(
+            fontSize = 18.sp
+        ),
+        modifier = Modifier
+            .width(200.dp)
+            .padding(start = 5.dp, top = 10.dp, bottom = 5.dp, end = 5.dp)
+    )
+
+    Button(
+        modifier = Modifier
+            .width(80.dp)
+            .padding(top = 10.dp, bottom = 10.dp),
+        onClick = {
+            if (selectedItems.isEmpty()) {
+                showMessage(context, "請選擇生長狀態")
+            } else {
+                currentTree.State = selectedItems.toMutableList()
+                treeCondition.value = selectedItems.joinToString()
+
+                showMessage(context, "您已新增樣樹${currentTree.SampleNum}之生長狀態\n${currentTree.State.joinToString()}")
+            //  Log.d("TreeConditionChips", "string: ${System.identityHashCode(selectedItems.joinToString()) }")
+            //  Log.d("TreeConditionChips", "string: ${System.identityHashCode(selectedItems) }")
+            }
+        }
+    ) {
+        Text(stringResource(id = R.string.input))
     }
 }

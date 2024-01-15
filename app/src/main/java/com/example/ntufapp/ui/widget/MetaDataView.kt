@@ -60,7 +60,10 @@ fun MetaDateView(newPlotData: PlotData) {
                 label = "樣區調查人員",
                 dialogType = "Name",
                 readOnly = true,
-                onChoose = {}, onAdd = {},
+                onChoose = {},
+                onAdd = {
+                    newPlotData.Surveyor.add(it)
+                },
                 keyboardType = KeyboardType.Number,
                 modifier = modifier
             )
@@ -71,7 +74,9 @@ fun MetaDateView(newPlotData: PlotData) {
                 dialogType = "Name",
                 readOnly = true,
                 onChoose = {},
-                onAdd = {},
+                onAdd = {
+                    newPlotData.HtSurveyor.add(it)
+                },
                 keyboardType = KeyboardType.Number,
                 modifier = modifier
             )

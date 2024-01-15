@@ -73,6 +73,7 @@ fun HtDBHView(
         if (dbhTreeSet.value.contains(i.toString())) {
             break
         } else {
+            Log.d("SpeciesConditionView Ht", "i: $i")
             dbhTreeSet.value.add(i.toString())
             visHtTreeSet.value.add(i.toString())
             forkHtTreeSet.value.add(i.toString())
@@ -86,7 +87,6 @@ fun HtDBHView(
         WindowInfo.WindowType.Compact -> 300.dp
         WindowInfo.WindowType.Medium -> 380.dp
         WindowInfo.WindowType.Expanded -> 420.dp
-        else -> 400.dp
     }
 
     val coroutineScope = rememberCoroutineScope()
@@ -338,6 +338,7 @@ fun ExposedUnaddressedTreeList(
     modifier: Modifier,
     onChoose: (String) -> Unit
 ) {
+    Log.d("ExposedUnaddressedTreeList", "Re-render")
     val dropdownExpanded = remember { mutableStateOf(false) }
 
     ExposedDropdownMenuBox(
