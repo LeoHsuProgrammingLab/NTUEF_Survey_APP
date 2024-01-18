@@ -72,13 +72,11 @@ fun HtDBHView(
     for (i in totalTreesNumList.size downTo 1) {
         if (dbhTreeSet.value.contains(i.toString())) {
             break
-        } else {
-            Log.d("SpeciesConditionView Ht", "i: $i")
-            dbhTreeSet.value.add(i.toString())
-            visHtTreeSet.value.add(i.toString())
-            forkHtTreeSet.value.add(i.toString())
-            measHtTreeSet.value.add(i.toString())
         }
+        dbhTreeSet.value.add(i.toString())
+        visHtTreeSet.value.add(i.toString())
+        forkHtTreeSet.value.add(i.toString())
+        measHtTreeSet.value.add(i.toString())
     }
 
     // Adjust the height

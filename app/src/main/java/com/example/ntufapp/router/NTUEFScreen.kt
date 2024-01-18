@@ -87,12 +87,14 @@ fun NTUEFApp(
                     oldPlotData = resultState.first,
                     newPlotData = resultState.second,
                     from = source?: "",
-//                    onBackButtonClick = {
-//                        when (source) {
-//                            "ReSurvey" -> navController.navigate(Screens.ReSurvey.name)
-//                            "NewSurvey" -> navController.navigate(Screens.NewSurvey.name)
-//                        }
-//                    },
+                    onBackButtonClick = {
+                        when (source) {
+                            "ReSurvey" -> navController.navigate(Screens.ReSurvey.name)
+                            "NewSurvey" -> navController.navigate(Screens.NewSurvey.name)
+                        }
+                        Log.d(dTag, resultState.second.PlotTrees.size.toString())
+                        Log.d(dTag, resultState.second.PlotTrees[0].Species)
+                    },
                     onNextButtonClick = {
                         navController.navigate(Screens.SaveJson.name)
                     }

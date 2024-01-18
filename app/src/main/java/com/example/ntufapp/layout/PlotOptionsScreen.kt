@@ -40,8 +40,6 @@ fun PlotOptionsScreen(
 ) {
 //    DisableBackButtonHandler(from = "PlotOptionsScreen")
     BackHandler(enabled = true) {}
-
-    Log.d("PlotOptionsScreen", "PlotOptionsScreen")
     val tag = "PlotOptions"
 
     Column(

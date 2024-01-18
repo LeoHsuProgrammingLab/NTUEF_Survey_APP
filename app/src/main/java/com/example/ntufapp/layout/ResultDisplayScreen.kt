@@ -22,6 +22,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -70,7 +71,7 @@ import com.example.ntufapp.utils.showMessage
 fun ResultDisplayScreen(
     oldPlotData: PlotData,
     newPlotData: PlotData,
-//    onBackButtonClick: () -> Unit,
+    onBackButtonClick: () -> Unit = {},
     onNextButtonClick: () -> Unit,
     from: String
 ) {
@@ -91,6 +92,8 @@ fun ResultDisplayScreen(
         ) {
             if (from == "ReSurvey") {
                 TabbedValidationResult(oldPlotData = oldPlotData, newPlotData = newPlotData)
+            } else {
+                TabbedResult(newPlotData = newPlotData)
             }
             ScatterPlot(plotData = newPlotData)
         }
@@ -101,17 +104,166 @@ fun ResultDisplayScreen(
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.End
         ) {
-//            OutlinedButton(
-//                onClick = { onBackButtonClick() },
-//                modifier = buttonModifier
-//            ) {
-//                Text("繼續調查", fontSize = 18.sp)
-//            }
+            OutlinedButton(
+                onClick = { onBackButtonClick() },
+                modifier = buttonModifier
+            ) {
+                Text("繼續調查", fontSize = 18.sp)
+            }
             OutlinedButton(
                 onClick = { onNextButtonClick() },
                 modifier = buttonModifier
             ) {
                 Text(stringResource(id = (R.string.next)), fontSize = 18.sp)
+            }
+        }
+    }
+}
+
+@Composable
+fun TabbedResult(
+    newPlotData: PlotData,
+) {
+    val context = LocalContext.current
+    val windowInfo = rememberWindowInfo()
+    val height = when(windowInfo.screenHeightInfo) {
+        WindowInfo.WindowType.Expanded -> 600.dp
+        WindowInfo.WindowType.Medium -> 550.dp
+        else -> 600.dp
+    }
+    val modifier = Modifier
+        .padding(10.dp)
+        .width(450.dp)
+
+    val tabList = listOf("量測樹高", "目視樹高", "分岔樹高", "胸徑", "樹種", "生長狀況")
+    val stringList = listOf("Meas", "Vis", "Fork", "DBH", "Species", "Condition")
+    val tabSelected = remember { mutableStateOf(0) }
+
+    Column(
+        modifier = modifier
+            .height(height)
+    ) {
+        TabRow(
+            selectedTabIndex = tabSelected.value,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+        ) {
+            tabList.forEachIndexed { index, title ->
+                Tab(
+                    modifier = Modifier
+                        .padding(5.dp)
+                        .width(100.dp),
+                    selected = (tabSelected.value == index),
+                    onClick = {
+                        tabSelected.value = index
+                    }
+                ) {
+                    Text(title)
+                }
+            }
+        }
+
+        Box(
+            modifier = modifier
+                .height(500.dp)
+                .border(border = lightBorder)
+                .background(
+                    color = md_theme_light_inverseOnSurface,
+                    shape = Shapes.medium
+                )
+        ) {
+            when (tabSelected.value) {
+                0 -> {
+                    ResultLazyColumn(
+                        treeList = newPlotData.PlotTrees,
+                        type = stringList[0]
+                    )
+                }
+                1 -> {
+                    ResultLazyColumn(
+                        treeList = newPlotData.PlotTrees,
+                        type = stringList[1]
+                    )
+                }
+                2 -> {
+                    ResultLazyColumn(
+                        treeList = newPlotData.PlotTrees,
+                        type = stringList[2]
+                    )
+                }
+                3 -> {
+                    ResultLazyColumn(
+                        treeList = newPlotData.PlotTrees,
+                        type = stringList[3]
+                    )
+                }
+                4 -> {
+                    ResultLazyColumn(
+                        treeList = newPlotData.PlotTrees,
+                        type = stringList[4]
+                    )
+                }
+                5 -> {
+                    ResultLazyColumn(
+                        treeList = newPlotData.PlotTrees,
+                        type = stringList[5]
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ResultLazyColumn(
+    treeList: List<Tree>,
+    type: String
+) {
+    LazyColumn(
+        modifier = Modifier
+            .padding(10.dp)
+    ) {
+        itemsIndexed(treeList) { id, tree ->
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                ListItem(
+                    modifier = circleThreeDigitsModifier,
+                    headlineContent = {
+                        Text(
+                            text = String.format("%03d", tree.SampleNum),
+                            style = TextStyle(
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold
+                            ),
+                            modifier = Modifier
+                                .wrapContentWidth(Alignment.CenterHorizontally)
+                                .wrapContentHeight(Alignment.CenterVertically)
+                        )
+                    }
+                )
+
+                TextField(
+                    value = when (type) {
+                        "DBH" -> tree.DBH.toString()
+                        "Vis" -> tree.VisHeight.toString()
+                        "Meas" -> tree.MeasHeight.toString()
+                        "Fork" -> tree.ForkHeight.toString()
+                        "Species" -> tree.Species
+                        else -> tree.State.joinToString()
+                    },
+                    readOnly = true,
+                    onValueChange = {},
+                    modifier = Modifier
+                        .padding(10.dp),
+                    label = {
+                        Text("調查結果", fontSize = 13.sp)
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    textStyle = TextStyle(fontSize = 18.sp)
+                )
             }
         }
     }
@@ -162,14 +314,14 @@ fun TabbedValidationResult(
             }
         }
 
-        val inValidDBHSet = remember { mutableStateOf(compareTwoPlots(oldPlotData, newPlotData, dbhThreshold, stringList[3])) }
-        val inValidMeasHtSet = remember { mutableStateOf(compareTwoPlots(oldPlotData, newPlotData, htThreshold, stringList[0])) }
-        val inValidVisHtSet = remember { mutableStateOf(compareTwoPlots(oldPlotData, newPlotData, htThreshold, stringList[1])) }
-        val inValidForkHtSet = remember { mutableStateOf(compareTwoPlots(oldPlotData, newPlotData, htThreshold, stringList[2])) }
-        val inValidDBHQuota = remember { mutableStateOf(createTreeQuotaPair(inValidDBHSet.value)) }
-        val inValidMeasHtQuota = remember { mutableStateOf(createTreeQuotaPair(inValidMeasHtSet.value)) }
-        val inValidVisHtQuota = remember { mutableStateOf(createTreeQuotaPair(inValidVisHtSet.value)) }
-        val inValidForkHtQuota = remember { mutableStateOf(createTreeQuotaPair(inValidForkHtSet.value)) }
+        val invalidDBHSet = remember { mutableStateOf(compareTwoPlots(oldPlotData, newPlotData, dbhThreshold, stringList[3])) }
+        val invalidMeasHtSet = remember { mutableStateOf(compareTwoPlots(oldPlotData, newPlotData, htThreshold, stringList[0])) }
+        val invalidVisHtSet = remember { mutableStateOf(compareTwoPlots(oldPlotData, newPlotData, htThreshold, stringList[1])) }
+        val invalidForkHtSet = remember { mutableStateOf(compareTwoPlots(oldPlotData, newPlotData, htThreshold, stringList[2])) }
+        val invalidDBHQuota = remember { mutableStateOf(createTreeQuotaPair(invalidDBHSet.value)) }
+        val invalidMeasHtQuota = remember { mutableStateOf(createTreeQuotaPair(invalidMeasHtSet.value)) }
+        val invalidVisHtQuota = remember { mutableStateOf(createTreeQuotaPair(invalidVisHtSet.value)) }
+        val invalidForkHtQuota = remember { mutableStateOf(createTreeQuotaPair(invalidForkHtSet.value)) }
 
         Box(
             modifier = modifier
@@ -183,8 +335,8 @@ fun TabbedValidationResult(
             when (tabSelected.value) {
                 0 -> {
                     ValidationLazyColumn(
-                        inValidTreeQuotaMap = inValidDBHQuota,
-                        inValidTreeList = inValidMeasHtSet,
+                        inValidTreeQuotaMap = invalidDBHQuota,
+                        inValidTreeList = invalidMeasHtSet,
                         oldPlotData = oldPlotData,
                         type = stringList[0],
                         threshold = htThreshold
@@ -192,8 +344,8 @@ fun TabbedValidationResult(
                 }
                 1 -> {
                     ValidationLazyColumn(
-                        inValidTreeQuotaMap = inValidVisHtQuota,
-                        inValidTreeList = inValidVisHtSet,
+                        inValidTreeQuotaMap = invalidVisHtQuota,
+                        inValidTreeList = invalidVisHtSet,
                         oldPlotData = oldPlotData,
                         type = stringList[1],
                         threshold = htThreshold
@@ -201,8 +353,8 @@ fun TabbedValidationResult(
                 }
                 2 -> {
                     ValidationLazyColumn(
-                        inValidTreeQuotaMap = inValidForkHtQuota,
-                        inValidTreeList = inValidForkHtSet,
+                        inValidTreeQuotaMap = invalidForkHtQuota,
+                        inValidTreeList = invalidForkHtSet,
                         oldPlotData = oldPlotData,
                         type = stringList[2],
                         threshold = htThreshold
@@ -210,8 +362,8 @@ fun TabbedValidationResult(
                 }
                 3 -> {
                     ValidationLazyColumn(
-                        inValidTreeQuotaMap = inValidMeasHtQuota,
-                        inValidTreeList = inValidDBHSet,
+                        inValidTreeQuotaMap = invalidMeasHtQuota,
+                        inValidTreeList = invalidDBHSet,
                         oldPlotData = oldPlotData,
                         type = stringList[3],
                         threshold = dbhThreshold

@@ -55,6 +55,10 @@ fun NewSurveyScreen(
         for (i in 0 until defaultTreeNum) {
             treeNumList.add((i + 1).toString())
         }
+    } else {
+        for (i in 0 until newPlotDataState.value.PlotTrees.size) {
+            treeNumList.add((i + 1).toString())
+        }
     }
 
     val totalTreesNumList = remember { mutableStateListOf(*treeNumList.toTypedArray()) }

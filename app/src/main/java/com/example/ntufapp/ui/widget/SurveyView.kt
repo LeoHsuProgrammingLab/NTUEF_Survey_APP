@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,6 +37,16 @@ fun SurveyView(
         val speciesTreeSet = remember { mutableStateOf(totalTreesNumList.toMutableSet()) }
         val conditionTreeSet = remember { mutableStateOf(totalTreesNumList.toMutableSet()) }
 
+        updateUnaddressedSet(
+            dbhSet = dbhTreeSet,
+            measHtSet = measHtTreeSet,
+            visHtSet = visHtTreeSet,
+            forkHtSet = forkHtTreeSet,
+            speciesSet = speciesTreeSet,
+            conditionSet = conditionTreeSet,
+            newPlotData = newPlotData
+        )
+
         Row(
             modifier = Modifier
                 .padding(5.dp)
@@ -63,9 +74,43 @@ fun SurveyView(
             dbhSet = dbhTreeSet,
             measHtSet = measHtTreeSet,
             visHtSet = visHtTreeSet,
-            forkHtSet = forkHtTreeSet
+            forkHtSet = forkHtTreeSet,
+            speciesSet = speciesTreeSet,
+            conditionSet = conditionTreeSet,
+            surveyType = "NewSurvey",
         ) {
             onNextButtonClick()
+        }
+    }
+}
+
+fun updateUnaddressedSet(
+    dbhSet: MutableState<MutableSet<String>>,
+    measHtSet: MutableState<MutableSet<String>>,
+    visHtSet: MutableState<MutableSet<String>>,
+    forkHtSet: MutableState<MutableSet<String>>,
+    speciesSet: MutableState<MutableSet<String>>,
+    conditionSet: MutableState<MutableSet<String>>,
+    newPlotData: PlotData
+) {
+    for (tree in newPlotData.PlotTrees) {
+        if (tree.DBH != 0.0) {
+            dbhSet.value.remove(tree.SampleNum.toString())
+        }
+        if (tree.MeasHeight != 0.0) {
+            measHtSet.value.remove(tree.SampleNum.toString())
+        }
+        if (tree.VisHeight != 0.0) {
+            visHtSet.value.remove(tree.SampleNum.toString())
+        }
+        if (tree.ForkHeight != 0.0) {
+            forkHtSet.value.remove(tree.SampleNum.toString())
+        }
+        if (tree.Species != "") {
+            speciesSet.value.remove(tree.SampleNum.toString())
+        }
+        if (tree.State.isNotEmpty()) {
+            conditionSet.value.remove(tree.SampleNum.toString())
         }
     }
 }

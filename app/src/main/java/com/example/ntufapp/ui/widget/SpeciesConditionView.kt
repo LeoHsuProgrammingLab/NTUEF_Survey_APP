@@ -55,11 +55,13 @@ fun SpeciesConditionView(
     surveyType: String = "NewSurvey"
 ) {
     val coroutineScope = rememberCoroutineScope()
-    Log.d("SpeciesConditionView", "currentTreeNum: ${currentTreeNum.value}")
-    val newestTreeNum = totalTreesNumList.size.toString()
-    if (!speciesTreeSet.value.contains(newestTreeNum)) {
-        conditionTreeSet.value.add(newestTreeNum)
-        speciesTreeSet.value.add(newestTreeNum)
+    Log.d("SpeciesConditionView", "totalTreesNumList: ${totalTreesNumList.size}")
+    for (i in totalTreesNumList.size downTo 1) {
+        if (speciesTreeSet.value.contains(i.toString())) {
+            break
+        }
+        speciesTreeSet.value.add(i.toString())
+        conditionTreeSet.value.add(i.toString())
     }
 
     val context = LocalContext.current
@@ -129,7 +131,6 @@ fun SpeciesConditionView(
                         coroutineScope.launch{}
                     }
                 )
-
             }
 //            TreeConditionChips(
 //                currentTreeNum = currentTreeNum.value,

@@ -506,6 +506,9 @@ fun SurveyConfirmDialog( // Survey Screen
     measHtSetSize: Int,
     visHtSetSize: Int,
     forkHtSetSize: Int,
+    speciesSetSize: Int = 0,
+    conditionSetSize: Int = 0,
+    surveyType: String = "ReSurvey",
     onDismiss: () -> Unit,
     onCancelClick: () -> Unit,
     onNextButtonClick: () -> Unit
@@ -521,6 +524,10 @@ fun SurveyConfirmDialog( // Survey Screen
                 Text("樹高還有${measHtSetSize}棵樹未調查")
                 Text("目視樹高還有${visHtSetSize}棵樹未調查")
                 Text("分岔樹高還有${forkHtSetSize}棵樹未調查")
+                if (surveyType == "NewSurvey") {
+                    Text("樹種還有${speciesSetSize}棵樹未調查")
+                    Text("生長狀況還有${conditionSetSize}棵樹未調查")
+                }
                 Text("請確認是否要完成此次調查?", style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 18.sp))
 
                 Spacer(modifier = Modifier.padding(10.dp))

@@ -22,6 +22,8 @@ fun CheckAddButton(
     measHtSet: MutableState<MutableSet<String>>,
     visHtSet: MutableState<MutableSet<String>>,
     forkHtSet: MutableState<MutableSet<String>>,
+    speciesSet: MutableState<MutableSet<String>>,
+    conditionSet: MutableState<MutableSet<String>>,
     surveyType: String = "ReSurvey",
     onNextButtonClick: () -> Unit
 ){
@@ -49,7 +51,18 @@ fun CheckAddButton(
 
         if (showDialog.value) {
             if (surveyType == "NewSurvey") {
-
+                SurveyConfirmDialog(
+                    dbhSetSize = dbhSet.value.size,
+                    measHtSetSize = measHtSet.value.size,
+                    visHtSetSize = visHtSet.value.size,
+                    forkHtSetSize = forkHtSet.value.size,
+                    speciesSetSize = speciesSet.value.size,
+                    conditionSetSize = conditionSet.value.size,
+                    surveyType = surveyType,
+                    onDismiss = {},
+                    onCancelClick = { showDialog.value = false },
+                    onNextButtonClick = onNextButtonClick
+                )
             } else {
                 SurveyConfirmDialog(
                     dbhSetSize = dbhSet.value.size,
