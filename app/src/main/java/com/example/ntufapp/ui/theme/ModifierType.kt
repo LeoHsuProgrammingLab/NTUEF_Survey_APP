@@ -10,6 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 
+fun getCustomedBasicModifier(width: Int, height: Int): Modifier {
+    return basicModifier.size(width.dp, height.dp)
+}
+
+val basicModifier = Modifier.padding(10.dp)
+
 val inputTextModifier = Modifier
     .padding(10.dp)
     .size(width = 120.dp, height = 60.dp)

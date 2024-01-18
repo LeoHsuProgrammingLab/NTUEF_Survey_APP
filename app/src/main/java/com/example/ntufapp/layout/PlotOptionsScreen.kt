@@ -33,6 +33,7 @@ import com.example.ntufapp.ui.widget.UploadFileDialog
 import com.example.ntufapp.ui.theme.LayoutDivider
 import com.example.ntufapp.utils.getFileName
 import com.example.ntufapp.utils.parseJsonToMetaData
+import com.example.ntufapp.utils.showMessage
 
 @Composable
 fun PlotOptionsScreen(
@@ -70,10 +71,23 @@ fun PlotOptionsScreen(
             val surveyType = remember { mutableStateOf("") }
             val outputFilename = remember { mutableStateOf("") }
 
-            // Old Plot Survey
             val showOldPlotUpload = remember { mutableStateOf(false) }
             val showOldUploadData = remember { mutableStateOf(false) }
+            val showNewPlotUploadChoices = remember { mutableStateOf(false) }
+            val showNewPlotUpload = remember { mutableStateOf(false) }
+            val showNewUploadData = remember { mutableStateOf(false) }
+            val showNewPlotManualInput = remember { mutableStateOf(false) }
+            val dismissDialog: (Boolean) -> Unit = { isNewPlot: Boolean ->
+                if (isNewPlot) {
+                    showNewPlotUpload.value = false
+                } else {
+                    showOldPlotUpload.value = false
+                }
+                buttonText.value = "請選擇JSON檔案"
+            }
 
+
+            // Old Plot
             Button(
                 modifier = Modifier.padding(end = 20.dp),
                 onClick = { showOldPlotUpload.value = true }
@@ -81,10 +95,6 @@ fun PlotOptionsScreen(
                 Text("複查樣區", fontSize = 20.sp)
             }
             // Upload Old Plot by JSON
-            val dismissOldDialog = {
-                showOldPlotUpload.value = false
-                buttonText.value = "請選擇JSON檔案"
-            }
             if(showOldPlotUpload.value) {
                 UploadFileDialog(
                     selectedFileUri = selectedFileUri.value,
@@ -95,19 +105,18 @@ fun PlotOptionsScreen(
                             try {
                                 plotData.value  = parseJsonToMetaData(uri, context)!!
                                 if(plotData.value.ManageUnit == "" || plotData.value.PlotTrees.size == 0) {
-                                    Toast.makeText(context, "你匯入了錯誤的檔案(.json)！", Toast.LENGTH_SHORT).show()
+                                    showMessage(context, "你匯入了錯誤的檔案(.json)！")
                                 } else {
                                     showOldUploadData.value = true
                                     outputFilename.value = getFileName(context, uri)
                                 }
                             } catch (e: Exception) {
-                                Log.e(tag, "Exception during JSON parsing: ${e.message}")
-                                Toast.makeText(context, "檔案解析時發生錯誤！", Toast.LENGTH_SHORT).show()
+                                showMessage(context, "檔案解析時發生錯誤！")
                             }
                         }
-                        dismissOldDialog()
+                        dismissDialog(false)
                     },
-                    onCancelClick = { dismissOldDialog() },
+                    onCancelClick = { dismissDialog(false) },
                     filePicker = filePickerLauncher,
                     buttonText = buttonText.value
                 )
@@ -125,12 +134,7 @@ fun PlotOptionsScreen(
                 )
             }
 
-            // New Plot Survey
-            val showNewPlotUploadChoices = remember { mutableStateOf(false) }
-            val showNewPlotUpload = remember { mutableStateOf(false) }
-            val showNewUploadData = remember { mutableStateOf(false) }
-            val showNewPlotManualInput = remember { mutableStateOf(false) }
-
+            // New Plot
             Button(
                 onClick = { showNewPlotUploadChoices.value = true }
             ) {
@@ -152,10 +156,6 @@ fun PlotOptionsScreen(
                 )
             }
             // Upload New Plot by JSON
-            val dismissNewDialog = {
-                showNewPlotUpload.value = false
-                buttonText.value = "請選擇JSON檔案"
-            }
             if (showNewPlotUpload.value) {
                 UploadFileDialog(
                     selectedFileUri = selectedFileUri.value,
@@ -166,19 +166,18 @@ fun PlotOptionsScreen(
                             try {
                                 plotData.value  = parseJsonToMetaData(uri, context)!!
                                 if(plotData.value.ManageUnit == "") {
-                                    Toast.makeText(context, "你匯入了錯誤的檔案(.json)！", Toast.LENGTH_SHORT).show()
+                                    showMessage(context, "你匯入了錯誤的檔案(.json)！")
                                 } else {
                                     showNewUploadData.value = true
                                     outputFilename.value = getFileName(context, uri)
                                 }
                             } catch (e: Exception) {
-                                Log.e(tag, "Exception during JSON parsing: ${e.message}")
-                                Toast.makeText(context, "檔案解析時發生錯誤！", Toast.LENGTH_SHORT).show()
+                                showMessage(context, "檔案解析時發生錯誤！")
                             }
                         }
-                        dismissNewDialog()
+                        dismissDialog(true)
                     },
-                    onCancelClick = { dismissNewDialog() },
+                    onCancelClick = { dismissDialog(true) },
                     filePicker = filePickerLauncher,
                     buttonText = buttonText.value
                 )

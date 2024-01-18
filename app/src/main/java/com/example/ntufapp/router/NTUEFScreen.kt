@@ -62,19 +62,14 @@ fun NTUEFApp(
 
             composable(route = Screens.ReSurvey.name) {
                 ReSurveyScreen(
-                    onNextButtonClick = {
-                        navController.navigate("${Screens.ResultDisplay}/source=${Screens.ReSurvey.name}")
-                    },
-                    oldPlotData = resultState.first, // old plot data
+                    onNextButtonClick = { navController.navigate("${Screens.ResultDisplay}/source=${Screens.ReSurvey.name}") },
                     newPlotData = resultState.second //new plot data
                 )
             }
 
             composable(route = Screens.NewSurvey.name) {
                 NewSurveyScreen(
-                    onNextButtonClick = {
-                        navController.navigate("${Screens.ResultDisplay}/source=${Screens.NewSurvey.name}")
-                    },
+                    onNextButtonClick = { navController.navigate("${Screens.ResultDisplay}/source=${Screens.NewSurvey.name}") },
                     newPlotData = resultState.second
                 )
             }
@@ -92,8 +87,6 @@ fun NTUEFApp(
                             "ReSurvey" -> navController.navigate(Screens.ReSurvey.name)
                             "NewSurvey" -> navController.navigate(Screens.NewSurvey.name)
                         }
-                        Log.d(dTag, resultState.second.PlotTrees.size.toString())
-                        Log.d(dTag, resultState.second.PlotTrees[0].Species)
                     },
                     onNextButtonClick = {
                         navController.navigate(Screens.SaveJson.name)
@@ -106,7 +99,7 @@ fun NTUEFApp(
                     newPlotData = resultState.second,
                     outputFilename = viewModel.fileName,
                     onBackButtonClick = {
-                        resultState.first.resetAllTrees()
+                        viewModel.reset()
                         navController.navigate(Screens.Start.name)
                     }
                 )

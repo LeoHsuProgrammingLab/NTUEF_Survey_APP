@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 
-class SurveyViewModel: ViewModel() {
+class SurveyViewModel: ViewModel() { // <oldPlot, newPlot>
     private val _resultState = MutableStateFlow(Pair(PlotData(), PlotData()))
     val resultState: StateFlow<Pair<PlotData, PlotData>> = _resultState.asStateFlow()
     var fileName: String = ""
@@ -33,9 +33,5 @@ class SurveyViewModel: ViewModel() {
 
     fun reset() {
         _resultState.value = Pair(PlotData(), PlotData())
-    }
-
-    fun compare() {
-        /*TODO: compare the visHeight, measHeight, forkHeight, DBH, and send the alarm*/
     }
 }

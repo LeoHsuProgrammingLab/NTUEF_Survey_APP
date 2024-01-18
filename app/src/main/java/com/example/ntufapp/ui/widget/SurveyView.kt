@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.ntufapp.model.PlotData
+import com.example.ntufapp.ui.theme.basicModifier
 
 @Composable
 fun SurveyView(
@@ -22,9 +23,7 @@ fun SurveyView(
     onNextButtonClick: () -> Unit
 ) {
     Column(
-        modifier = Modifier
-            .padding(10.dp)
-            .fillMaxWidth(),
+        modifier = basicModifier.fillMaxWidth(),
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -48,9 +47,7 @@ fun SurveyView(
         )
 
         Row(
-            modifier = Modifier
-                .padding(5.dp)
-                .fillMaxWidth(),
+            modifier = basicModifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             SpeciesConditionView(

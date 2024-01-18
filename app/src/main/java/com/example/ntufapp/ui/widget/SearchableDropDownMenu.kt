@@ -46,7 +46,7 @@ fun SearchableAddMenu(
     totalItemsList: MutableList<String>,
     defaultString: String = "",
     label: String = "搜尋",
-    dialogType: String = "Tree",
+    dialogType: String = "tree",
     readOnly: Boolean = false,
     keyboardType: KeyboardType,
     onChoose: (String) -> Unit,

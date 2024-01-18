@@ -33,6 +33,7 @@ import com.example.ntufapp.R
 import com.example.ntufapp.data.DataSource
 import com.example.ntufapp.model.PlotData
 import com.example.ntufapp.ui.theme.Shapes
+import com.example.ntufapp.ui.theme.basicModifier
 import com.example.ntufapp.utils.showMessage
 
 @Composable
@@ -51,17 +52,16 @@ fun UploadFileDialog( // Plot Options Screen
     ) {
         Surface(shape = Shapes.small) {
             Column(
-                modifier = Modifier.padding(10.dp),
+                modifier = basicModifier,
             ) {
                 DialogHeader(header = "請匯入樣區資料")
-                Spacer(modifier = Modifier.padding(10.dp))
+                Spacer(modifier = basicModifier)
                 Row(
                     modifier = Modifier.width(200.dp),
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    val context = LocalContext.current
                     Button(
-                        modifier = Modifier.padding(10.dp),
+                        modifier = basicModifier,
                         onClick = {
                             filePicker.launch("application/json")
                         }
@@ -70,20 +70,20 @@ fun UploadFileDialog( // Plot Options Screen
                     }
                 }
 
-                Spacer(modifier = Modifier.padding(10.dp))
+                Spacer(modifier = basicModifier)
                 Row(
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     val context = LocalContext.current
                     Button(
-                        modifier = Modifier.padding(10.dp),
+                        modifier = basicModifier,
                         onClick = onCancelClick,
                     ) {
                         Text(stringResource(id = (R.string.cancel)))
                     }
 
                     Button(
-                        modifier = Modifier.padding(10.dp),
+                        modifier = basicModifier,
                         onClick = {
                             if (selectedFileUri != null) {
                                 onSendClick(selectedFileUri)
@@ -108,78 +108,54 @@ fun AddDialog(
     onNextButtonClick: (String) -> Unit,
     curSize: Int
 ){
-    val modifier = Modifier.padding(10.dp)
-    when(type) {
-        "Tree" ->
-            Dialog(
-                onDismissRequest = { onDismiss.invoke() }
+    Dialog(
+        onDismissRequest = { onDismiss.invoke() }
+    ) {
+        Surface(shape = Shapes.small) {
+            Column(
+                modifier = basicModifier,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Surface(shape = Shapes.small) {
-                    Column(modifier = modifier) {
-                        Text(text = "您預計新增第 ${curSize + 1} 棵樹")
-                        Spacer(modifier = modifier)
+                val surveyorName = remember { mutableStateOf("") }
+                if (type == "tree") {
+                    DialogHeader(header = "您預計新增第 ${curSize + 1} 棵樣樹")
+                } else {
+                    DialogHeader(header = "您預計新增第 ${curSize + 1} 位調查人員")
+                    OutlinedTextField(
+                        value = surveyorName.value,
+                        onValueChange = {
+                            surveyorName.value = it
+                        },
+                        placeholder = { Text("請輸入調查人員姓名") },
+                        modifier = basicModifier.width(200.dp)
+                    )
+                }
+                Spacer(modifier = basicModifier)
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Button(
+                        modifier = basicModifier,
+                        onClick = onCancelClick,
+                    ) {
+                        Text(stringResource(id = (R.string.cancel)))
+                    }
 
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceEvenly
-                        ) {
-                            Button(
-                                modifier = modifier,
-                                onClick = onCancelClick,
-                            ) {
-                                Text(stringResource(id = (R.string.cancel)))
-                            }
-
-                            Button(
-                                modifier = modifier,
-                                onClick = { onNextButtonClick((curSize + 1).toString()) }
-                            ) {
-                                Text(stringResource(id = (R.string.next)))
+                    Button(
+                        modifier = basicModifier,
+                        onClick = {
+                            if(type == "tree") {
+                                onNextButtonClick((curSize + 1).toString())
+                            } else {
+                                onNextButtonClick(surveyorName.value)
                             }
                         }
+                    ) {
+                        Text(stringResource(id = (R.string.next)))
                     }
                 }
             }
-        "Name" ->
-            Dialog(
-                onDismissRequest = { onDismiss.invoke() }
-            ) {
-                Surface(shape = Shapes.small) {
-                    Column(modifier = modifier) {
-                        val surveyorName = remember { mutableStateOf("") }
-                        Text(text = "您預計新增第 ${curSize + 1} 位調查人員")
-
-                        OutlinedTextField(
-                            value = surveyorName.value,
-                            onValueChange = {
-                                surveyorName.value = it
-                            },
-                            placeholder = { Text("請輸入調查人員姓名") },
-                        )
-
-                        Spacer(modifier = modifier)
-
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceEvenly
-                        ) {
-                            Button(
-                                modifier = modifier,
-                                onClick = onCancelClick,
-                            ) {
-                                Text(stringResource(id = (R.string.cancel)))
-                            }
-
-                            Button(
-                                modifier = modifier,
-                                onClick = {
-                                    onNextButtonClick(surveyorName.value)
-                                }
-                            ) {
-                                Text(stringResource(id = (R.string.next)))
-                            }
-                        }
-                    }
-                }
-            }
+        }
     }
 }
 
@@ -194,20 +170,21 @@ fun ConfirmDialog( // Plot Options Screen
     Dialog(
         onDismissRequest = { onDismiss.invoke() }
     ) {
-        val context = LocalContext.current
-
         Surface(shape = Shapes.small) {
-            Column(modifier = Modifier.padding(10.dp)) {
-                Text(text = "您已匯入${metaData.ManageUnit}${metaData.SubUnit}的資料")
-                Text("樣區名稱：${metaData.PlotName}")
-                Text("樣區編號：${metaData.PlotNum}")
-                Text("該樣區有${metaData.PlotTrees.size}棵樣樹")
-
-                Spacer(modifier = Modifier.padding(10.dp))
-                Row{
+            Column(
+                modifier = basicModifier,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                DialogHeader(
+                    header = "您已匯入${metaData.ManageUnit}${metaData.SubUnit}的資料\n樣區名稱：${metaData.PlotName}\n樣區編號：${metaData.PlotNum}\n該樣區有${metaData.PlotTrees.size}棵樣樹"
+                )
+                Spacer(basicModifier)
+                Row(
+                  horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
                     // cancel button
                     Button(
-                        modifier = Modifier.padding(10.dp),
+                        modifier = basicModifier,
                         onClick = onCancelClick,
                     ) {
                         Text(stringResource(id = (R.string.cancel)))
@@ -215,7 +192,7 @@ fun ConfirmDialog( // Plot Options Screen
 
                     // next button
                     Button(
-                        modifier = Modifier.padding(10.dp),
+                        modifier = basicModifier,
                         onClick = { onNextButtonClick(metaData) }
                     ) {
                         Text(stringResource(id = (R.string.next)))
@@ -235,27 +212,28 @@ fun NewSurveyUploadChoiceDialog(
         onDismissRequest = {}
     ) {
         Surface(shape = Shapes.small) {
-            Column(modifier = Modifier.padding(10.dp)) {
+            Column(
+                modifier = basicModifier,
+            ) {
                 DialogHeader(header = "請選擇輸入新樣區之方式")
-                Spacer(modifier = Modifier.padding(10.dp))
+                Spacer(modifier = basicModifier)
                 Row(
                     horizontalArrangement = Arrangement.SpaceEvenly
-
                 ) {
                     Button(
-                        modifier = Modifier.padding(10.dp),
+                        modifier = basicModifier,
                         onClick = { onDismiss.invoke() }
                     ) {
                         Text(stringResource(id = R.string.cancel))
                     }
                     Button(
-                        modifier = Modifier.padding(10.dp),
+                        modifier = basicModifier,
                         onClick = { onUploadTypeClick("Manual") }
                     ) {
                         Text("手動輸入")
                     }
                     Button(
-                        modifier = Modifier.padding(10.dp),
+                        modifier = basicModifier,
                         onClick = { onUploadTypeClick("JSON") }
                     ) {
                         Text("匯入JSON檔")
@@ -278,7 +256,7 @@ fun SaveJsonDialog(
         val text = remember { mutableStateOf("") }
         Surface(shape = Shapes.small) {
             Column(
-                modifier = Modifier.padding(10.dp),
+                modifier = basicModifier,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 OutlinedTextField(
@@ -330,23 +308,22 @@ fun GeneralConfirmDialog(
             shape = Shapes.small
         ) {
             Column(
-                modifier = Modifier.padding(10.dp),
+                modifier = basicModifier,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                val modifier = Modifier.padding(10.dp)
                 DialogHeader(header = reminder)
-                Spacer(modifier = modifier)
+                Spacer(modifier = basicModifier)
                 Row(
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     OutlinedButton(
-                        modifier = modifier,
+                        modifier = basicModifier,
                         onClick = onCancelClick
                     ) {
                         Text(stringResource(id = (R.string.cancel)))
                     }
                     OutlinedButton(
-                        modifier = modifier,
+                        modifier = basicModifier,
                         onClick = onConfirmClick
                     ) {
                         Text(confirm)
@@ -383,7 +360,7 @@ fun ManualInputNewPlotDialog(
         val TWD97_Y = remember { mutableStateOf("") }
 
         Surface(shape = Shapes.small) {
-            Column(modifier = Modifier.padding(10.dp)) {
+            Column(modifier = basicModifier) {
                 DialogHeader(header = "請輸入樣區資料")
                 TextField(value = manageUnit.value, onValueChange = { text: String -> manageUnit.value = text }, label = { Text("營林區")})
                 TextField(value = subUnit.value, onValueChange = { text: String -> subUnit.value = text }, label = { Text("林班地")})
@@ -401,13 +378,13 @@ fun ManualInputNewPlotDialog(
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     Button(
-                        modifier = Modifier.padding(10.dp),
+                        modifier = basicModifier,
                         onClick = { onDismiss.invoke() }
                     ) {
                         Text(stringResource(id = (R.string.cancel)))
                     }
                     Button(
-                        modifier = Modifier.padding(10.dp),
+                        modifier = basicModifier,
                         onClick = {
                             if (
                                 manageUnit.value != "" &&
@@ -462,7 +439,7 @@ fun AdjustSpeciesDialog( // Survey Screen
     ) {
         Surface(shape = Shapes.small) {
             Column(
-                modifier = Modifier.padding(10.dp),
+                modifier = basicModifier,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 SearchableChooseMenu(
@@ -471,19 +448,19 @@ fun AdjustSpeciesDialog( // Survey Screen
                         treeSpecies.value = it
                     }
                 )
-                Spacer(modifier = Modifier.padding(10.dp))
+                Spacer(modifier = basicModifier)
                 Row(
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ){
                     Button(
-                        modifier = Modifier.padding(10.dp),
+                        modifier = basicModifier,
                         onClick = onCancelClick,
                     ) {
                         Text(stringResource(id = (R.string.cancel)))
                     }
 
                     Button(
-                        modifier = Modifier.padding(10.dp),
+                        modifier = basicModifier,
                         onClick = {
                             if(treeSpecies.value != "") {
                                 onNextButtonClick(treeSpecies.value)
@@ -519,31 +496,35 @@ fun SurveyConfirmDialog( // Survey Screen
         }
     ) {
         Surface(shape = Shapes.small) {
-            Column(modifier = Modifier.padding(10.dp)) {
-                Text(text = "DBH還有${dbhSetSize}棵樹未調查")
-                Text("樹高還有${measHtSetSize}棵樹未調查")
-                Text("目視樹高還有${visHtSetSize}棵樹未調查")
-                Text("分岔樹高還有${forkHtSetSize}棵樹未調查")
-                if (surveyType == "NewSurvey") {
-                    Text("樹種還有${speciesSetSize}棵樹未調查")
-                    Text("生長狀況還有${conditionSetSize}棵樹未調查")
+            Column(
+                modifier = basicModifier,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                DialogHeader(header = "您還有以下未調查樣樹，確認完成嗎？")
+                Column {
+                    Text(text = "DBH還有${dbhSetSize}棵樹未調查")
+                    Text("樹高還有${measHtSetSize}棵樹未調查")
+                    Text("目視樹高還有${visHtSetSize}棵樹未調查")
+                    Text("分岔樹高還有${forkHtSetSize}棵樹未調查")
+                    if (surveyType == "NewSurvey") {
+                        Text("樹種還有${speciesSetSize}棵樹未調查")
+                        Text("生長狀況還有${conditionSetSize}棵樹未調查")
+                    }
                 }
-                Text("請確認是否要完成此次調查?", style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 18.sp))
-
-                Spacer(modifier = Modifier.padding(10.dp))
-
-                Row{
+                Spacer(modifier = basicModifier)
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
                     Button(
-                        modifier = Modifier.padding(10.dp),
+                        modifier = basicModifier,
                         onClick = onCancelClick,
                     ) {
                         Text("繼續調查")
                     }
 
                     Button(
-                        modifier = Modifier.padding(10.dp),
+                        modifier = basicModifier,
                         onClick = {
-                            //TODO: Save the data
                             onNextButtonClick()
                         }
                     ) {
@@ -559,7 +540,7 @@ fun SurveyConfirmDialog( // Survey Screen
 fun DialogHeader(header: String) {
     Text(
         text = header,
-        modifier = Modifier.padding(10.dp),
+        modifier = basicModifier,
         style = TextStyle(
             fontWeight = FontWeight.Bold,
             fontSize = 18.sp

@@ -16,7 +16,6 @@ import com.example.ntufapp.ui.widget.SurveyView
 
 @Composable
 fun ReSurveyScreen(
-    oldPlotData: PlotData,
     newPlotData: PlotData,
     onNextButtonClick: () -> Unit,
 ) {
@@ -25,13 +24,12 @@ fun ReSurveyScreen(
     // Save the final return data
     val newPlotDataState = remember { mutableStateOf(newPlotData) }
     newPlotDataState.value.setToday()
+    // Store all the tree numbers in ReSurvey Layout
     val treeNumList = mutableListOf<String>()
     for (i in 0 until newPlotData.PlotTrees.size) {
         treeNumList.add((i + 1).toString())
     }
-    // Save every tree's number in ReSurvey Layout
     val totalTreesNumList = remember { mutableStateListOf(*treeNumList.toTypedArray()) }
-
     SurveyView(totalTreesNumList = totalTreesNumList, newPlotData = newPlotDataState.value, onNextButtonClick = onNextButtonClick)
 }
 
@@ -45,10 +43,8 @@ fun NewSurveyScreen(
 
     // Save the final return data
     val newPlotDataState = remember { mutableStateOf(newPlotData) }
-
     newPlotDataState.value.setToday()
-
-    // Save every tree's number in ReSurvey Layout
+    // // Store all the tree numbers in ReSurvey Layout
     val treeNumList = mutableListOf<String>()
     if (newPlotDataState.value.PlotTrees.size == 0) {
         newPlotDataState.value.initPlotTrees()
@@ -60,9 +56,7 @@ fun NewSurveyScreen(
             treeNumList.add((i + 1).toString())
         }
     }
-
     val totalTreesNumList = remember { mutableStateListOf(*treeNumList.toTypedArray()) }
-
     SurveyView(totalTreesNumList = totalTreesNumList, newPlotData = newPlotDataState.value, onNextButtonClick = onNextButtonClick)
 }
 
