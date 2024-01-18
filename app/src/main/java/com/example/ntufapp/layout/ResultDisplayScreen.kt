@@ -124,7 +124,6 @@ fun ResultDisplayScreen(
 fun TabbedResult(
     newPlotData: PlotData,
 ) {
-    val context = LocalContext.current
     val windowInfo = rememberWindowInfo()
     val height = when(windowInfo.screenHeightInfo) {
         WindowInfo.WindowType.Expanded -> 600.dp
@@ -141,7 +140,7 @@ fun TabbedResult(
 
     Column(
         modifier = modifier
-            .height(height)
+            .height(height),
     ) {
         TabRow(
             selectedTabIndex = tabSelected.value,
@@ -159,7 +158,16 @@ fun TabbedResult(
                         tabSelected.value = index
                     }
                 ) {
-                    Text(title)
+                    Text(
+                        title,
+                        modifier = Modifier
+                            .wrapContentWidth(Alignment.CenterHorizontally)
+                            .wrapContentHeight(Alignment.CenterVertically),
+                        style = TextStyle(
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
                 }
             }
         }
@@ -506,94 +514,89 @@ fun ScatterPlot(
         WindowInfo.WindowType.Expanded -> 600.dp
         else -> 550.dp
     }
-
-    Box(
+    // Result Plot
+    Canvas(
         modifier = Modifier
-            .padding(10.dp)
             .width(800.dp)
             .height(height)
+            .fillMaxSize()
+            .padding(10.dp)
     ) {
-        Canvas(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ){
-            // Draw the background and box
-            drawRect(
-                color = Color.Black,
-                topLeft = Offset(0f, 0f),
-                size = Size(size.width, size.height),
-                style = Stroke(width = 4f)
-            )
+        // Draw the background and box
+        drawRect(
+            color = Color.Black,
+            topLeft = Offset(0f, 0f),
+            size = Size(size.width, size.height),
+            style = Stroke(width = 3f)
+        )
 
-            var xAxisMax = 0f
-            var xAxisMin = 200f
-            var yAxisMax = 0f
-            var yAxisMin = 200f
-            for (i in plotData.PlotTrees) {
-                if(i.DBH > xAxisMax) {
-                    xAxisMax = i.DBH.toFloat()
-                } else {
-                    if(i.DBH < xAxisMin) {
-                        xAxisMin = i.DBH.toFloat()
-                    }
-                }
-
-                if (maxThree(i.VisHeight, i.MeasHeight, i.ForkHeight) > yAxisMax) {
-                    yAxisMax = maxThree(i.VisHeight, i.MeasHeight, i.ForkHeight).toFloat()
-                } else {
-                    if (minThree(i.VisHeight, i.MeasHeight, i.ForkHeight) < yAxisMin) {
-                        yAxisMin = minThree(i.VisHeight, i.MeasHeight, i.ForkHeight).toFloat()
-                    }
+        var xAxisMax = 0f
+        var xAxisMin = 200f
+        var yAxisMax = 0f
+        var yAxisMin = 200f
+        for (i in plotData.PlotTrees) {
+            if(i.DBH > xAxisMax) {
+                xAxisMax = i.DBH.toFloat()
+            } else {
+                if(i.DBH < xAxisMin) {
+                    xAxisMin = i.DBH.toFloat()
                 }
             }
 
-            // Set the max and min value of x-axis and y-axis
-            xAxisMax = if (xAxisMax == 0f) {
-                80f
+            if (maxThree(i.VisHeight, i.MeasHeight, i.ForkHeight) > yAxisMax) {
+                yAxisMax = maxThree(i.VisHeight, i.MeasHeight, i.ForkHeight).toFloat()
             } else {
-                val temp = xAxisMax.toInt() / 5
-                (temp + 1) * 5f
+                if (minThree(i.VisHeight, i.MeasHeight, i.ForkHeight) < yAxisMin) {
+                    yAxisMin = minThree(i.VisHeight, i.MeasHeight, i.ForkHeight).toFloat()
+                }
             }
-
-            yAxisMax = if (yAxisMax == 0f) {
-                40f
-            } else {
-                val temp = yAxisMax.toInt() / 5
-                (temp + 1) * 5f
-            }
-
-            xAxisMin = if (xAxisMin >= 5f) {
-                val temp = xAxisMin.toInt() / 5
-                (temp - 1) * 5f
-            } else {
-                0f
-            }
-
-            yAxisMin = if (yAxisMin >= 5f) {
-                val temp = yAxisMin.toInt() / 5
-                (temp - 1) * 5f
-            } else {
-                0f
-            }
-            // Set padding & Paint for each height
-            val padding = 150f
-            val heightList = listOf("Meas", "Vis", "Fork")
-            val forkHeightPaint = Paint().apply { color = Color.Red }
-            val visHeightPaint = Paint().apply { color = Color.Green }
-            val measHeightPaint = Paint().apply { color = Color.Magenta }
-            val paintList = listOf(measHeightPaint, visHeightPaint, forkHeightPaint)
-            // Draw scatter points for each data series
-            for (yType in heightList) {
-                drawDataPoints(plotData.PlotTrees, xAxisMin, xAxisMax, yAxisMin, yAxisMax, yType, padding = padding, paintList = paintList, context)
-            }
-            // Draw axis
-            drawAxis(xAxisMin, xAxisMax, yAxisMin, yAxisMax, padding = padding)
-            // Draw legend
-            drawLegend(xAxisMin, xAxisMax, yAxisMin, yAxisMax, padding = 150f, heightList, paintList)
-
-            // TODO: Draw the regression line
         }
+
+        // Set the max and min value of x-axis and y-axis
+        xAxisMax = if (xAxisMax == 0f) {
+            80f
+        } else {
+            val temp = xAxisMax.toInt() / 5
+            (temp + 1) * 5f
+        }
+
+        yAxisMax = if (yAxisMax == 0f) {
+            40f
+        } else {
+            val temp = yAxisMax.toInt() / 5
+            (temp + 1) * 5f
+        }
+
+        xAxisMin = if (xAxisMin >= 5f) {
+            val temp = xAxisMin.toInt() / 5
+            (temp - 1) * 5f
+        } else {
+            0f
+        }
+
+        yAxisMin = if (yAxisMin >= 5f) {
+            val temp = yAxisMin.toInt() / 5
+            (temp - 1) * 5f
+        } else {
+            0f
+        }
+        // Set padding & Paint for each height
+        val padding = 150f
+        val heightList = listOf("Meas", "Vis", "Fork")
+        val forkHeightPaint = Paint().apply { color = Color.Red }
+        val visHeightPaint = Paint().apply { color = Color.Green }
+        val measHeightPaint = Paint().apply { color = Color.Magenta }
+        val paintList = listOf(measHeightPaint, visHeightPaint, forkHeightPaint)
+        // Draw scatter points for each data series
+        for (yType in heightList) {
+            drawDataPoints(plotData.PlotTrees, xAxisMin, xAxisMax, yAxisMin, yAxisMax, yType, padding = padding, paintList = paintList, context)
+        }
+        // Draw axis
+        drawAxis(xAxisMin, xAxisMax, yAxisMin, yAxisMax, padding = padding)
+        // Draw legend
+        drawLegend(xAxisMin, xAxisMax, yAxisMin, yAxisMax, padding = 150f, heightList, paintList)
+
+        // TODO: Draw the regression line
     }
 }
 

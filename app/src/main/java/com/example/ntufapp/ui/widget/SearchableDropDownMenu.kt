@@ -57,8 +57,6 @@ fun SearchableAddMenu(
     val validSearchText = remember { mutableStateOf(defaultString) }
     val filteredOptions = remember { mutableStateListOf<String>() }
     val showDialog = remember { mutableStateOf(false) }
-    val keyboardController = LocalSoftwareKeyboardController.current
-
     val dropdownExpanded = remember { mutableStateOf(false) }
 
     Column(
@@ -179,7 +177,6 @@ fun SearchableAddMenu(
                             onAdd(it)
                             searchText.value = it
                             onChoose(searchText.value)
-                            Log.d("SearchableAddMenu", "here!")
                         },
                         curSize = totalItemsList.size
                     )
@@ -201,8 +198,6 @@ fun SearchableChooseMenu(
 ) {
     val speciesOptions = remember { mutableStateListOf<String>() }
     val searchText = remember { mutableStateOf(defaultString) }
-    val keyboardController = LocalSoftwareKeyboardController.current
-
     val dropdownExpanded = remember { mutableStateOf(false) }
     val addExpanded = remember { mutableStateOf(false) }
 

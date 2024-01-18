@@ -359,13 +359,13 @@ fun TreeConditionWidget(
         ),
         modifier = Modifier
             .width(200.dp)
-            .padding(start = 5.dp, top = 5.dp, bottom = 5.dp, end = 5.dp)
+            .padding(5.dp)
     )
 
     Button(
         modifier = Modifier
             .width(80.dp)
-            .padding(top = 10.dp, bottom = 10.dp),
+            .padding(vertical = 10.dp),
         onClick = {
             if (selectedItems.isEmpty()) {
                 showMessage(context, "請選擇生長狀態")
@@ -374,8 +374,6 @@ fun TreeConditionWidget(
                 treeCondition.value = selectedItems.joinToString()
                 onUpdateTreeSet()
                 showMessage(context, "您已新增樣樹${currentTree.SampleNum}之生長狀態\n${currentTree.State.joinToString()}")
-            //  Log.d("TreeConditionChips", "string: ${System.identityHashCode(selectedItems.joinToString()) }")
-            //  Log.d("TreeConditionChips", "string: ${System.identityHashCode(selectedItems) }")
             }
         }
     ) {
