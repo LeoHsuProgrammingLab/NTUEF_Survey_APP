@@ -1,11 +1,15 @@
 package com.example.ntufapp.utils
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
 import android.provider.OpenableColumns
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,6 +52,7 @@ fun parseJsonToMetaData(uri: Uri, context: Context): PlotData? {
 }
 
 
+@RequiresApi(Build.VERSION_CODES.R)
 fun saveFile(context: Context, plotData: PlotData, filename: String = "", toCSV: Boolean) {
     // Read the data
     val gson = Gson()
@@ -95,61 +100,28 @@ fun saveFile(context: Context, plotData: PlotData, filename: String = "", toCSV:
         if (toCSV) {
             val flattenedPlotData = flattenPlotData(plotData)
             Log.d("saveFile", "flattenedPlotData: $flattenedPlotData")
-            writeToCSV(file, flattenedPlotData)
+            if (!Environment.isExternalStorageManager()) {
+                showMessage(context, "請先取得權限！")
+                val permissionIntent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+                context.startActivity(permissionIntent)
+            } else {
+                writeToCSV(file, flattenedPlotData)
+                showMessage(context, "已取得權限！儲存成功！${file.absoluteFile}")
+            }
         } else {
             writeToJson(file, myJson)
+            showMessage(context, "儲存成功！${file.absoluteFile}")
         }
-        showMessage(context, "儲存成功！${file.absoluteFile}")
     } catch (e: IOException) {
         showMessage(context, "儲存失敗：${e.message}")
         e.printStackTrace()
     }
 }
 
-fun flattenPlotData(plotData: PlotData): List<List<String>> {
-    val flattenedPlotData = mutableListOf<List<String>>()
-
-    // Add the header
-    val header = mutableListOf<String>()
-    columnName.forEach {
-        header.add(it)
-    }
-    flattenedPlotData.add(header)
-
-    // Add the data
-    plotData.PlotTrees.forEach { tree ->
-        val row = listOf(
-            tree.SampleNum.toString(),
-            tree.Species,
-            tree.DBH.toString(),
-            tree.State.joinToString(";"),
-            tree.MeasHeight.toString(),
-            tree.VisHeight.toString(),
-            tree.ForkHeight.toString(),
-            plotData.Date,
-            plotData.ManageUnit,
-            plotData.SubUnit,
-            plotData.PlotNum,
-            plotData.PlotName,
-            plotData.PlotArea.toString(),
-            plotData.PlotType,
-            plotData.TWD97_X,
-            plotData.TWD97_Y,
-            plotData.Altitude.toString(),
-            plotData.Slope.toString(),
-            plotData.Aspect,
-            plotData.Surveyor.joinToString(";"),
-            plotData.HtSurveyor.joinToString(";"),
-        )
-
-        flattenedPlotData.add(row)
-    }
-    return flattenedPlotData
-}
-
 fun writeToCSV(outputFile: File, flattenedPlotData: List<List<String>>) {
 
     if (!outputFile.exists()) {
+        outputFile.createNewFile()
         Log.d("saveFile", "outputFile does not exist")
     } else {
         outputFile.delete()
@@ -194,4 +166,45 @@ fun getFileName(context: Context, uri: Uri?): String {
 fun checkPermission(context: Context): Boolean {
     val permission = context.checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
     return permission == android.content.pm.PackageManager.PERMISSION_GRANTED
+}
+
+fun flattenPlotData(plotData: PlotData): List<List<String>> {
+    val flattenedPlotData = mutableListOf<List<String>>()
+
+    // Add the header
+    val header = mutableListOf<String>()
+    columnName.forEach {
+        header.add(it)
+    }
+    flattenedPlotData.add(header)
+
+    // Add the data
+    plotData.PlotTrees.forEach { tree ->
+        val row = listOf(
+            tree.SampleNum.toString(),
+            tree.Species,
+            tree.DBH.toString(),
+            tree.State.joinToString(";"),
+            tree.MeasHeight.toString(),
+            tree.VisHeight.toString(),
+            tree.ForkHeight.toString(),
+            plotData.Date,
+            plotData.ManageUnit,
+            plotData.SubUnit,
+            plotData.PlotNum,
+            plotData.PlotName,
+            plotData.PlotArea.toString(),
+            plotData.PlotType,
+            plotData.TWD97_X,
+            plotData.TWD97_Y,
+            plotData.Altitude.toString(),
+            plotData.Slope.toString(),
+            plotData.Aspect,
+            plotData.Surveyor.joinToString(";"),
+            plotData.HtSurveyor.joinToString(";"),
+        )
+
+        flattenedPlotData.add(row)
+    }
+    return flattenedPlotData
 }
