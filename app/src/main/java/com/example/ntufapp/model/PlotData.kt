@@ -30,95 +30,67 @@ data class PlotData(
        Date = today.toString()
    }
     fun searchTree(treeNum: Int): Tree? {
-        for(tree in PlotTrees) {
-            if(tree.SampleNum == treeNum) {
-                return tree
-            }
-        }
-        return null
+        return PlotTrees.find { it.SampleNum == treeNum }
     }
 
     fun clone(): PlotData {
-        val clonePlot = PlotData()
-        clonePlot.Date = Date
-        clonePlot.ManageUnit = ManageUnit
-        clonePlot.SubUnit = SubUnit
-        clonePlot.PlotName = PlotName
-        clonePlot.PlotNum = PlotNum
-        clonePlot.PlotType = PlotType
-        clonePlot.PlotArea = PlotArea
-        clonePlot.TWD97_X = TWD97_X
-        clonePlot.TWD97_Y = TWD97_Y
-        clonePlot.Altitude = Altitude
-        clonePlot.Slope = Slope
-        clonePlot.Aspect = Aspect
-
-        for (surveyor in Surveyor) {
-            clonePlot.Surveyor.add(surveyor)
-        }
-
-        for (htSurveyor in HtSurveyor) {
-            clonePlot.HtSurveyor.add(htSurveyor)
-        }
-
-        for (tree in PlotTrees) {
-            clonePlot.PlotTrees.add(tree.clone())
-        }
-
-        return clonePlot
+        return PlotData(
+            Date = Date,
+            ManageUnit = ManageUnit,
+            SubUnit = SubUnit,
+            PlotName = PlotName,
+            PlotNum = PlotNum,
+            PlotType = PlotType,
+            PlotArea = PlotArea,
+            TWD97_X = TWD97_X,
+            TWD97_Y = TWD97_Y,
+            Altitude = Altitude,
+            Slope = Slope,
+            Aspect = Aspect,
+            Surveyor = Surveyor.toMutableList(),
+            HtSurveyor = HtSurveyor.toMutableList(),
+            PlotTrees = PlotTrees.toMutableList()
+        )
     }
 
     fun resetAllTrees() {
-        for (tree in PlotTrees) {
-            tree.reset()
-        }
+        PlotTrees.forEach { it.reset() }
     }
 
     fun initPlotTrees() {
-        for (i in 0 until defaultTreeNum) {
-            PlotTrees.add(Tree(SampleNum = i + 1))
-        }
-    }
-
-    fun getPlotTreesNum(): Int {
-        return PlotTrees.size
+        PlotTrees.clear()
+        PlotTrees.addAll((1..defaultTreeNum).map { Tree(SampleNum = it) })
     }
 }
 
 fun compareTwoPlots(oldPlot: PlotData, newPlot: PlotData, threshold: Double, target: String): MutableSet<Tree> {
     val targetSet = mutableSetOf<Tree>()
 
-    for(i in 0 until oldPlot.PlotTrees.size) {
-        val newTree = newPlot.searchTree(oldPlot.PlotTrees[i].SampleNum)
-        val needReaffirm = when(target) {
-            "DBH" -> checkThreshold(oldPlot.PlotTrees[i].DBH, newTree!!.DBH, threshold)
-            "Meas" -> checkThreshold(oldPlot.PlotTrees[i].MeasHeight, newTree!!.MeasHeight, threshold)
-            "Vis" -> checkThreshold(oldPlot.PlotTrees[i].VisHeight, newTree!!.VisHeight, threshold)
-            "Fork" -> checkThreshold(oldPlot.PlotTrees[i].ForkHeight, newTree!!.ForkHeight, threshold)
-            else -> false
-        }
-        if (needReaffirm) {
-            targetSet.add(newTree!!)
+    oldPlot.PlotTrees.forEach { oldTree ->
+        val newTree = newPlot.searchTree(oldTree.SampleNum)
+        if (newTree != null && checkThreshold(oldTree.getFieldValue<Double>(target), newTree.getFieldValue<Double>(target), threshold)) {
+            targetSet.add(newTree)
         }
     }
 
     return targetSet
 }
 
-fun createTreeQuotaPair(invalidSet: MutableSet<Tree>): MutableMap<Int, Int> {
-    val quotaPair = mutableMapOf<Int, Int>()
-    for (tree in invalidSet) {
-        quotaPair[tree.SampleNum] = 3
+private inline fun <reified T> Tree.getFieldValue(fieldName: String): T =
+    when(fieldName) {
+        "DBH" -> DBH as T
+        "Meas" -> MeasHeight as T
+        "Vis" -> VisHeight as T
+        "Fork" -> ForkHeight as T
+        else -> throw IllegalArgumentException("Invalid field name")
     }
-    return quotaPair
+
+fun createTreeQuotaPair(invalidSet: MutableSet<Tree>): MutableMap<Int, Int> {
+    return invalidSet.associate { it.SampleNum to 3 }.toMutableMap()
 }
 
 fun checkThreshold(old: Double, new: Double, threshold: Double): Boolean {
-    return if (old > 0.0) {
-        (abs(old - new) / old) > threshold
-    } else {
-        true
-    }
+    return abs(old - new) > threshold * old
 }
 
 fun checkThresholdByInterval(old: Double, new: Double, threshold: Double): Boolean {

@@ -5,25 +5,22 @@ import androidx.compose.runtime.MutableState
 data class Tree(
     var SampleNum: Int = -1,
     var Species: String = "", // 2
-    var DBH: Double = 0.0,
     var State: MutableList<String> = mutableListOf(),
+    var DBH: Double = 0.0,
     var VisHeight: Double = 0.0,
     var MeasHeight: Double = 0.0,
     var ForkHeight: Double = 0.0,
 ) {
     fun clone(): Tree {
-        val cloneTree = Tree()
-        cloneTree.SampleNum = SampleNum
-        cloneTree.Species = Species
-        cloneTree.DBH = DBH
-        cloneTree.VisHeight = VisHeight
-        cloneTree.MeasHeight = MeasHeight
-        cloneTree.ForkHeight = ForkHeight
-        for(state in State) {
-            cloneTree.State.add(state)
-        }
-
-        return cloneTree
+        return Tree(
+            SampleNum = SampleNum,
+            Species = Species,
+            State = State,
+            DBH = DBH,
+            VisHeight = VisHeight,
+            MeasHeight = MeasHeight,
+            ForkHeight = ForkHeight
+        )
     }
     fun reset() {
         DBH = 0.0
