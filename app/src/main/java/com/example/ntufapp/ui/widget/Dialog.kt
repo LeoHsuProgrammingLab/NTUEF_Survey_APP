@@ -294,7 +294,8 @@ fun SaveJsonDialog(
 @Composable
 fun GeneralConfirmDialog(
     reminder: String,
-    confirm: String,
+    confirmText: String,
+    cancelText: String = stringResource(id = (R.string.cancel)),
     leadingIcon: () -> Unit = {},
     onDismiss: () -> Unit,
     onConfirmClick: () -> Unit,
@@ -320,13 +321,13 @@ fun GeneralConfirmDialog(
                         modifier = basicModifier,
                         onClick = onCancelClick
                     ) {
-                        Text(stringResource(id = (R.string.cancel)))
+                        Text(cancelText)
                     }
                     OutlinedButton(
                         modifier = basicModifier,
                         onClick = onConfirmClick
                     ) {
-                        Text(confirm)
+                        Text(confirmText)
                     }
                 }
             }

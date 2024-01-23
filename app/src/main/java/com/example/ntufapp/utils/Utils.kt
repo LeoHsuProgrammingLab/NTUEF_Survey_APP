@@ -15,8 +15,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import com.example.ntufapp.data.DataSource.columnName
+import com.example.ntufapp.data.ntufappInfo.Companion.outputDir
 import com.example.ntufapp.data.ntufappInfo.Companion.outputDirName
 import com.example.ntufapp.model.PlotData
+import com.example.ntufapp.ui.widget.GeneralConfirmDialog
 import com.google.gson.Gson
 import java.io.BufferedReader
 import java.io.BufferedWriter
@@ -51,55 +53,53 @@ fun parseJsonToMetaData(uri: Uri, context: Context): PlotData? {
     }
 }
 
-
-@RequiresApi(Build.VERSION_CODES.R)
-fun saveFile(context: Context, plotData: PlotData, filename: String = "", toCSV: Boolean) {
-    // Read the data
-    val gson = Gson()
-    val myJson = gson.toJson(plotData)
-
-    // Check if the string is valid
-    var validFilename: String
+fun getFilenameWithFormat(plotData: PlotData, filename: String = "", toCSV: Boolean = false): String {
     if (filename.isNotEmpty()) {
-        validFilename = if (toCSV) {
-            filename.replaceAfter(".", "csv")
+        if (toCSV) {
+            return filename.replaceAfter(".", "csv")
         } else {
-            filename
+            return filename
         }
     } else {
         val formattedFilename = plotData.ManageUnit + plotData.PlotName + "_" + plotData.PlotNum
-        validFilename = if (toCSV) {
-            "$formattedFilename.csv"
+        if (toCSV) {
+            return "$formattedFilename.csv"
         } else {
-            "$formattedFilename.json"
+            return "$formattedFilename.json"
         }
     }
+}
 
-    val documentsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
-    val dirName = outputDirName
-    // The below is the app-specific directory, and it may be invisible to the user.
-    // val documentsDir = context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
-
-    // Create the directory if it doesn't exist
-    val appDir = File(documentsDir, dirName)
-    if (!appDir.exists()) {
-        if(!appDir.mkdir()) {
+fun checkIfFileExists(context: Context, filename: String): Boolean {
+    if (!outputDir.exists()) {
+        if(!outputDir.mkdir()) {
             showMessage(context, "儲存失敗：無法建立資料夾！")
         }
     }
+
+    val file = File(outputDir, filename)
+    return file.exists()
+}
+
+//var count = 1
+//while (file.exists()) {
+//    var isOverwrite = false
+//    if (isOverwrite) {
+//        break
+//    }
+//    val postfixStart = validFilename.lastIndexOf(".")
+//    file = File(appDir, "${validFilename.substring(0, postfixStart)}_${count}${validFilename.substring(postfixStart)}")
+//    count++
+//}
+
+@RequiresApi(Build.VERSION_CODES.R)
+fun saveFile(context: Context, plotData: PlotData, outputDir: File, validFilename: String, toCSV: Boolean = false) {
     // Create the file path
-    var file = File(appDir, validFilename)
-    var count = 1
-    while (file.exists()) {
-        val postfixStart = validFilename.lastIndexOf(".")
-        file = File(appDir, "${validFilename.substring(0, postfixStart)}_${count}${validFilename.substring(postfixStart)}")
-        count++
-    }
+    val file = File(outputDir, validFilename)
 
     try {
         if (toCSV) {
             val flattenedPlotData = flattenPlotData(plotData)
-            Log.d("saveFile", "flattenedPlotData: $flattenedPlotData")
             if (!Environment.isExternalStorageManager()) {
                 showMessage(context, "請先取得權限！")
                 val permissionIntent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
@@ -109,6 +109,9 @@ fun saveFile(context: Context, plotData: PlotData, filename: String = "", toCSV:
                 showMessage(context, "已取得權限！儲存成功！${file.absoluteFile}")
             }
         } else {
+            // Read the Json data
+            val gson = Gson()
+            val myJson = gson.toJson(plotData)
             writeToJson(file, myJson)
             showMessage(context, "儲存成功！${file.absoluteFile}")
         }

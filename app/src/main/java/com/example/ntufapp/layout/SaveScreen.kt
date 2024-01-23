@@ -1,6 +1,8 @@
 package com.example.ntufapp.layout
 
+import android.os.Build
 import androidx.activity.compose.BackHandler
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,11 +22,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ntufapp.R
+import com.example.ntufapp.data.ntufappInfo.Companion.outputDir
 import com.example.ntufapp.model.PlotData
 import com.example.ntufapp.ui.widget.GeneralConfirmDialog
 import com.example.ntufapp.ui.theme.LayoutDivider
+import com.example.ntufapp.utils.checkIfFileExists
+import com.example.ntufapp.utils.getFilenameWithFormat
 import com.example.ntufapp.utils.saveFile
 
+@RequiresApi(Build.VERSION_CODES.R)
 @Composable
 fun SaveScreen(
     newPlotData: PlotData,
@@ -58,7 +64,10 @@ fun SaveScreen(
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 val showDialog = remember { mutableStateOf(false) }
+                val showOverwriteDialog = remember { mutableStateOf(false) }
                 val showBackDialogue = remember { mutableStateOf(false) }
+                val validFilename = getFilenameWithFormat(newPlotData, outputFilename)
+                val currentFilename = remember { mutableStateOf(validFilename) }
                 OutlinedButton(
                     modifier = modifier,
                     onClick = { showBackDialogue.value = true }
@@ -68,31 +77,58 @@ fun SaveScreen(
                 OutlinedButton(
                     modifier = modifier,
                     onClick = {
-                        for (i in newPlotData.PlotTrees.size-1 downTo 0) {
-                            if (newPlotData.PlotTrees[i].State.size == 0 &&
-                                newPlotData.PlotTrees[i].DBH == 0.0 &&
-                                newPlotData.PlotTrees[i].MeasHeight == 0.0 &&
-                                newPlotData.PlotTrees[i].VisHeight == 0.0 &&
-                                newPlotData.PlotTrees[i].ForkHeight == 0.0 &&
-                                newPlotData.PlotTrees[i].Species == ""
-                            ) {
-                                newPlotData.PlotTrees.removeAt(i)
-                            } else {
-                                break
-                            }
+                        val lastIndexToKeep = newPlotData.PlotTrees.findLast {
+                            it.State.isNotEmpty() &&
+                            it.Species.isNotEmpty() &&
+                            it.DBH != 0.0 &&
+                            it.MeasHeight != 0.0 &&
+                            it.VisHeight != 0.0 &&
+                            it.ForkHeight != 0.0
                         }
-                        saveFile(context, newPlotData, filename = outputFilename, toCSV = true)
-                        showDialog.value = true
+                        if (lastIndexToKeep != null) {
+                            newPlotData.PlotTrees = newPlotData.PlotTrees.subList(0, lastIndexToKeep.SampleNum)
+                        }
+                        showOverwriteDialog.value = checkIfFileExists(context, validFilename)
+                        if (!showOverwriteDialog.value) {
+                            saveFile(context, newPlotData, outputDir = outputDir, validFilename = validFilename)
+                        }
                     }
                 ) {
                     Text(text = "儲存樣區資料", fontSize = 20.sp)
                 }
 
+                if (showOverwriteDialog.value) {
+                    GeneralConfirmDialog(
+                        reminder = "${currentFilename.value} 已存在，確定要覆蓋嗎？",
+                        confirmText = "覆蓋",
+                        cancelText = "另存新檔",
+                        onDismiss = {},
+                        onConfirmClick = {
+                            showOverwriteDialog.value = false
+                            saveFile(context, newPlotData, outputDir = outputDir, validFilename = currentFilename.value)
+                        },
+                        onCancelClick = {
+                            var notUsedFilename = validFilename
+                            while (checkIfFileExists(context, notUsedFilename)) {
+                                val lastChar = notUsedFilename.split(".")[0].last()
+                                if (lastChar.isDigit()) {
+                                    notUsedFilename = notUsedFilename.split(".")[0].dropLast(1) + "${lastChar.toString().toInt() + 1}" + "." + notUsedFilename.split(".")[1]
+                                } else {
+                                    notUsedFilename = notUsedFilename.split(".")[0] + "_1" + "." + notUsedFilename.split(".")[1]
+                                }
+                            }
+                            currentFilename.value = notUsedFilename
+                            showOverwriteDialog.value = false
+                            saveFile(context, newPlotData, outputDir = outputDir, validFilename = currentFilename.value)
+                        }
+                    )
+                }
+
                 if (showBackDialogue.value) {
                     GeneralConfirmDialog(
                         reminder = "確定要返回主頁嗎？\n返回主頁將會清除所有資料！",
-                        confirm = "確定",
-                        onDismiss = { /*TODO*/ },
+                        confirmText = "確定",
+                        onDismiss = {},
                         onConfirmClick = { onBackButtonClick() },
                         onCancelClick = { showBackDialogue.value = false }
                     )
