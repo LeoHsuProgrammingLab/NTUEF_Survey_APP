@@ -110,7 +110,7 @@ fun SaveScreen(
                             saveFile(context, newPlotData, outputDir = outputDir, validFilename = currentFilename.value)
                         },
                         onCancelClick = {
-                            currentFilename.value = generateUniqueFilename(context, validFilename.removeSuffix(suffix = ".csv").removeSuffix(suffix = ".json"))
+                            currentFilename.value = generateUniqueFilename(context, validFilename.substringBeforeLast("."))
                             saveFile(context, newPlotData, outputDir = outputDir, validFilename = currentFilename.value)
                             showOverwriteDialog.value = false
                         }
