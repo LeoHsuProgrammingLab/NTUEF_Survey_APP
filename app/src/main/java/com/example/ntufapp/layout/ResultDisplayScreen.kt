@@ -154,9 +154,7 @@ fun TabbedResult(
                         .padding(5.dp)
                         .width(100.dp),
                     selected = (tabSelected.value == index),
-                    onClick = {
-                        tabSelected.value = index
-                    }
+                    onClick = { tabSelected.value = index }
                 ) {
                     Text(
                         title,
@@ -182,40 +180,10 @@ fun TabbedResult(
                 )
         ) {
             when (tabSelected.value) {
-                0 -> {
+                in 0..5 -> {
                     ResultLazyColumn(
                         treeList = newPlotData.PlotTrees,
-                        type = stringList[0]
-                    )
-                }
-                1 -> {
-                    ResultLazyColumn(
-                        treeList = newPlotData.PlotTrees,
-                        type = stringList[1]
-                    )
-                }
-                2 -> {
-                    ResultLazyColumn(
-                        treeList = newPlotData.PlotTrees,
-                        type = stringList[2]
-                    )
-                }
-                3 -> {
-                    ResultLazyColumn(
-                        treeList = newPlotData.PlotTrees,
-                        type = stringList[3]
-                    )
-                }
-                4 -> {
-                    ResultLazyColumn(
-                        treeList = newPlotData.PlotTrees,
-                        type = stringList[4]
-                    )
-                }
-                5 -> {
-                    ResultLazyColumn(
-                        treeList = newPlotData.PlotTrees,
-                        type = stringList[5]
+                        type = stringList[tabSelected.value]
                     )
                 }
             }
@@ -266,9 +234,7 @@ fun ResultLazyColumn(
                     onValueChange = {},
                     modifier = Modifier
                         .padding(10.dp),
-                    label = {
-                        Text("調查結果", fontSize = 13.sp)
-                    },
+                    label = { Text("調查結果", fontSize = 13.sp) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     textStyle = TextStyle(fontSize = 18.sp)
                 )
@@ -282,7 +248,6 @@ fun TabbedValidationResult(
     oldPlotData: PlotData,
     newPlotData: PlotData,
 ) {
-    val context = LocalContext.current
     val windowInfo = rememberWindowInfo()
     val height = when(windowInfo.screenHeightInfo) {
         WindowInfo.WindowType.Expanded -> 600.dp
