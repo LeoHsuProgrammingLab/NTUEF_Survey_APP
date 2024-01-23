@@ -81,43 +81,31 @@ fun checkIfFileExists(context: Context, filename: String): Boolean {
     return file.exists()
 }
 
-//var count = 1
-//while (file.exists()) {
-//    var isOverwrite = false
-//    if (isOverwrite) {
-//        break
-//    }
-//    val postfixStart = validFilename.lastIndexOf(".")
-//    file = File(appDir, "${validFilename.substring(0, postfixStart)}_${count}${validFilename.substring(postfixStart)}")
-//    count++
-//}
-
 @RequiresApi(Build.VERSION_CODES.R)
 fun saveFile(context: Context, plotData: PlotData, outputDir: File, validFilename: String, toCSV: Boolean = false) {
     // Create the file path
     val file = File(outputDir, validFilename)
 
-    try {
-        if (toCSV) {
-            val flattenedPlotData = flattenPlotData(plotData)
-            if (!Environment.isExternalStorageManager()) {
-                showMessage(context, "請先取得權限！")
-                val permissionIntent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
-                context.startActivity(permissionIntent)
-            } else {
+    if (!Environment.isExternalStorageManager()) {
+        showMessage(context, "請先取得權限！")
+        val permissionIntent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+        context.startActivity(permissionIntent)
+    } else {
+        try {
+            if (toCSV) {
+                val flattenedPlotData = flattenPlotData(plotData)
                 writeToCSV(file, flattenedPlotData)
-                showMessage(context, "已取得權限！儲存成功！${file.absoluteFile}")
+            } else {
+                // Read the Json data
+                val gson = Gson()
+                val myJson = gson.toJson(plotData)
+                writeToJson(file, myJson)
             }
-        } else {
-            // Read the Json data
-            val gson = Gson()
-            val myJson = gson.toJson(plotData)
-            writeToJson(file, myJson)
-            showMessage(context, "儲存成功！${file.absoluteFile}")
+            showMessage(context, "檔案${file.absoluteFile.name}儲存成功！\n${file.absoluteFile}")
+        } catch (e: IOException) {
+            showMessage(context, "儲存失敗：${e.message}")
+            e.printStackTrace()
         }
-    } catch (e: IOException) {
-        showMessage(context, "儲存失敗：${e.message}")
-        e.printStackTrace()
     }
 }
 
@@ -163,6 +151,16 @@ fun getFileName(context: Context, uri: Uri?): String {
         }
     }
     return ""
+}
+
+fun generateUniqueFilename(context: Context, baseFilename: String, format: String = ".json"): String {
+    var version = 0
+    var uniqueFilename = baseFilename + format
+    while (checkIfFileExists(context, uniqueFilename)) {
+        version++
+        uniqueFilename = baseFilename + "_$version" + format
+    }
+    return uniqueFilename
 }
 
 // Research

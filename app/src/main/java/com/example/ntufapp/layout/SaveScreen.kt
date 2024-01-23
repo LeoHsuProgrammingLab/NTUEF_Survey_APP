@@ -27,6 +27,7 @@ import com.example.ntufapp.model.PlotData
 import com.example.ntufapp.ui.widget.GeneralConfirmDialog
 import com.example.ntufapp.ui.theme.LayoutDivider
 import com.example.ntufapp.utils.checkIfFileExists
+import com.example.ntufapp.utils.generateUniqueFilename
 import com.example.ntufapp.utils.getFilenameWithFormat
 import com.example.ntufapp.utils.saveFile
 
@@ -90,7 +91,8 @@ fun SaveScreen(
                         }
                         showOverwriteDialog.value = checkIfFileExists(context, validFilename)
                         if (!showOverwriteDialog.value) {
-                            saveFile(context, newPlotData, outputDir = outputDir, validFilename = validFilename)
+                            currentFilename.value = validFilename
+                            saveFile(context, newPlotData, outputDir = outputDir, validFilename = currentFilename.value)
                         }
                     }
                 ) {
@@ -108,18 +110,9 @@ fun SaveScreen(
                             saveFile(context, newPlotData, outputDir = outputDir, validFilename = currentFilename.value)
                         },
                         onCancelClick = {
-                            var notUsedFilename = validFilename
-                            while (checkIfFileExists(context, notUsedFilename)) {
-                                val lastChar = notUsedFilename.split(".")[0].last()
-                                if (lastChar.isDigit()) {
-                                    notUsedFilename = notUsedFilename.split(".")[0].dropLast(1) + "${lastChar.toString().toInt() + 1}" + "." + notUsedFilename.split(".")[1]
-                                } else {
-                                    notUsedFilename = notUsedFilename.split(".")[0] + "_1" + "." + notUsedFilename.split(".")[1]
-                                }
-                            }
-                            currentFilename.value = notUsedFilename
-                            showOverwriteDialog.value = false
+                            currentFilename.value = generateUniqueFilename(context, validFilename.removeSuffix(suffix = ".csv").removeSuffix(suffix = ".json"))
                             saveFile(context, newPlotData, outputDir = outputDir, validFilename = currentFilename.value)
+                            showOverwriteDialog.value = false
                         }
                     )
                 }
