@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material3.Button
@@ -361,20 +363,64 @@ fun ManualInputNewPlotDialog(
         val TWD97_Y = remember { mutableStateOf("") }
 
         Surface(shape = Shapes.small) {
-            Column(modifier = basicModifier) {
+            Column(
+                modifier = basicModifier,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 DialogHeader(header = "請輸入樣區資料")
-                TextField(value = manageUnit.value, onValueChange = { text: String -> manageUnit.value = text }, label = { Text("營林區")})
-                TextField(value = subUnit.value, onValueChange = { text: String -> subUnit.value = text }, label = { Text("林班地")})
-                TextField(value = plotName.value, onValueChange = { text: String -> plotName.value = text }, label = { Text("樣區名稱")})
-                TextField(value = plotNum.value, onValueChange = { text: String -> plotNum.value = text }, label = { Text("樣區編號")})
-                TextField(value = plotType.value, onValueChange = { text: String -> plotType.value = text }, label = { Text("樣區型態")})
-                TextField(value = plotArea.value, onValueChange = { text: String -> plotArea.value = text }, label = { Text("樣區面積(m2)")}, placeholder = { Text("請輸入數字")})
-                TextField(value = altitude.value, onValueChange = { text: String -> altitude.value = text }, label = { Text("樣區海拔(m)")}, placeholder = { Text("請輸入數字")})
-                TextField(value = slope.value, onValueChange = { text: String -> slope.value = text }, label = { Text("樣區坡度")}, placeholder = { Text("請輸入數字")})
-                TextField(value = aspect.value, onValueChange = { text: String -> aspect.value = text }, label = { Text("樣區坡向")})
-                TextField(value = TWD97_X.value, onValueChange = { text: String -> TWD97_X.value = text }, label = { Text("TWD97_X")})
-                TextField(value = TWD97_Y.value, onValueChange = { text: String -> TWD97_Y.value = text }, label = { Text("TWD97_Y")})
-
+                LazyColumn(
+                    modifier = basicModifier.height(500.dp)
+                ) {
+                    items(1) {
+                        TextField(
+                            value = manageUnit.value,
+                            onValueChange = { text: String -> manageUnit.value = text },
+                            label = { Text("營林區") })
+                        TextField(
+                            value = subUnit.value,
+                            onValueChange = { text: String -> subUnit.value = text },
+                            label = { Text("林班地") })
+                        TextField(
+                            value = plotName.value,
+                            onValueChange = { text: String -> plotName.value = text },
+                            label = { Text("樣區名稱") })
+                        TextField(
+                            value = plotNum.value,
+                            onValueChange = { text: String -> plotNum.value = text },
+                            label = { Text("樣區編號") })
+                        TextField(
+                            value = plotType.value,
+                            onValueChange = { text: String -> plotType.value = text },
+                            label = { Text("樣區型態") })
+                        TextField(
+                            value = plotArea.value,
+                            onValueChange = { text: String -> plotArea.value = text },
+                            label = { Text("樣區面積(m2)") },
+                            placeholder = { Text("請輸入數字") })
+                        TextField(
+                            value = altitude.value,
+                            onValueChange = { text: String -> altitude.value = text },
+                            label = { Text("樣區海拔(m)") },
+                            placeholder = { Text("請輸入數字") })
+                        TextField(
+                            value = slope.value,
+                            onValueChange = { text: String -> slope.value = text },
+                            label = { Text("樣區坡度") },
+                            placeholder = { Text("請輸入數字") })
+                        TextField(
+                            value = aspect.value,
+                            onValueChange = { text: String -> aspect.value = text },
+                            label = { Text("樣區坡向") })
+                        TextField(
+                            value = TWD97_X.value,
+                            onValueChange = { text: String -> TWD97_X.value = text },
+                            label = { Text("TWD97_X") })
+                        TextField(
+                            value = TWD97_Y.value,
+                            onValueChange = { text: String -> TWD97_Y.value = text },
+                            label = { Text("TWD97_Y") })
+                    }
+                }
                 Row(
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {

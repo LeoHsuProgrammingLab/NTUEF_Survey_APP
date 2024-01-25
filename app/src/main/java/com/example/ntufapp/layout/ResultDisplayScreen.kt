@@ -22,7 +22,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -423,10 +422,10 @@ fun ValidationLazyColumn(
                             }
                             // Get the old value
                             val oldValue = when(type) {
-                                "DBH" -> oldPlotData.searchTree(tree.SampleNum)!!.DBH
-                                "Vis" -> oldPlotData.searchTree(tree.SampleNum)!!.VisHeight
-                                "Meas" -> oldPlotData.searchTree(tree.SampleNum)!!.MeasHeight
-                                else -> oldPlotData.searchTree(tree.SampleNum)!!.ForkHeight
+                                "DBH" -> oldPlotData.getTreeBySampleNum(tree.SampleNum)!!.DBH
+                                "Vis" -> oldPlotData.getTreeBySampleNum(tree.SampleNum)!!.VisHeight
+                                "Meas" -> oldPlotData.getTreeBySampleNum(tree.SampleNum)!!.MeasHeight
+                                else -> oldPlotData.getTreeBySampleNum(tree.SampleNum)!!.ForkHeight
                             }
                             // Check if the new value is valid
                             if(checkThreshold(oldValue, newValue, threshold)) {

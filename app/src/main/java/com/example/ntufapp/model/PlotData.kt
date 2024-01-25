@@ -29,8 +29,8 @@ data class PlotData(
        val today: LocalDate = LocalDate.now()
        Date = today.toString()
    }
-    fun searchTree(treeNum: Int): Tree? {
-        return PlotTrees.find { it.SampleNum == treeNum }
+    fun getTreeBySampleNum(sampleNum: Int): Tree? {
+        return PlotTrees.find { it.SampleNum == sampleNum }
     }
 
     fun clone(): PlotData {
@@ -67,8 +67,8 @@ fun compareTwoPlots(oldPlot: PlotData, newPlot: PlotData, threshold: Double, tar
     val targetSet = mutableSetOf<Tree>()
 
     oldPlot.PlotTrees.forEach { oldTree ->
-        val newTree = newPlot.searchTree(oldTree.SampleNum)
-        if (newTree != null && checkThreshold(oldTree.getFieldValue<Double>(target), newTree.getFieldValue<Double>(target), threshold)) {
+        val newTree = newPlot.getTreeBySampleNum(oldTree.SampleNum)
+        if (newTree != null && checkThreshold(oldTree.getFieldValue(target), newTree.getFieldValue(target), threshold)) {
             targetSet.add(newTree)
         }
     }

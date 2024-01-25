@@ -119,7 +119,7 @@ fun SaveScreen(
 
                 if (showBackDialogue.value) {
                     GeneralConfirmDialog(
-                        reminder = "確定要返回主頁嗎？\n返回主頁將會清除所有資料！",
+                        reminder = "確定要返回主頁嗎？\n返回主頁將會重新開始調查！",
                         confirmText = "確定",
                         onDismiss = {},
                         onConfirmClick = { onBackButtonClick() },

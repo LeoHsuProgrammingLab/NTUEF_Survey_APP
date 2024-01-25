@@ -63,25 +63,25 @@ fun InputProgressView(
                 InputRow(label = "DBH",
                     onClick = {
                         dbhState.doubleValue = it
-                        newPlotData.searchTree(currentTreeNum.toInt())!!.DBH = it
+                        newPlotData.getTreeBySampleNum(currentTreeNum.toInt())!!.DBH = it
                     }
                 )
                 InputRow(label = "目視樹高",
                     onClick = {
                         visHtState.doubleValue = it
-                        newPlotData.searchTree(currentTreeNum.toInt())!!.VisHeight = it
+                        newPlotData.getTreeBySampleNum(currentTreeNum.toInt())!!.VisHeight = it
                     }
                 )
                 InputRow(label = "量測樹高",
                     onClick = {
                         htState.doubleValue = it
-                        newPlotData.searchTree(currentTreeNum.toInt())!!.MeasHeight = it
+                        newPlotData.getTreeBySampleNum(currentTreeNum.toInt())!!.MeasHeight = it
                     }
                 )
                 InputRow(label = "分岔樹高",
                     onClick = {
                         forkHtState.doubleValue = it
-                        newPlotData.searchTree(currentTreeNum.toInt())!!.ForkHeight = it
+                        newPlotData.getTreeBySampleNum(currentTreeNum.toInt())!!.ForkHeight = it
                     }
                 )
             }
