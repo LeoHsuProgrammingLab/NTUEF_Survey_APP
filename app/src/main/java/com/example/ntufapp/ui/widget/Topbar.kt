@@ -37,7 +37,9 @@ fun NTUEFTopBar() {
         },
         navigationIcon = {
             IconButton(
-                onClick = {}
+                onClick = {
+
+                }
             ) {
                 Icon(Icons.Default.Menu, contentDescription = "Menu")
             }
@@ -45,3 +47,4 @@ fun NTUEFTopBar() {
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = md_theme_light_primary)
     )
 }
+
