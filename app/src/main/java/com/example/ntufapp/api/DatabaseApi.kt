@@ -3,6 +3,10 @@ package com.example.ntufapp.api
 import com.example.ntufapp.api.dataType.Connection
 import com.example.ntufapp.api.dataType.TokenRequest
 import com.example.ntufapp.api.dataType.TokenRequestWithBody
+import okhttp3.MediaType
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.Header
@@ -21,8 +25,8 @@ interface CatalogueApi {
         "app-client-type:1"
     )
 
-    @POST("/ForestSampleCatalogue") // Should be a GET request, but the API is designed by the other company SMH
-    fun getCatalogue(@Body requestBody: TokenRequest = TokenRequest(testToken)): Response<Connection>
+    @POST("/NTU_Forest_API/ForestSampleCatalogue") // Should be a GET request, but the API is designed by the other company SMH
+    suspend fun getCatalogue(@Body requestBody: RequestBody): Response<ResponseBody>
 }
 
 interface PlotApi {
@@ -35,7 +39,7 @@ interface PlotApi {
     )
 
     @POST("/ForestSampleInfo") // Should be a GET request, but the API is designed by the other company SMH
-    fun getPlotInfo(@Body requestBody: TokenRequestWithBody): Response<Connection>
+    suspend fun getPlotInfo(@Body requestBody: TokenRequestWithBody): Response<Connection>
 }
 
 interface SystemCodeApi {
@@ -48,7 +52,7 @@ interface SystemCodeApi {
     )
 
     @POST("/ForestSystemItemCodeList") // Should be a GET request, but the API is designed by the other company SMH
-    fun getUserAndConditionCodeList(@Body requestBody: TokenRequest = TokenRequest(testToken)): Response<Connection>
+    suspend fun getUserAndConditionCodeList(@Body requestBody: TokenRequest = TokenRequest(testToken)): Response<Connection>
 }
 
 interface UploadPlotApi {
@@ -61,5 +65,5 @@ interface UploadPlotApi {
     )
 
     @POST("/CreateForestLocationInvestigationRecord")
-    fun createInvestigationRecord(@Body surveyData: Any): Response<Connection>
+    suspend fun createInvestigationRecord(@Body surveyData: Any): Response<Connection>
 }
