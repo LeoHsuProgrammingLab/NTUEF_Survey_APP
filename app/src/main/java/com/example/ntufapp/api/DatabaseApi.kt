@@ -38,8 +38,8 @@ interface PlotApi {
         "app-client-type:1"
     )
 
-    @POST("/ForestSampleInfo") // Should be a GET request, but the API is designed by the other company SMH
-    suspend fun getPlotInfo(@Body requestBody: TokenRequestWithBody): Response<Connection>
+    @POST("/NTU_Forest_API/ForestSampleInfo") // Should be a GET request, but the API is designed by the other company SMH
+    suspend fun getPlotInfo(@Body requestBody: TokenRequestWithBody): Response<ResponseBody> // TODO
 }
 
 interface SystemCodeApi {
@@ -51,8 +51,8 @@ interface SystemCodeApi {
         "app-client-type:1"
     )
 
-    @POST("/ForestSystemItemCodeList") // Should be a GET request, but the API is designed by the other company SMH
-    suspend fun getUserAndConditionCodeList(@Body requestBody: TokenRequest = TokenRequest(testToken)): Response<Connection>
+    @POST("/NTU_Forest_API/ForestSystemItemCodeList") // Should be a GET request, but the API is designed by the other company SMH
+    suspend fun getUserAndConditionCodeList(@Body requestBody: RequestBody): Response<ResponseBody>
 }
 
 interface UploadPlotApi {
@@ -64,6 +64,6 @@ interface UploadPlotApi {
         "app-client-type:1"
     )
 
-    @POST("/CreateForestLocationInvestigationRecord")
-    suspend fun createInvestigationRecord(@Body surveyData: Any): Response<Connection>
+    @POST("/NTU_Forest_API/CreateForestLocationInvestigationRecord")
+    suspend fun createInvestigationRecord(@Body surveyData: Any): Response<ResponseBody> // TODO
 }

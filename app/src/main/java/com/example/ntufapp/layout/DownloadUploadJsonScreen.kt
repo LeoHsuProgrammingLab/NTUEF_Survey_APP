@@ -18,7 +18,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.ntufapp.R
 import com.example.ntufapp.api.RetrofitInstance
+import com.example.ntufapp.api.catalogueApi
 import com.example.ntufapp.api.dataType.Connection
+import com.example.ntufapp.api.systemCodeApi
 import com.example.ntufapp.ui.theme.LayoutDivider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -53,28 +55,8 @@ fun DownloadUploadJsonScreen () {
         LayoutDivider()
         Button(
             onClick = {
-                coroutineScope.launch {
-                    val json = "{\"token\":\"NDRFQzBFQjctNjg2OS00MEE5LTg0NDctRUU2OTg2RjE3QkYz\"}"
-                    val requestBody = json.toRequestBody("application/json".toMediaTypeOrNull())
-                    Log.d(tag, "requestBody: ${requestBody}")
-                    val response = try {
-                        RetrofitInstance.catalogueApiService.getCatalogue(requestBody)
-                    } catch (e: IOException) {
-                        Log.e(tag, "IOException: ${e.message}, you might not have internet connection, you gotta check it")
-                        return@launch
-                    } catch (e: HttpException) {
-                        Log.e(tag, "HttpException: ${e.message}, unexpected http response")
-                        return@launch
-                    }
-
-                    if (response.isSuccessful) {
-                        Log.d(tag, "response: ${response.body()?.string()}")
-                    } else {
-                        Log.d(tag, "response: ${response}")
-                    }
-
-
-                }
+                catalogueApi(coroutineScope, tag)
+                systemCodeApi(coroutineScope, tag)
             }
         ) {
             Text("Get JSON Response")
