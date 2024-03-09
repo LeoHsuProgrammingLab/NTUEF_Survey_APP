@@ -1,6 +1,8 @@
 package com.example.ntufapp.ui.widget
 
+import PlotSelectionDropDownMenu
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,10 +35,61 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.ntufapp.R
 import com.example.ntufapp.data.DataSource
+import com.example.ntufapp.data.ntufappInfo.Companion.tag
 import com.example.ntufapp.model.PlotData
 import com.example.ntufapp.ui.theme.Shapes
 import com.example.ntufapp.ui.theme.basicModifier
 import com.example.ntufapp.utils.showMessage
+
+@Composable
+fun ChoosePlotToDownloadDialog(
+    allPlotsInfo: Map<String, List<Pair<String, String>>>,
+    onDownload: (String) -> Unit,
+    onDismiss: () -> Unit,
+    onCancelClick: () -> Unit
+) {
+    val midLocation = remember { mutableStateOf("") }
+    val context = LocalContext.current
+    Dialog(
+        onDismissRequest = { onDismiss.invoke() },
+    ) {
+        Surface(shape = Shapes.large) {
+            Column(
+                modifier = basicModifier,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                DialogHeader(header = "請選擇樣區並下載")
+                PlotSelectionDropDownMenu(
+                    label = "",
+                    allPlotsInfo = allPlotsInfo,
+                    onChoose = { midLocation.value = it })
+                Row(horizontalArrangement = Arrangement.SpaceEvenly) {
+                    Button(
+                        modifier = basicModifier,
+                        onClick = {
+                            onCancelClick()
+                        }
+                    ) {
+                        Text(stringResource(id = R.string.cancel))
+                    }
+                    Button(
+                        modifier = basicModifier,
+                        onClick = {
+//                        Log.d("LoadJsonScreen", midLocation.value);
+                            if (midLocation.value != "") {
+                                onDownload(midLocation.value)
+                            } else {
+                                showMessage(context, "請選擇樣區!")
+                            }
+                        }
+                    ) {
+                        Text(stringResource(id = R.string.download))
+                    }
+                }
+            }
+        }
+    }
+}
 
 @Composable
 fun UploadFileDialog( // Plot Options Screen
@@ -48,9 +101,7 @@ fun UploadFileDialog( // Plot Options Screen
     onCancelClick: () -> Unit
 ) {
     Dialog(
-        onDismissRequest = {
-            onDismiss.invoke()
-        }
+        onDismissRequest = { onDismiss.invoke() }
     ) {
         Surface(shape = Shapes.small) {
             Column(

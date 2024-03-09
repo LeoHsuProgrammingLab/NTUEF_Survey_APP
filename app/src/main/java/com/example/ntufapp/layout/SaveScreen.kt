@@ -66,12 +66,12 @@ fun SaveScreen(
             ) {
                 val showDialog = remember { mutableStateOf(false) }
                 val showOverwriteDialog = remember { mutableStateOf(false) }
-                val showBackDialogue = remember { mutableStateOf(false) }
+                val showBackDialog = remember { mutableStateOf(false) }
                 val validFilename = getFilenameWithFormat(newPlotData, outputFilename)
                 val currentFilename = remember { mutableStateOf(validFilename) }
                 OutlinedButton(
                     modifier = modifier,
-                    onClick = { showBackDialogue.value = true }
+                    onClick = { showBackDialog.value = true }
                 ) {
                     Text(text = "返回主頁", fontSize = 20.sp)
                 }
@@ -117,13 +117,13 @@ fun SaveScreen(
                     )
                 }
 
-                if (showBackDialogue.value) {
+                if (showBackDialog.value) {
                     GeneralConfirmDialog(
                         reminder = "確定要返回主頁嗎？\n返回主頁將會重新開始調查！",
                         confirmText = "確定",
                         onDismiss = {},
                         onConfirmClick = { onBackButtonClick() },
-                        onCancelClick = { showBackDialogue.value = false }
+                        onCancelClick = { showBackDialog.value = false }
                     )
                 }
 //                if (showDialog.value) {

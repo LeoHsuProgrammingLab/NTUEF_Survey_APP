@@ -8,12 +8,24 @@ plugins {
 android {
     compileSdk 34
 
+    def secretsPropertiesFile = rootProject.file("secrets.properties")
+    def secretsProperties = new Properties()
+    secretsProperties.load(new FileInputStream(secretsPropertiesFile))
+
     defaultConfig {
         applicationId "com.example.ntufapp"
         minSdk 26
         targetSdk 34
         versionCode 1
         versionName "1.0"
+        buildConfigField("String", "BASE_URL", secretsProperties['BASE_URL'])
+        println("BASE_URL: " + secretsProperties['BASE_URL'])
+        buildConfigField("String", "API_PARAMS_TOKEN", secretsProperties['API_PARAMS_TOKEN'])
+        println("API_PARAMS_TOKEN: " + secretsProperties['API_PARAMS_TOKEN'])
+        buildConfigField("String", "CATALOGUE_API_KEY", secretsProperties['CATALOGUE_API_KEY'])
+        buildConfigField("String", "PLOT_API_KEY", secretsProperties['PLOT_API_KEY'])
+        buildConfigField("String", "CODE_API_KEY", secretsProperties['CODE_API_KEY'])
+        buildConfigField("String", "CREATE_API_KEY", secretsProperties['CREATE_API_KEY'])
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

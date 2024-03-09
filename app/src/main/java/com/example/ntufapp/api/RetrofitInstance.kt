@@ -1,27 +1,45 @@
 package com.example.ntufapp.api
 
 import android.util.Log
+import com.example.ntufapp.BuildConfig
+import com.example.ntufapp.api.dataType.plotInfoResponse.PlotInfoResponse
+import com.example.ntufapp.api.dataType.plotsCatalogueResponse.PlotsCatalogueResponse
+import com.example.ntufapp.api.dataType.userAndConditionCodeResponse.UserAndConditionCodeResponse
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
+import okhttp3.ResponseBody
 import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
+import java.net.SocketTimeoutException
+import java.util.concurrent.TimeUnit
 
 object RetrofitInstance {
-    private const val BASE_URL = "http://211.79.114.51:8888/"
-    private const val BASE_URL2 = "http://formis.exfo.ntu.edu.tw:8889/"
+    private const val BASE_URL = BuildConfig.BASE_URL
 
     private val retrofit by lazy {
         val gson = GsonBuilder()
             .setLenient()
             .create()
+        val okClient = OkHttpClient.Builder()
+            .connectTimeout(5, TimeUnit.SECONDS)
+            .readTimeout(5, TimeUnit.SECONDS)
+            .writeTimeout(10, TimeUnit.SECONDS)
+            .build()
+
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create(gson))
+            .client(okClient)
             .build()
     }
 
@@ -42,13 +60,60 @@ object RetrofitInstance {
     }
 }
 
-fun catalogueApi(coroutineScope: CoroutineScope, tag: String) {
+fun catalogueApi(coroutineScope: CoroutineScope, tag: String, callback: (PlotsCatalogueResponse?, String) -> Unit) {
     coroutineScope.launch {
-        val json = "{\"token\":\"NDRFQzBFQjctNjg2OS00MEE5LTg0NDctRUU2OTg2RjE3QkYz\"}"
+        val json = "{\"token\":\"${BuildConfig.API_PARAMS_TOKEN}\"}"
         val requestBody = json.toRequestBody("application/json".toMediaTypeOrNull())
 
-        val response = try {
-            RetrofitInstance.catalogueApiService.getCatalogue(requestBody)
+        Log.d(tag, "requestBody: $requestBody")
+        try {
+            val response = RetrofitInstance.catalogueApiService.getCatalogue(requestBody)
+            if (response.isSuccessful) {
+                val gson = Gson()
+                val catalogueRsp = gson.fromJson(response.body()?.string(), PlotsCatalogueResponse::class.java)
+                callback(catalogueRsp, "")
+                Log.d(tag, "response: ${catalogueRsp.body}")
+            } else {
+                callback(null, "資料庫回應錯誤")
+                Log.d(tag, "Unsuccessful! response: $response")
+            }
+        } catch (e: IOException) {
+            Log.d(tag, "IOException: ${e.message}, you might not have internet connection, you gotta check it")
+            callback(null, "沒有網路，請檢查網路連線")
+            return@launch
+        } catch (e: HttpException) {
+            Log.d(tag, "HttpException: ${e.message}, unexpected http response")
+            callback(null, "網路協定錯誤")
+            return@launch
+        }
+    }
+}
+
+fun plotApi(coroutineScope: CoroutineScope, tag: String, locationMid: String = "0B39CE46-B8D9-43C5-B045-1F5AC3373AED") {
+    coroutineScope.launch {
+        val json = "{" +
+                "\"token\":\"${BuildConfig.API_PARAMS_TOKEN}\"," +
+                "\"location_mid\":\"${locationMid}\"}"
+
+        val requestBody = json.toRequestBody("application/json".toMediaTypeOrNull())
+
+        try {
+            val response = withContext(Dispatchers.Default) {
+                RetrofitInstance.plotApiService.getPlotInfo(requestBody)
+            }
+            Log.d(tag, "response: $response")
+            val responseBody = response.body()?.string()
+
+            if (response.isSuccessful) {
+                val gson = Gson()
+                val plotInfoRsp = gson.fromJson(responseBody, PlotInfoResponse::class.java)
+                Log.d(tag, "response: ${plotInfoRsp.body}")
+            } else {
+                Log.d(tag, "Unsuccessful! response: $responseBody")
+            }
+        } catch (e: SocketTimeoutException) {
+            Log.e(tag, "SocketTimeoutException: ${e.message}, timeout")
+            return@launch
         } catch (e: IOException) {
             Log.e(tag, "IOException: ${e.message}, you might not have internet connection, you gotta check it")
             return@launch
@@ -56,41 +121,12 @@ fun catalogueApi(coroutineScope: CoroutineScope, tag: String) {
             Log.e(tag, "HttpException: ${e.message}, unexpected http response")
             return@launch
         }
-
-        if (response.isSuccessful) {
-            Log.d(tag, "response: ${response.body()?.string()}")
-        } else {
-            Log.d(tag, "response: ${response}")
-        }
     }
 }
 
-fun plotApi(coroutineScope: CoroutineScope, tag: String) {
+fun userAndConditionCodeApi(coroutineScope: CoroutineScope, tag: String) {
     coroutineScope.launch {
-        val json = "{\"token\":\"NDRFQzBFQjctNjg2OS00MEE5LTg0NDctRUU2OTg2RjE3QkYz\"}"
-        val requestBody = json.toRequestBody("application/json".toMediaTypeOrNull())
-
-        val response = try {
-            RetrofitInstance.catalogueApiService.getCatalogue(requestBody)
-        } catch (e: IOException) {
-            Log.e(tag, "IOException: ${e.message}, you might not have internet connection, you gotta check it")
-            return@launch
-        } catch (e: HttpException) {
-            Log.e(tag, "HttpException: ${e.message}, unexpected http response")
-            return@launch
-        }
-
-        if (response.isSuccessful) {
-            Log.d(tag, "response: ${response.body()?.string()}")
-        } else {
-            Log.d(tag, "response: ${response}")
-        }
-    }
-}
-
-fun systemCodeApi(coroutineScope: CoroutineScope, tag: String) {
-    coroutineScope.launch {
-        val json = "{\"token\":\"NDRFQzBFQjctNjg2OS00MEE5LTg0NDctRUU2OTg2RjE3QkYz\"}"
+        val json = "{\"token\":\"${BuildConfig.API_PARAMS_TOKEN}\"}"
         val requestBody = json.toRequestBody("application/json".toMediaTypeOrNull())
 
         val response = try {
@@ -104,13 +140,34 @@ fun systemCodeApi(coroutineScope: CoroutineScope, tag: String) {
         }
 
         if (response.isSuccessful) {
-            Log.d(tag, "response: ${response.body()?.string()}")
+            val gson = Gson()
+            val userAndConditionCodeRsp = gson.fromJson(response.body()?.string(), UserAndConditionCodeResponse::class.java)
+            Log.d(tag, "response: ${userAndConditionCodeRsp.body}")
         } else {
-            Log.d(tag, "response: ${response}")
+            Log.d(tag, "Unsuccessful! response: $response")
         }
     }
 }
 
-fun uploadPlotDataApi() {
+fun uploadPlotDataApi(coroutineScope: CoroutineScope, tag: String, surveyData: String = "") {
+    coroutineScope.launch {
+        val requestBody = surveyData.toRequestBody("application/json".toMediaTypeOrNull())
+
+        val response = try {
+            RetrofitInstance.uploadPlotDataApiService.createInvestigationRecord(requestBody)
+        } catch (e: IOException) {
+            Log.e(tag, "IOException: ${e.message}, you might not have internet connection, you gotta check it")
+            return@launch
+        } catch (e: HttpException) {
+            Log.e(tag, "HttpException: ${e.message}, unexpected http response")
+            return@launch
+        }
+
+        if (response.isSuccessful) {
+            Log.d(tag, "response: ${response.body()?.string()}")
+        } else {
+            Log.d(tag, "Unsuccessful! response: $response")
+        }
+    }
 
 }

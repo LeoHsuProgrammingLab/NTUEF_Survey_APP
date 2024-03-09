@@ -1,8 +1,10 @@
 package com.example.ntufapp.ui.widget
 
 import android.util.Log
+import android.view.View.OnFocusChangeListener
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,9 +38,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusState
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -336,7 +342,6 @@ fun ExposedUnaddressedTreeList(
     modifier: Modifier,
     onChoose: (String) -> Unit
 ) {
-    Log.d("ExposedUnaddressedTreeList", "Re-render")
     val dropdownExpanded = remember { mutableStateOf(false) }
 
     ExposedDropdownMenuBox(
@@ -346,9 +351,11 @@ fun ExposedUnaddressedTreeList(
         },
         modifier = modifier.padding(horizontal = 10.dp)
     ) {
+        val keyboardController = LocalSoftwareKeyboardController.current
         OutlinedTextField(
             value = treeSet.value.size.toString(),
             onValueChange = {},
+//            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.None),
             readOnly = true,
             label = {
                 Text(
@@ -370,7 +377,8 @@ fun ExposedUnaddressedTreeList(
                         else -> 90.dp
                     }
                 )
-                .menuAnchor(),
+                .menuAnchor()
+                .onFocusChanged { keyboardController?.hide() },
             textStyle = TextStyle(fontSize = 16.sp),
         )
 

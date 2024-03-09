@@ -1,4 +1,4 @@
-package com.example.ntufapp.api.dataType
+package com.example.ntufapp.api.dataType.plotInfoResponse
 
 data class Message(
     val body: String,
