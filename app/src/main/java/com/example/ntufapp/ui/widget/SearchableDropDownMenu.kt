@@ -1,6 +1,5 @@
 package com.example.ntufapp.ui.widget
 
-import android.util.Log
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
@@ -24,7 +23,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -36,6 +34,7 @@ import com.example.ntufapp.R
 import com.example.ntufapp.ui.theme.DropdownDivider
 import com.example.ntufapp.ui.theme.dropDownItemModifier
 import com.example.ntufapp.ui.theme.dropDownMenuModifier
+import com.example.ntufapp.ui.widget.dialog.AddDialog
 import com.example.ntufapp.utils.showMessage
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)

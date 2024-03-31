@@ -1,5 +1,6 @@
 package com.example.ntufapp.ui.widget
 
+import android.app.DownloadManager.Query
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
@@ -55,10 +56,11 @@ fun PlotSelectionDropDownMenu(
     }
     val location = remember { mutableStateOf("請選擇樣區") }
 
+
     Column(
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
-        val modifier = dropDownMenuModifier
+        val outlinedModifier = dropDownMenuModifier
             .width(
                 when (widthType) {
                     "medium" -> 100.dp
@@ -66,178 +68,99 @@ fun PlotSelectionDropDownMenu(
                     else -> 90.dp
                 }
             )
+        val boxModifier = Modifier.padding(horizontal = 10.dp).height(80.dp)
 
-        // 1. ExposedDropdownMenuBox for dept_name
-        ExposedDropdownMenuBox(
-            expanded = deptNameDropdownExpanded.value,
-            onExpandedChange = {
-                deptNameDropdownExpanded.value = !deptNameDropdownExpanded.value
-            },
-            modifier = Modifier
-                .height(80.dp)
-                .padding(horizontal = 10.dp)
+        @Composable
+        fun DropdownBox (
+            expanded: Boolean,
+            onExpandChange: (Boolean) -> Unit,
+            currentValue: String,
+            itemList: List<String>,
+            onItemsChange: (String) -> Unit,
         ) {
             val keyboardController = LocalSoftwareKeyboardController.current
-            OutlinedTextField(
-                value = deptName.value,
-                onValueChange = {},
-                //            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.None),
-                readOnly = true,
-                label = {
-                    Text(text = label, style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.Bold))
-                },
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = deptNameDropdownExpanded.value)
-                },
-                modifier = modifier
-                    .height(50.dp)
-                    .menuAnchor()
-                    .onFocusChanged { keyboardController?.hide() },
-                textStyle = TextStyle(fontSize = 16.sp),
-            )
-
-            // DropdownMenu
-            ExposedDropdownMenu(
-                expanded = deptNameDropdownExpanded.value,
-                onDismissRequest = { deptNameDropdownExpanded.value = false },
-                modifier = dropDownMenuModifier
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { onExpandChange(!expanded) },
+                modifier = boxModifier
             ) {
-                deptNameList.forEach { option ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(option)
-                        },
-                        onClick = {
-                            deptNameDropdownExpanded.value = false
-                            areaNameList.value = listOf("請選擇樣區") + (allPlotsInfo[option]?.keys?.sorted() ?: emptyList())
-                            deptName.value = option
-                            areaName.value = areaNameList.value.first()
-                        },
-                        modifier = modifier
-                    )
-                    DropdownDivider()
-                }
-            }
-        }
+                OutlinedTextField(
+                    value = currentValue,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = {
+                        Text(text = label, style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.Bold))
+                    },
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                    },
+                    modifier = outlinedModifier
+                        .height(50.dp)
+                        .menuAnchor()
+                        .onFocusChanged { keyboardController?.hide() },
+                    textStyle = TextStyle(fontSize = 16.sp),
+                )
 
-        // 2. ExposedDropdownMenuBox for area_name
-        ExposedDropdownMenuBox(
-            expanded = deptNameDropdownExpanded.value,
-            onExpandedChange = {
-                areaNameDropdownExpanded.value = !areaNameDropdownExpanded.value
-            },
-            modifier = Modifier
-                .height(80.dp)
-                .padding(horizontal = 10.dp)
-        ) {
-            val keyboardController = LocalSoftwareKeyboardController.current
-            OutlinedTextField(
-                value = deptName.value,
-                onValueChange = {},
-                //            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.None),
-                readOnly = true,
-                label = {
-                    Text(
-                        text = label,
-                        style = TextStyle(
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold
+                // DropdownMenu
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { onExpandChange(false) },
+                    modifier = dropDownMenuModifier
+                ) {
+                    itemList.forEach { option ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(option)
+                            },
+                            onClick = {
+                                onExpandChange(false)
+                                onItemsChange(option)
+                            },
+                            modifier = dropDownItemModifier
                         )
-                    )
-                },
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = deptNameDropdownExpanded.value)
-                },
-                modifier = modifier
-                    .height(50.dp)
-                    .menuAnchor()
-                    .onFocusChanged { keyboardController?.hide() },
-                textStyle = TextStyle(fontSize = 16.sp),
-            )
-
-            // DropdownMenu
-            ExposedDropdownMenu(
-                expanded = deptNameDropdownExpanded.value,
-                onDismissRequest = { deptNameDropdownExpanded.value = false },
-                modifier = dropDownMenuModifier
-            ) {
-                deptNameList.forEach { option ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(option)
-                        },
-                        onClick = {
-                            areaNameDropdownExpanded.value = false
-                            locationList.value = listOf("請選擇樣區") + (allPlotsInfo[deptName.value]?.get(option)
-                                ?.map { pair -> pair.first }?.sorted() ?: emptyList())
-                            areaName.value = option
-                            location.value = locationList.value.firstOrNull() ?: "尚無"
-                        },
-                        modifier = modifier
-                    )
-                    DropdownDivider()
+                        DropdownDivider()
+                    }
                 }
             }
         }
 
-        // 3. ExposedDropdownMenuBox for location_name
-        ExposedDropdownMenuBox(
+        DropdownBox(
+            expanded = deptNameDropdownExpanded.value,
+            onExpandChange = { deptNameDropdownExpanded.value = it },
+            currentValue = deptName.value,
+            itemList = deptNameList,
+            onItemsChange = {
+                deptName.value = it
+                areaNameList.value = listOf("請選擇樣區") + (allPlotsInfo[it]?.keys?.sorted() ?: emptyList())
+                areaName.value = areaNameList.value.first()
+            }
+        )
+
+        DropdownBox(
+            expanded = areaNameDropdownExpanded.value,
+            onExpandChange = { areaNameDropdownExpanded.value = it },
+            currentValue = areaName.value,
+            itemList = areaNameList.value,
+            onItemsChange = {
+                areaName.value = it
+                locationList.value = listOf("請選擇樣區") + (allPlotsInfo[deptName.value]?.get(it)
+                    ?.map { pair -> pair.first }?.sorted() ?: emptyList())
+                location.value = locationList.value.firstOrNull() ?: "尚無"
+            }
+        )
+
+        DropdownBox(
             expanded = locationDropdownExpanded.value,
-            onExpandedChange = {
-                locationDropdownExpanded.value = !locationDropdownExpanded.value
-            },
-            modifier = Modifier
-                .height(80.dp)
-                .padding(horizontal = 10.dp)
-        ) {
-            val keyboardController = LocalSoftwareKeyboardController.current
-            OutlinedTextField(
-                value = location.value,
-                onValueChange = {},
-                //            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.None),
-                readOnly = true,
-                label = {
-                    Text(
-                        text = label,
-                        style = TextStyle(
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
-                },
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = locationDropdownExpanded.value)
-                },
-                modifier = modifier
-                    .height(50.dp)
-                    .menuAnchor()
-                    .onFocusChanged { keyboardController?.hide() },
-                textStyle = TextStyle(fontSize = 16.sp),
-            )
-
-            // DropdownMenu
-            ExposedDropdownMenu(
-                expanded = locationDropdownExpanded.value,
-                onDismissRequest = { locationDropdownExpanded.value = false },
-                modifier = dropDownMenuModifier
-            ) {
-                locationList.value.forEach { option ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(option)
-                        },
-                        onClick = {
-                            locationDropdownExpanded.value = false
-                            location.value = option
-                            onChoose(
-                                allPlotsInfo[deptName.value]?.get(areaName.value)?.find { pair -> pair.first == option }?.second ?: ""
-                            )
-                        },
-                        modifier = modifier
-                    )
-                    DropdownDivider()
-                }
+            onExpandChange = { locationDropdownExpanded.value = it },
+            currentValue = location.value,
+            itemList = locationList.value,
+            onItemsChange = {
+                location.value = it
+                onChoose(
+                    allPlotsInfo[deptName.value]?.get(areaName.value)?.find { pair -> pair.first == it }?.second ?: ""
+                )
             }
-        }
+        )
     }
 }
+

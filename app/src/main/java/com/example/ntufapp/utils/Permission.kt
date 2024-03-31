@@ -1,6 +1,7 @@
 package com.example.ntufapp.utils
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Environment
@@ -37,6 +38,11 @@ fun ExternalStoragePermissionHandler(onPermissionGranted: () -> Unit) {
 
         onDispose { }
     }
+}
+
+fun checkPermission(context: Context): Boolean {
+    val permission = context.checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    return permission == android.content.pm.PackageManager.PERMISSION_GRANTED
 }
 
 

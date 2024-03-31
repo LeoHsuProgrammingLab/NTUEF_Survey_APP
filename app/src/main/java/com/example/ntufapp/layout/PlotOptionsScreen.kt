@@ -1,9 +1,7 @@
 package com.example.ntufapp.layout
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.Image
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,10 +24,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ntufapp.R
 import com.example.ntufapp.model.PlotData
-import com.example.ntufapp.ui.widget.ConfirmDialog
-import com.example.ntufapp.ui.widget.ManualInputNewPlotDialog
-import com.example.ntufapp.ui.widget.NewSurveyUploadChoiceDialog
-import com.example.ntufapp.ui.widget.UploadFileDialog
+import com.example.ntufapp.ui.widget.dialog.ConfirmDialog
+import com.example.ntufapp.ui.widget.dialog.ManualInputNewPlotDialog
+import com.example.ntufapp.ui.widget.dialog.NewSurveyUploadChoiceDialog
+import com.example.ntufapp.ui.widget.dialog.UploadFileDialog
 import com.example.ntufapp.ui.theme.LayoutDivider
 import com.example.ntufapp.utils.getFileName
 import com.example.ntufapp.utils.parseJsonToMetaData

@@ -26,7 +26,7 @@ import com.example.ntufapp.api.dataType.plotsCatalogueResponse.PlotsCatalogueRes
 import com.example.ntufapp.api.plotApi
 import com.example.ntufapp.api.uploadPlotDataApi
 import com.example.ntufapp.ui.theme.LayoutDivider
-import com.example.ntufapp.ui.widget.ChoosePlotToDownloadDialog
+import com.example.ntufapp.ui.widget.dialog.ChoosePlotToDownloadDialog
 import com.example.ntufapp.utils.showMessage
 import kotlinx.coroutines.launch
 

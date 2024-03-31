@@ -39,10 +39,9 @@ import com.example.ntufapp.model.Tree
 import com.example.ntufapp.ui.theme.IntervalDivider
 import com.example.ntufapp.ui.theme.Shapes
 import com.example.ntufapp.ui.theme.lightBorder
+import com.example.ntufapp.ui.widget.dialog.AdjustSpeciesDialog
 import com.example.ntufapp.utils.showMessage
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

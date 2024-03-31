@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.sp
 import com.example.ntufapp.R
 import com.example.ntufapp.data.ntufappInfo.Companion.outputDir
 import com.example.ntufapp.model.PlotData
-import com.example.ntufapp.ui.widget.GeneralConfirmDialog
+import com.example.ntufapp.ui.widget.dialog.GeneralConfirmDialog
 import com.example.ntufapp.ui.theme.LayoutDivider
 import com.example.ntufapp.utils.checkIfFileExists
 import com.example.ntufapp.utils.generateUniqueFilename

@@ -8,35 +8,15 @@ import android.os.Environment
 import android.provider.OpenableColumns
 import android.provider.Settings
 import android.util.Log
-import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
-import com.example.ntufapp.data.DataSource.columnName
 import com.example.ntufapp.data.ntufappInfo.Companion.outputDir
-import com.example.ntufapp.data.ntufappInfo.Companion.outputDirName
 import com.example.ntufapp.model.PlotData
-import com.example.ntufapp.ui.widget.GeneralConfirmDialog
 import com.google.gson.Gson
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-
-fun maxThree(a: Double, b: Double, c: Double): Double {
-    return maxOf(a, maxOf(b, c))
-}
-
-fun minThree(a: Double, b: Double, c: Double): Double {
-    return minOf(a, minOf(b, c))
-}
-
-fun showMessage(context: Context, s: String) {
-    Toast.makeText(context, s, Toast.LENGTH_SHORT).show()
-}
 
 fun parseJsonToMetaData(uri: Uri, context: Context): PlotData? {
     val inputStream = context.contentResolver.openInputStream(uri)
@@ -161,51 +141,4 @@ fun generateUniqueFilename(context: Context, baseFilename: String, format: Strin
         uniqueFilename = baseFilename + "_$version" + format
     }
     return uniqueFilename
-}
-
-// Research
-fun checkPermission(context: Context): Boolean {
-    val permission = context.checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-    return permission == android.content.pm.PackageManager.PERMISSION_GRANTED
-}
-
-fun flattenPlotData(plotData: PlotData): List<List<String>> {
-    val flattenedPlotData = mutableListOf<List<String>>()
-
-    // Add the header
-    val header = mutableListOf<String>()
-    columnName.forEach {
-        header.add(it)
-    }
-    flattenedPlotData.add(header)
-
-    // Add the data
-    plotData.PlotTrees.forEach { tree ->
-        val row = listOf(
-            tree.SampleNum.toString(),
-            tree.Species,
-            tree.DBH.toString(),
-            tree.State.joinToString(";"),
-            tree.MeasHeight.toString(),
-            tree.VisHeight.toString(),
-            tree.ForkHeight.toString(),
-            plotData.Date,
-            plotData.ManageUnit,
-            plotData.SubUnit,
-            plotData.PlotNum,
-            plotData.PlotName,
-            plotData.PlotArea.toString(),
-            plotData.PlotType,
-            plotData.TWD97_X,
-            plotData.TWD97_Y,
-            plotData.Altitude.toString(),
-            plotData.Slope.toString(),
-            plotData.Aspect,
-            plotData.Surveyor.joinToString(";"),
-            plotData.HtSurveyor.joinToString(";"),
-        )
-
-        flattenedPlotData.add(row)
-    }
-    return flattenedPlotData
 }

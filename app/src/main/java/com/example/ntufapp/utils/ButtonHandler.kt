@@ -1,6 +1,5 @@
 package com.example.ntufapp.utils
 
-import android.util.Log
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
