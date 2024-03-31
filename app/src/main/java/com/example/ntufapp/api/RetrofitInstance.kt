@@ -8,7 +8,9 @@ import com.example.ntufapp.api.dataType.userAndConditionCodeResponse.UserAndCond
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -16,6 +18,7 @@ import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import okhttp3.ResponseBody
+import org.json.JSONObject
 import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -62,8 +65,7 @@ object RetrofitInstance {
 
 fun catalogueApi(coroutineScope: CoroutineScope, tag: String, callback: (PlotsCatalogueResponse?, String) -> Unit) {
     coroutineScope.launch {
-        val json = "{\"token\":\"${BuildConfig.API_PARAMS_TOKEN}\"}"
-        val requestBody = json.toRequestBody("application/json".toMediaTypeOrNull())
+        val requestBody = createRequestBody(listOf("token" to BuildConfig.API_PARAMS_TOKEN))
 
         Log.d(tag, "requestBody: $requestBody")
         try {
@@ -89,45 +91,47 @@ fun catalogueApi(coroutineScope: CoroutineScope, tag: String, callback: (PlotsCa
     }
 }
 
-fun plotApi(coroutineScope: CoroutineScope, tag: String, locationMid: String = "0B39CE46-B8D9-43C5-B045-1F5AC3373AED") {
-    coroutineScope.launch {
-        val json = "{" +
-                "\"token\":\"${BuildConfig.API_PARAMS_TOKEN}\"," +
-                "\"location_mid\":\"${locationMid}\"}"
-
-        val requestBody = json.toRequestBody("application/json".toMediaTypeOrNull())
+suspend fun plotApi(coroutineScope: CoroutineScope, tag: String, locationMid: String): PlotInfoResponse? {
+    return coroutineScope.async {
+        val requestBody = createRequestBody(listOf("token" to BuildConfig.API_PARAMS_TOKEN, "location_mid" to locationMid))
 
         try {
             val response = withContext(Dispatchers.Default) {
                 RetrofitInstance.plotApiService.getPlotInfo(requestBody)
             }
-            Log.d(tag, "response: $response")
+//            Log.d(tag, "response: $response")
             val responseBody = response.body()?.string()
 
             if (response.isSuccessful) {
+                if (responseBody != null) {
+                    val jsonRsp = JSONObject(responseBody)
+//                    TODO: save the data to local storage
+
+                }
                 val gson = Gson()
                 val plotInfoRsp = gson.fromJson(responseBody, PlotInfoResponse::class.java)
                 Log.d(tag, "response: ${plotInfoRsp.body}")
+                return@async plotInfoRsp
             } else {
                 Log.d(tag, "Unsuccessful! response: $responseBody")
+                return@async null
             }
         } catch (e: SocketTimeoutException) {
             Log.e(tag, "SocketTimeoutException: ${e.message}, timeout")
-            return@launch
+            return@async null
         } catch (e: IOException) {
             Log.e(tag, "IOException: ${e.message}, you might not have internet connection, you gotta check it")
-            return@launch
+            return@async null
         } catch (e: HttpException) {
             Log.e(tag, "HttpException: ${e.message}, unexpected http response")
-            return@launch
+            return@async null
         }
-    }
+    }.await()
 }
 
 fun userAndConditionCodeApi(coroutineScope: CoroutineScope, tag: String) {
     coroutineScope.launch {
-        val json = "{\"token\":\"${BuildConfig.API_PARAMS_TOKEN}\"}"
-        val requestBody = json.toRequestBody("application/json".toMediaTypeOrNull())
+        val requestBody = createRequestBody(listOf("token" to BuildConfig.API_PARAMS_TOKEN))
 
         val response = try {
             RetrofitInstance.systemCodeApiService.getUserAndConditionCodeList(requestBody)

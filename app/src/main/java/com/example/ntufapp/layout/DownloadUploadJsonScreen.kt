@@ -28,6 +28,7 @@ import com.example.ntufapp.api.uploadPlotDataApi
 import com.example.ntufapp.ui.theme.LayoutDivider
 import com.example.ntufapp.ui.widget.ChoosePlotToDownloadDialog
 import com.example.ntufapp.utils.showMessage
+import kotlinx.coroutines.launch
 
 @Composable
 fun DownloadUploadJsonScreen () {
@@ -57,7 +58,7 @@ fun DownloadUploadJsonScreen () {
         ) {
             val context = LocalContext.current
             val showDialog = remember { mutableStateOf(false) }
-            val listOfPlots = remember { mutableStateOf(emptyMap<String, List<Pair<String, String>>>()) }
+            val listOfPlots = remember { mutableStateOf(emptyMap<String, Map<String, List<Pair<String, String>>>>()) }
             Button(
                 modifier = Modifier.padding(5.dp),
                 onClick = {
@@ -65,14 +66,18 @@ fun DownloadUploadJsonScreen () {
 
                     catalogueApi(coroutineScope, tag) { response: PlotsCatalogueResponse?, log: String ->
                         if (response != null) {
-                            val updatedMap = response.body.data_list.associate {data ->
-                                val plotName = data.dept_name + data.area_name + " (" + data.area_kinds_name + ") "
+                            // associate: key-value map
+                            // map: new value in the list
+                            val structuredMap = response.body.data_list.associate {data ->
+                                val deptName = data.dept_name // TODO: 林班層級
+                                val areaName = data.area_name + " (" + data.area_kinds_name + ") "
                                 val locationList = data.location_list.map { location ->
                                     Pair(location.location_name, location.location_mid)
                                 }
-                                plotName to locationList
+                                val areaMap = mapOf(areaName to locationList)
+                                deptName to areaMap
                             }
-                            listOfPlots.value = updatedMap
+                            listOfPlots.value = structuredMap
                             Log.d(tag, "listOfPlots: $listOfPlots")
                             showDialog.value = true
                         } else {
@@ -93,7 +98,12 @@ fun DownloadUploadJsonScreen () {
             if (showDialog.value) {
                 ChoosePlotToDownloadDialog(
                     allPlotsInfo = listOfPlots.value,
-                    onDownload = { plotApi(coroutineScope, tag, it) },
+                    onDownload = {
+                        coroutineScope.launch {
+                            val plotInfoRsp = plotApi(coroutineScope, tag, it)
+                            // TODO: store the data
+                        }
+                     },
                     onDismiss = {},
                     onCancelClick = { showDialog.value = false }
                 )

@@ -1,15 +1,12 @@
 package com.example.ntufapp.ui.widget
 
-import PlotSelectionDropDownMenu
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -35,7 +32,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.ntufapp.R
 import com.example.ntufapp.data.DataSource
-import com.example.ntufapp.data.ntufappInfo.Companion.tag
 import com.example.ntufapp.model.PlotData
 import com.example.ntufapp.ui.theme.Shapes
 import com.example.ntufapp.ui.theme.basicModifier
@@ -43,7 +39,7 @@ import com.example.ntufapp.utils.showMessage
 
 @Composable
 fun ChoosePlotToDownloadDialog(
-    allPlotsInfo: Map<String, List<Pair<String, String>>>,
+    allPlotsInfo: Map<String, Map<String, List<Pair<String, String>>>>,
     onDownload: (String) -> Unit,
     onDismiss: () -> Unit,
     onCancelClick: () -> Unit
@@ -63,6 +59,7 @@ fun ChoosePlotToDownloadDialog(
                     label = "",
                     allPlotsInfo = allPlotsInfo,
                     onChoose = { midLocation.value = it })
+
                 Row(horizontalArrangement = Arrangement.SpaceEvenly) {
                     Button(
                         modifier = basicModifier,
