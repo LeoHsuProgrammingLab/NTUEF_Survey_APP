@@ -23,11 +23,13 @@ import com.example.ntufapp.utils.showMessage
 
 @Composable
 fun UploadFileDialog( // Plot Options Screen
-    selectedFileUri: Uri?,
     filePicker: ManagedActivityResultLauncher<String, Uri?>,
-    buttonText: String,
+    header: String,
+    mainButtonText: String,
+    nextButtonText: String,
+    cancelButtonText: String = stringResource(id = (R.string.cancel)),
     onDismiss: () -> Unit,
-    onSendClick: (Uri?) -> Unit,
+    onSendClick: () -> Unit,
     onCancelClick: () -> Unit
 ) {
     Dialog(
@@ -37,7 +39,7 @@ fun UploadFileDialog( // Plot Options Screen
             Column(
                 modifier = basicModifier,
             ) {
-                DialogHeader(header = "請匯入樣區資料")
+                DialogHeader(header = header)
                 Spacer(modifier = basicModifier)
                 Row(
                     modifier = Modifier.width(200.dp),
@@ -49,7 +51,7 @@ fun UploadFileDialog( // Plot Options Screen
                             filePicker.launch("application/json")
                         }
                     ) {
-                        Text(buttonText)
+                        Text(mainButtonText)
                     }
                 }
 
@@ -62,20 +64,14 @@ fun UploadFileDialog( // Plot Options Screen
                         modifier = basicModifier,
                         onClick = onCancelClick,
                     ) {
-                        Text(stringResource(id = (R.string.cancel)))
+                        Text(cancelButtonText)
                     }
 
                     Button(
                         modifier = basicModifier,
-                        onClick = {
-                            if (selectedFileUri != null) {
-                                onSendClick(selectedFileUri)
-                            } else {
-                                showMessage(context, "請選擇JSON檔案")
-                            }
-                        }
+                        onClick = onSendClick
                     ) {
-                        Text("匯入")
+                        Text(nextButtonText)
                     }
                 }
             }

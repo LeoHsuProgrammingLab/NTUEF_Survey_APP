@@ -66,7 +66,7 @@ fun NTUEFApp(
 
     val items = listOf(
         NavigationItem(
-            title = "調查頁面",
+            title = "首頁",
             selectedIcon = Icons.Filled.Home,
             unselectedIcon = Icons.Outlined.Home,
             onClick = {
@@ -95,38 +95,32 @@ fun NTUEFApp(
 
     ModalNavigationDrawer(
         drawerContent = {
-            val isShowConfirmDialog = remember { mutableStateOf(false) }
             ModalDrawerSheet {
                 items.forEachIndexed { id, item ->
+                    val isShowConfirmDialog = remember { mutableStateOf(false) }
                     NavigationDrawerItem(
-                        label = {
-                            Text(text = item.title,)
-                        },
-                        selected = (id == selectedItemIndex.value),
+                        label = { Text(text = item.title,) },
+                        selected = (selectedItemIndex.value == id),
                         icon = {
                             Icon(
-                                if (id == selectedItemIndex.value) item.selectedIcon else item.unselectedIcon,
+                                if (selectedItemIndex.value == id) item.selectedIcon else item.unselectedIcon,
                                 contentDescription = item.title
                             )
                         },
                         onClick = {
-                            if (id == selectedItemIndex.value) {
-                                scope.launch { drawerState.close() }
-                            } else {
-                                val isNoAffectPage = when (navController.currentDestination?.route) {
-                                    Screens.Start.name, Screens.LoadJson.name -> true
-                                    else -> false
-                                }
+                            val isNoAffectPage = when (navController.currentDestination?.route) {
+                                Screens.Start.name, Screens.LoadJson.name -> true
+                                else -> false
+                            }
 
-                                if (isNoAffectPage) {
-                                    selectedItemIndex.value = id
-                                    scope.launch {
-                                        drawerState.close()
-                                    }
-                                    item.onClick()
-                                } else {
-                                    isShowConfirmDialog.value = true    // show confirm dialog
+                            if (isNoAffectPage) {
+                                selectedItemIndex.value = id
+                                scope.launch {
+                                    drawerState.close()
                                 }
+                                item.onClick()
+                            } else {
+                                isShowConfirmDialog.value = true    // show confirm dialog
                             }
                         },
                         modifier = Modifier.padding(16.dp)
@@ -145,9 +139,13 @@ fun NTUEFApp(
                                 scope.launch { drawerState.close() }
                             },
                             onConfirmClick = {
-                                selectedItemIndex.value = 0
+                                selectedItemIndex.value = id
+                                if (selectedItemIndex.value == 0) {
+                                    navController.navigate(Screens.Start.name)
+                                } else {
+                                    navController.navigate(Screens.LoadJson.name)
+                                }
                                 isShowConfirmDialog.value = false
-                                item.onClick()
                                 scope.launch { drawerState.close() }
                             }
                         )

@@ -95,28 +95,30 @@ fun PlotOptionsScreen(
             // Upload Old Plot by JSON
             if(showOldPlotUpload.value) {
                 UploadFileDialog(
-                    selectedFileUri = selectedFileUri.value,
+                    header = "請匯入樣區資料",
+                    mainButtonText = buttonText.value,
+                    nextButtonText = "匯入",
                     onDismiss = {},
-                    onSendClick = { uri ->
-                        if(uri != null) {
-                            selectedFileUri.value = uri
+                    onSendClick = {
+                        if(selectedFileUri.value != null) {
                             try {
-                                plotData.value  = parseJsonToMetaData(uri, context)!!
+                                plotData.value  = parseJsonToMetaData(selectedFileUri.value!!, context)!!
                                 if(plotData.value.ManageUnit == "" || plotData.value.PlotTrees.size == 0) {
                                     showMessage(context, "你匯入了錯誤的檔案(.json)！")
                                 } else {
                                     showOldUploadData.value = true
-                                    outputFilename.value = getFileName(context, uri)
+                                    outputFilename.value = getFileName(context, selectedFileUri.value)
                                 }
                             } catch (e: Exception) {
                                 showMessage(context, "檔案解析時發生錯誤！")
                             }
+                        } else {
+                            showMessage(context, "請選擇JSON檔案")
                         }
                         dismissDialog(false)
                     },
                     onCancelClick = { dismissDialog(false) },
                     filePicker = filePickerLauncher,
-                    buttonText = buttonText.value
                 )
             }
 
@@ -159,28 +161,30 @@ fun PlotOptionsScreen(
             // Upload New Plot by JSON
             if (showNewPlotUpload.value) {
                 UploadFileDialog(
-                    selectedFileUri = selectedFileUri.value,
+                    header = "請匯入樣區資料",
+                    mainButtonText = buttonText.value,
+                    nextButtonText = "匯入",
                     onDismiss = {},
-                    onSendClick = { uri ->
-                        if(uri != null) {
-                            selectedFileUri.value = uri
+                    onSendClick = {
+                        if(selectedFileUri.value != null) {
                             try {
-                                plotData.value  = parseJsonToMetaData(uri, context)!!
+                                plotData.value  = parseJsonToMetaData(selectedFileUri.value!!, context)!!
                                 if(plotData.value.ManageUnit == "") {
                                     showMessage(context, "你匯入了錯誤的檔案(.json)！")
                                 } else {
                                     showNewUploadData.value = true
-                                    outputFilename.value = getFileName(context, uri)
+                                    outputFilename.value = getFileName(context, selectedFileUri.value!!)
                                 }
                             } catch (e: Exception) {
                                 showMessage(context, "檔案解析時發生錯誤！")
                             }
+                        } else {
+                            showMessage(context, "請選擇JSON檔案")
                         }
                         dismissDialog(true)
                     },
                     onCancelClick = { dismissDialog(true) },
-                    filePicker = filePickerLauncher,
-                    buttonText = buttonText.value
+                    filePicker = filePickerLauncher
                 )
             }
 
