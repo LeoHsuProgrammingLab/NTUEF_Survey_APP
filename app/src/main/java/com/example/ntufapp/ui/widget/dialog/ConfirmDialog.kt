@@ -12,17 +12,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.Dialog
 import com.example.ntufapp.R
-import com.example.ntufapp.model.PlotData
 import com.example.ntufapp.ui.theme.Shapes
 import com.example.ntufapp.ui.theme.basicModifier
 
 @Composable
 // https://medium.com/@rooparshkalia/single-choice-dialog-with-jetpack-compose-d021650d31ca
 fun ConfirmDialog( // Plot Options Screen
-    metaData: PlotData,
+    header: String,
     onDismiss: () -> Unit,
     onCancelClick: () -> Unit,
-    onNextButtonClick: (PlotData) -> Unit
+    onConfirmClick: () -> Unit
 ){
     Dialog(
         onDismissRequest = { onDismiss.invoke() }
@@ -33,7 +32,7 @@ fun ConfirmDialog( // Plot Options Screen
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 DialogHeader(
-                    header = "您已匯入${metaData.ManageUnit}${metaData.SubUnit}的資料\n樣區名稱：${metaData.PlotName}\n樣區編號：${metaData.PlotNum}\n該樣區有${metaData.PlotTrees.size}棵樣樹"
+                    header = header
                 )
                 Spacer(basicModifier)
                 Row(
@@ -50,7 +49,7 @@ fun ConfirmDialog( // Plot Options Screen
                     // next button
                     Button(
                         modifier = basicModifier,
-                        onClick = { onNextButtonClick(metaData) }
+                        onClick = onConfirmClick
                     ) {
                         Text(stringResource(id = (R.string.next)))
                     }

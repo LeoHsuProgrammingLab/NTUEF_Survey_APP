@@ -120,14 +120,16 @@ fun PlotOptionsScreen(
                 )
             }
 
+            val confirmHeader = "您已匯入${plotData.value.ManageUnit}${plotData.value.SubUnit}的資料\n樣區名稱：${plotData.value.PlotName}\n樣區編號：${plotData.value.PlotNum}\n該樣區有${plotData.value.PlotTrees.size}棵樣樹"
+
             if(showOldUploadData.value) {
                 ConfirmDialog(
-                    metaData = plotData.value,
+                    header = confirmHeader,
                     onDismiss = {},
                     onCancelClick = { showOldUploadData.value = false },
-                    onNextButtonClick = {
+                    onConfirmClick = {
                         surveyType.value = "ReSurvey"
-                        onNextButtonClick(it, surveyType.value, outputFilename.value)
+                        onNextButtonClick(plotData.value, surveyType.value, outputFilename.value)
                     }
                 )
             }
@@ -181,12 +183,13 @@ fun PlotOptionsScreen(
                 )
             }
 
+
             if (showNewUploadData.value) {
                 ConfirmDialog(
-                    metaData = plotData.value,
+                    header = confirmHeader,
                     onDismiss = {},
                     onCancelClick = { showNewUploadData.value = false },
-                    onNextButtonClick = { onNextButtonClick(it, surveyType.value, outputFilename.value) }
+                    onConfirmClick = { onNextButtonClick(plotData.value, surveyType.value, outputFilename.value) }
                 )
             }
 

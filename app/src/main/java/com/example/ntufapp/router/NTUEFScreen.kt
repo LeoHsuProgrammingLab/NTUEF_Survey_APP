@@ -9,8 +9,6 @@ import androidx.compose.material.icons.filled.Dataset
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.Dataset
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.rememberScaffoldState
-import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalDrawerSheet
@@ -33,15 +31,17 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.unit.dp
 import com.example.ntufapp.data.ntufappInfo.Companion.dTag
 import com.example.ntufapp.layout.DownloadUploadJsonScreen
 import com.example.ntufapp.layout.NewSurveyScreen
 import com.example.ntufapp.layout.ResultDisplayScreen
 import com.example.ntufapp.layout.SaveScreen
-import com.example.ntufapp.ui.widget.Drawer
 import com.example.ntufapp.ui.widget.NavigationItem
+import com.example.ntufapp.ui.widget.dialog.ConfirmDialog
 import kotlinx.coroutines.launch
 
 enum class Screens {
@@ -72,7 +72,7 @@ fun NTUEFApp(
                     drawerState.close()
                     navController.navigate(Screens.Start.name)
                 }
-            }
+            },
         ),
         NavigationItem(
             title = "上下載Json頁面",
@@ -90,8 +90,10 @@ fun NTUEFApp(
     val selectedItemIndex = rememberSaveable {
         mutableStateOf(0)
     }
+
     ModalNavigationDrawer(
         drawerContent = {
+            val isShowConfirmDialog = remember { mutableStateOf(false) }
             ModalDrawerSheet {
                 items.forEachIndexed { id, item ->
                     NavigationDrawerItem(
@@ -106,13 +108,47 @@ fun NTUEFApp(
                             )
                         },
                         onClick = {
-                            selectedItemIndex.value = id
-                            scope.launch {
-                                drawerState.close()
+                            if (id == selectedItemIndex.value) {
+                                scope.launch { drawerState.close() }
+                            } else {
+                                val isNoAffectPage = when (navController.currentDestination?.route) {
+                                    Screens.Start.name, Screens.LoadJson.name -> true
+                                    else -> false
+                                }
+
+                                if (isNoAffectPage) {
+                                    selectedItemIndex.value = id
+                                    scope.launch {
+                                        drawerState.close()
+                                    }
+                                    item.onClick()
+                                } else {
+                                    isShowConfirmDialog.value = true    // show confirm dialog
+                                }
                             }
-                            item.onClick()
-                        }
+                        },
+                        modifier = Modifier.padding(16.dp)
                     )
+
+                    if (isShowConfirmDialog.value) {
+                        ConfirmDialog(
+                            header = "確定要離開嗎？將會遺失所有為儲存資料！",
+                            onDismiss = {
+                                isShowConfirmDialog.value = false
+                                scope.launch { drawerState.close() }
+                            },
+                            onCancelClick = {
+                                isShowConfirmDialog.value = false
+                                scope.launch { drawerState.close() }
+                            },
+                            onConfirmClick = {
+                                selectedItemIndex.value = 0
+                                isShowConfirmDialog.value = false
+                                item.onClick()
+                                scope.launch { drawerState.close() }
+                            }
+                        )
+                    }
                 }
             }
         },

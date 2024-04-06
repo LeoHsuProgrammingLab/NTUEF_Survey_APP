@@ -6,5 +6,6 @@ data class AreaData(
     val area_kinds_name: String,
     val area_name: String,
     val dept_name: String,
+    val area_compart: Int,
     val location_list: List<Location>
 )

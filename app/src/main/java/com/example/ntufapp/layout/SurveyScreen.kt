@@ -19,7 +19,7 @@ fun ReSurveyScreen(
     newPlotData: PlotData,
     onNextButtonClick: () -> Unit,
 ) {
-//    DisableBackButtonHandler(backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher!!)
+    BackHandler(enabled = true) {}
 
     // Save the final return data
     val newPlotDataState = remember { mutableStateOf(newPlotData) }
