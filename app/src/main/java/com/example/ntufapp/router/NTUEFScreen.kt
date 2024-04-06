@@ -34,14 +34,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.ntufapp.R
 import com.example.ntufapp.data.ntufappInfo.Companion.dTag
 import com.example.ntufapp.layout.DownloadUploadJsonScreen
 import com.example.ntufapp.layout.NewSurveyScreen
 import com.example.ntufapp.layout.ResultDisplayScreen
 import com.example.ntufapp.layout.SaveScreen
 import com.example.ntufapp.ui.widget.NavigationItem
-import com.example.ntufapp.ui.widget.dialog.ConfirmDialog
+import com.example.ntufapp.ui.widget.dialog.GeneralConfirmDialog
 import kotlinx.coroutines.launch
 
 enum class Screens {
@@ -131,8 +133,9 @@ fun NTUEFApp(
                     )
 
                     if (isShowConfirmDialog.value) {
-                        ConfirmDialog(
-                            header = "確定要離開嗎？將會遺失所有為儲存資料！",
+                        GeneralConfirmDialog(
+                            reminder = "確定要離開嗎？將會遺失所有為儲存資料！",
+                            confirmText = stringResource(R.string.leave),
                             onDismiss = {
                                 isShowConfirmDialog.value = false
                                 scope.launch { drawerState.close() }

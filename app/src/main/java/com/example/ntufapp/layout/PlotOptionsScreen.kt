@@ -20,15 +20,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ntufapp.R
 import com.example.ntufapp.model.PlotData
-import com.example.ntufapp.ui.widget.dialog.ConfirmDialog
 import com.example.ntufapp.ui.widget.dialog.ManualInputNewPlotDialog
 import com.example.ntufapp.ui.widget.dialog.NewSurveyUploadChoiceDialog
 import com.example.ntufapp.ui.widget.dialog.UploadFileDialog
 import com.example.ntufapp.ui.theme.LayoutDivider
+import com.example.ntufapp.ui.widget.dialog.GeneralConfirmDialog
 import com.example.ntufapp.utils.getFileName
 import com.example.ntufapp.utils.parseJsonToMetaData
 import com.example.ntufapp.utils.showMessage
@@ -84,7 +85,6 @@ fun PlotOptionsScreen(
                 buttonText.value = "請選擇JSON檔案"
             }
 
-
             // Old Plot
             Button(
                 modifier = Modifier.padding(end = 20.dp),
@@ -123,8 +123,9 @@ fun PlotOptionsScreen(
             val confirmHeader = "您已匯入${plotData.value.ManageUnit}${plotData.value.SubUnit}的資料\n樣區名稱：${plotData.value.PlotName}\n樣區編號：${plotData.value.PlotNum}\n該樣區有${plotData.value.PlotTrees.size}棵樣樹"
 
             if(showOldUploadData.value) {
-                ConfirmDialog(
-                    header = confirmHeader,
+                GeneralConfirmDialog(
+                    reminder = confirmHeader,
+                    confirmText = stringResource(id = R.string.next),
                     onDismiss = {},
                     onCancelClick = { showOldUploadData.value = false },
                     onConfirmClick = {
@@ -185,8 +186,9 @@ fun PlotOptionsScreen(
 
 
             if (showNewUploadData.value) {
-                ConfirmDialog(
-                    header = confirmHeader,
+                GeneralConfirmDialog(
+                    reminder = confirmHeader,
+                    confirmText = stringResource(id = R.string.next),
                     onDismiss = {},
                     onCancelClick = { showNewUploadData.value = false },
                     onConfirmClick = { onNextButtonClick(plotData.value, surveyType.value, outputFilename.value) }

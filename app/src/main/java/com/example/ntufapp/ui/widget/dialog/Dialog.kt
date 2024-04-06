@@ -2,6 +2,7 @@ package com.example.ntufapp.ui.widget.dialog
 
 import android.net.Uri
 import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,6 +36,8 @@ import com.example.ntufapp.data.DataSource
 import com.example.ntufapp.model.PlotData
 import com.example.ntufapp.ui.theme.Shapes
 import com.example.ntufapp.ui.theme.basicModifier
+import com.example.ntufapp.ui.theme.md_theme_light_onPrimary
+import com.example.ntufapp.ui.theme.md_theme_light_primary
 import com.example.ntufapp.ui.widget.PlotSelectionDropDownMenu
 import com.example.ntufapp.ui.widget.SearchableChooseMenu
 import com.example.ntufapp.utils.showMessage
@@ -55,7 +58,7 @@ fun DialogHeader(header: String) {
 @Composable
 fun GeneralConfirmDialog(
     reminder: String,
-    confirmText: String,
+    confirmText: String = stringResource(id = (R.string.confirm)),
     cancelText: String = stringResource(id = (R.string.cancel)),
     leadingIcon: () -> Unit = {},
     onDismiss: () -> Unit,
@@ -78,13 +81,13 @@ fun GeneralConfirmDialog(
                 Row(
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    OutlinedButton(
+                    Button(
                         modifier = basicModifier,
                         onClick = onCancelClick
                     ) {
                         Text(cancelText)
                     }
-                    OutlinedButton(
+                    Button(
                         modifier = basicModifier,
                         onClick = onConfirmClick
                     ) {
