@@ -17,7 +17,7 @@ interface CatalogueApi {
         "app-client-type:1"
     )
 
-    @POST("/NTU_Forest_API/ForestSampleCatalogue") // Should be a GET request, but the API is designed by the other company SMH
+    @POST("/ForestSampleCatalogue") // Should be a GET request, but the API is designed by the other company SMH
     suspend fun getCatalogue(@Body requestBody: RequestBody): Response<ResponseBody>
 }
 
@@ -30,7 +30,7 @@ interface PlotApi {
         "app-client-type:1"
     )
 
-    @POST("/NTU_Forest_API/ForestSampleInfo") // Should be a GET request, but the API is designed by the other company SMH
+    @POST("/ForestSampleInfo") // Should be a GET request, but the API is designed by the other company SMH
     suspend fun getPlotInfo(@Body requestBody: RequestBody): Response<ResponseBody>
     // requestBody: {"token":"NDRFQzBFQjctNjg2OS00MEE5LTg0NDctRUU2OTg2RjE3QkYz", "location_mid":"99FD5CB8-6EFE-4242-9E3F-D78BEB04283D"} // 西川柳杉生長量試驗
 }
@@ -44,7 +44,7 @@ interface SystemCodeApi {
         "app-client-type:1"
     )
 
-    @POST("/NTU_Forest_API/ForestSystemItemCodeList") // Should be a GET request, but the API is designed by the other company SMH
+    @POST("/ForestSystemItemCodeList") // Should be a GET request, but the API is designed by the other company SMH
     suspend fun getUserAndConditionCodeList(@Body requestBody: RequestBody): Response<ResponseBody>
     // requestBody: {"token":"NDRFQzBFQjctNjg2OS00MEE5LTg0NDctRUU2OTg2RjE3QkYz"}
 }
@@ -58,6 +58,6 @@ interface UploadPlotApi {
         "app-client-type:1"
     )
 
-    @POST("/NTU_Forest_API/CreateForestLocationInvestigationRecord")
+    @POST("/CreateForestLocationInvestigationRecord")
     suspend fun createInvestigationRecord(@Body surveyData: RequestBody): Response<ResponseBody>
 }

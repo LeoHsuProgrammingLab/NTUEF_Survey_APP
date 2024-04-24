@@ -1,18 +1,30 @@
 package com.example.ntufapp.ui.widget
 
 import android.app.DownloadManager.Query
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -41,21 +53,21 @@ fun PlotSelectionDropDownMenu(
     val areaNameDropdownExpanded = remember { mutableStateOf(false) }
     val locationDropdownExpanded = remember { mutableStateOf(false) }
 
-    // deptNameList will be expanded in the future
+    // deptNameList will be expanded in the future, currently only one dept
     val deptNameList = allPlotsInfo.keys.toList()
     val deptName = remember { mutableStateOf(allPlotsInfo.keys.first()) }
+    // areaNameList contains all the area_name in the selected dept
     val areaNameList = remember {
         mutableStateOf( allPlotsInfo.values.map { it.keys }.flatten() ) // it.keys is a list, so flatten it
     }
     val areaName = remember { mutableStateOf("請選擇試驗地") }
 
     // TODO: 林班地
-    // You have to choose the
+    // locationList contains all the location_name in the selected area
     val locationList = remember { // List of location_name
         mutableStateOf(listOf("請選擇樣區") + (allPlotsInfo[deptName.value]?.get(areaName.value)?.map { it.first } ?: emptyList()))
     }
     val location = remember { mutableStateOf("請選擇樣區") }
-
 
     Column(
         verticalArrangement = Arrangement.SpaceEvenly
@@ -79,6 +91,15 @@ fun PlotSelectionDropDownMenu(
             onItemsChange: (String) -> Unit,
         ) {
             val keyboardController = LocalSoftwareKeyboardController.current
+            val selectedIndex = remember { mutableIntStateOf(itemList.indexOf(currentValue)) }
+            val listState = rememberLazyListState()
+
+            LaunchedEffect(expanded) {
+                if (expanded && selectedIndex.intValue != -1) {
+                    listState.animateScrollToItem(selectedIndex.value)
+                }
+            }
+
             ExposedDropdownMenuBox(
                 expanded = expanded,
                 onExpandedChange = { onExpandChange(!expanded) },
@@ -92,7 +113,9 @@ fun PlotSelectionDropDownMenu(
                         Text(text = label, style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.Bold))
                     },
                     trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                        IconButton (onClick = { onExpandChange(!expanded) }) {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                        }
                     },
                     modifier = outlinedModifier
                         .height(50.dp)
@@ -104,22 +127,31 @@ fun PlotSelectionDropDownMenu(
                 // DropdownMenu
                 ExposedDropdownMenu(
                     expanded = expanded,
-                    onDismissRequest = { onExpandChange(false) },
-                    modifier = dropDownMenuModifier
+                    onDismissRequest = {},
+                    modifier = dropDownMenuModifier.height(300.dp)
                 ) {
-                    itemList.forEach { option ->
-                        DropdownMenuItem(
-                            text = {
-                                Text(option)
-                            },
-                            onClick = {
-                                onExpandChange(false)
-                                onItemsChange(option)
-                            },
-                            modifier = dropDownItemModifier
-                        )
-                        DropdownDivider()
-                    }
+                        LazyColumn(
+                            state = listState,
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .width(500.dp)
+                                .height(300.dp)
+                        ) {
+                            itemsIndexed(itemList) { index, option ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(text = option)
+                                    },
+                                    onClick = {
+                                        onExpandChange(false)
+                                        onItemsChange(option)
+                                        selectedIndex.intValue = index  // Update the selected index
+                                    },
+                                    modifier = dropDownItemModifier
+                                )
+                                DropdownDivider()
+                            }
+                        }
                 }
             }
         }

@@ -57,7 +57,8 @@ fun DownloadUploadJsonScreen () {
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             val context = LocalContext.current
-            val showDialog = remember { mutableStateOf(false) }
+            val showDownloadDialog = remember { mutableStateOf(false) }
+            val showUploadDialog = remember { mutableStateOf(false) }
             val listOfPlots = remember { mutableStateOf(emptyMap<String, Map<String, List<Pair<String, String>>>>()) }
             Button(
                 modifier = Modifier.padding(5.dp),
@@ -66,20 +67,18 @@ fun DownloadUploadJsonScreen () {
 
                     catalogueApi(coroutineScope, tag) { response: PlotsCatalogueResponse?, log: String ->
                         if (response != null) {
-                            // associate: key-value map
-                            // map: new value in the list
-                            val structuredMap = response.body.data_list.associate {data ->
-                                val deptName = data.dept_name // TODO: 林班層級
-                                val areaName = data.area_name + " (" + data.area_kinds_name + ") "
-                                val locationList = data.location_list.map { location ->
-                                    Pair(location.location_name, location.location_mid)
-                                }
-                                val areaMap = mapOf(areaName to locationList)
-                                deptName to areaMap
+                            val structuredMap = response.body.data_list.groupBy { it.dept_name }.mapValues { (dept, dataList) ->
+                                dataList.map { data ->
+                                    val areaName = "${data.area_name} (${data.area_kinds_name})"
+                                    val locationList = data.location_list.map { location ->
+                                        Pair(location.location_name, location.location_mid)
+                                    }
+                                    areaName to locationList
+                                }.toMap()
                             }
                             listOfPlots.value = structuredMap
-                            Log.d(tag, "listOfPlots: $listOfPlots")
-                            showDialog.value = true
+//                            Log.d(tag, "listOfPlots: $listOfPlots")
+                            showDownloadDialog.value = true
                         } else {
                             Log.d(tag, log)
                             showMessage(context, log)
@@ -95,7 +94,7 @@ fun DownloadUploadJsonScreen () {
                 Text("下載樣區資料")
             }
 
-            if (showDialog.value) {
+            if (showDownloadDialog.value) {
                 ChoosePlotToDownloadDialog(
                     allPlotsInfo = listOfPlots.value,
                     onDownload = {
@@ -105,18 +104,21 @@ fun DownloadUploadJsonScreen () {
                         }
                      },
                     onDismiss = {},
-                    onCancelClick = { showDialog.value = false }
+                    onCancelClick = { showDownloadDialog.value = false }
                 )
             }
 
             Button(
                 modifier = Modifier.padding(5.dp),
                 onClick = {
-                    Log.d(tag, "Button clicked")
-                    uploadPlotDataApi(coroutineScope, tag)
+                    showUploadDialog.value = true
                 }
             ) {
                 Text("上傳樣區資料")
+            }
+            // TODO: Check if data is valid
+            if (showUploadDialog.value) {
+                uploadPlotDataApi(coroutineScope, tag)
             }
         }
     }

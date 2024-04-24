@@ -40,7 +40,8 @@ fun ChoosePlotToDownloadDialog(
                 PlotSelectionDropDownMenu(
                     label = "",
                     allPlotsInfo = allPlotsInfo,
-                    onChoose = { midLocation.value = it })
+                    onChoose = { midLocation.value = it }
+                )
 
                 Row(horizontalArrangement = Arrangement.SpaceEvenly) {
                     Button(
