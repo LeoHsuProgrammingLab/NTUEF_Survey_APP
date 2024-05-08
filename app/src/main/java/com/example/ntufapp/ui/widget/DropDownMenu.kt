@@ -35,6 +35,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ntufapp.api.extractNumber
 import com.example.ntufapp.ui.theme.DropdownDivider
 import com.example.ntufapp.ui.theme.dropDownItemModifier
 import com.example.ntufapp.ui.theme.dropDownMenuModifier
@@ -130,28 +131,30 @@ fun PlotSelectionDropDownMenu(
                     onDismissRequest = {},
                     modifier = dropDownMenuModifier.height(300.dp)
                 ) {
-                        LazyColumn(
-                            state = listState,
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .width(500.dp)
-                                .height(300.dp)
-                        ) {
-                            itemsIndexed(itemList) { index, option ->
-                                DropdownMenuItem(
-                                    text = {
-                                        Text(text = option)
-                                    },
-                                    onClick = {
-                                        onExpandChange(false)
-                                        onItemsChange(option)
-                                        selectedIndex.intValue = index  // Update the selected index
-                                    },
-                                    modifier = dropDownItemModifier
-                                )
-                                DropdownDivider()
-                            }
+                    // SubcomposeLayout
+                    // Should define the height and width (size) of the LazyColumn
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .width(500.dp)
+                            .height(300.dp)
+                    ) {
+                        itemsIndexed(itemList) { index, option ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(text = option)
+                                },
+                                onClick = {
+                                    onExpandChange(false)
+                                    onItemsChange(option)
+                                    selectedIndex.intValue = index  // Update the selected index
+                                },
+                                modifier = dropDownItemModifier
+                            )
+                            DropdownDivider()
                         }
+                    }
                 }
             }
         }
@@ -176,7 +179,7 @@ fun PlotSelectionDropDownMenu(
             onItemsChange = {
                 areaName.value = it
                 locationList.value = listOf("請選擇樣區") + (allPlotsInfo[deptName.value]?.get(it)
-                    ?.map { pair -> pair.first }?.sorted() ?: emptyList())
+                    ?.map { pair -> pair.first }?.sortedWith(compareBy { locationName -> extractNumber(locationName) }) ?: emptyList())
                 location.value = locationList.value.firstOrNull() ?: "尚無"
             }
         )

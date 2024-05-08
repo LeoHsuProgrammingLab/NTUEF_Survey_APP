@@ -4,5 +4,6 @@ data class PlotInfoResponse(
     val body: Body,
     val message: Message,
     val result: Boolean,
-    val statusCode: String
+    val statusCode: String,
+    var location_mid: String = ""
 )

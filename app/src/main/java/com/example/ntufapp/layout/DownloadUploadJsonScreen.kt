@@ -23,12 +23,19 @@ import androidx.compose.ui.unit.dp
 import com.example.ntufapp.R
 import com.example.ntufapp.api.catalogueApi
 import com.example.ntufapp.api.dataType.plotsCatalogueResponse.PlotsCatalogueResponse
+import com.example.ntufapp.api.extractNumber
+import com.example.ntufapp.api.getTodayDate
 import com.example.ntufapp.api.plotApi
+import com.example.ntufapp.api.transformToUploadData
 import com.example.ntufapp.api.uploadPlotDataApi
+import com.example.ntufapp.data.ntufappInfo.Companion.outputDir
 import com.example.ntufapp.ui.theme.LayoutDivider
 import com.example.ntufapp.ui.widget.dialog.ChoosePlotToDownloadDialog
 import com.example.ntufapp.utils.showMessage
+import com.example.ntufapp.utils.writeToJson
+import com.google.gson.Gson
 import kotlinx.coroutines.launch
+import java.io.File
 
 @Composable
 fun DownloadUploadJsonScreen () {
@@ -84,11 +91,6 @@ fun DownloadUploadJsonScreen () {
                             showMessage(context, log)
                         }
                     }
-
-                    // TODO: Dialog with DropdownMenu to select plot and button to get plot data (V)
-                    // TODO: plotApi(coroutineScope, tag, location_mid) (V)
-                    // TODO: show plot data & save to local storage
-                    // TODO: Get the correct data
                 }
             ) {
                 Text("下載樣區資料")
@@ -100,7 +102,24 @@ fun DownloadUploadJsonScreen () {
                     onDownload = {
                         coroutineScope.launch {
                             val plotInfoRsp = plotApi(coroutineScope, tag, it)
-                            // TODO: store the data
+                            val today = getTodayDate()
+                            var plotName = "調查樣區_${today}"
+                            if (plotInfoRsp?.body?.location_info?.location_name != null) {
+                                plotName = plotInfoRsp.body.location_info.location_name + "_" + plotInfoRsp.body.newest_investigation.investigation_date
+                            }
+
+                            // save data to json
+                            val saveJson = transformToUploadData(plotInfoRsp!!)
+                            try {
+                                val file = File(outputDir, "$plotName.json")
+                                val gson = Gson()
+                                val myJson = gson.toJson(saveJson)
+                                writeToJson(file, myJson)
+                                showMessage(context, "檔案${file.absoluteFile.name}儲存成功！\n${file.absoluteFile}")
+                            } catch (e: Exception) {
+                                showMessage(context, "儲存失敗：${e.message}")
+                                e.printStackTrace()
+                            }
                         }
                      },
                     onDismiss = {},

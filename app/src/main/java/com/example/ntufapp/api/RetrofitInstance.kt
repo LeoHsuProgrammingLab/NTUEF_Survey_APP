@@ -103,14 +103,10 @@ suspend fun plotApi(coroutineScope: CoroutineScope, tag: String, locationMid: St
             val responseBody = response.body()?.string()
 
             if (response.isSuccessful) {
-                if (responseBody != null) {
-                    val jsonRsp = JSONObject(responseBody)
-//                    TODO: save the data to local storage
-
-                }
                 val gson = Gson()
                 val plotInfoRsp = gson.fromJson(responseBody, PlotInfoResponse::class.java)
-                Log.d(tag, "response: ${plotInfoRsp.body}")
+                plotInfoRsp.location_mid = locationMid
+                Log.d(tag, "location_mid: $locationMid, response: ${plotInfoRsp.body}")
                 return@async plotInfoRsp
             } else {
                 Log.d(tag, "Unsuccessful! response: $responseBody")
