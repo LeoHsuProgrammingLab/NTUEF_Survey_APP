@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.example.ntufapp.R
 import com.example.ntufapp.api.catalogueApi
 import com.example.ntufapp.api.dataType.plotsCatalogueResponse.PlotsCatalogueResponse
+import com.example.ntufapp.api.dataType.responseToSurveyData.SurveyDataForUpload
 import com.example.ntufapp.api.extractNumber
 import com.example.ntufapp.api.getTodayDate
 import com.example.ntufapp.api.plotApi
@@ -109,11 +110,10 @@ fun DownloadUploadJsonScreen () {
                             }
 
                             // save data to json
-                            val saveJson = transformToUploadData(plotInfoRsp!!)
                             try {
                                 val file = File(outputDir, "$plotName.json")
                                 val gson = Gson()
-                                val myJson = gson.toJson(saveJson)
+                                val myJson = gson.toJson(plotInfoRsp)
                                 writeToJson(file, myJson)
                                 showMessage(context, "檔案${file.absoluteFile.name}儲存成功！\n${file.absoluteFile}")
                             } catch (e: Exception) {
@@ -135,9 +135,10 @@ fun DownloadUploadJsonScreen () {
             ) {
                 Text("上傳樣區資料")
             }
-            // TODO: Check if data is valid
+
             if (showUploadDialog.value) {
-                uploadPlotDataApi(coroutineScope, tag)
+                // TODO: Let user choose the file to upload
+//                uploadPlotDataApi(coroutineScope, tag, SurveyDataForUpload)
             }
         }
     }

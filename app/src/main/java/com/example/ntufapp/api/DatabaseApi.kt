@@ -59,5 +59,5 @@ interface UploadPlotApi {
     )
 
     @POST("/CreateForestLocationInvestigationRecord")
-    suspend fun createInvestigationRecord(@Body surveyData: RequestBody): Response<ResponseBody>
+    suspend fun createInvestigationRecord(@Body requestBody: RequestBody): Response<ResponseBody>
 }

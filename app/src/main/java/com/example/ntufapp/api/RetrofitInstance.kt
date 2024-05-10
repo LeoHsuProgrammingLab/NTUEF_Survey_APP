@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.ntufapp.BuildConfig
 import com.example.ntufapp.api.dataType.plotInfoResponse.PlotInfoResponse
 import com.example.ntufapp.api.dataType.plotsCatalogueResponse.PlotsCatalogueResponse
+import com.example.ntufapp.api.dataType.responseToSurveyData.SurveyDataForUpload
 import com.example.ntufapp.api.dataType.userAndConditionCodeResponse.UserAndConditionCodeResponse
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -106,7 +107,6 @@ suspend fun plotApi(coroutineScope: CoroutineScope, tag: String, locationMid: St
                 val gson = Gson()
                 val plotInfoRsp = gson.fromJson(responseBody, PlotInfoResponse::class.java)
                 plotInfoRsp.location_mid = locationMid
-                Log.d(tag, "location_mid: $locationMid, response: ${plotInfoRsp.body}")
                 return@async plotInfoRsp
             } else {
                 Log.d(tag, "Unsuccessful! response: $responseBody")
@@ -149,9 +149,11 @@ fun userAndConditionCodeApi(coroutineScope: CoroutineScope, tag: String) {
     }
 }
 
-fun uploadPlotDataApi(coroutineScope: CoroutineScope, tag: String, surveyData: String = "") {
+fun uploadPlotDataApi(coroutineScope: CoroutineScope, tag: String, surveyData: SurveyDataForUpload) {
     coroutineScope.launch {
-        val requestBody = surveyData.toRequestBody("application/json".toMediaTypeOrNull())
+        val gson = Gson()
+        val surveyDataJson = gson.toJson(surveyData)
+        val requestBody = surveyDataJson.toRequestBody("application/json".toMediaTypeOrNull())
 
         val response = try {
             RetrofitInstance.uploadPlotDataApiService.createInvestigationRecord(requestBody)
@@ -169,5 +171,4 @@ fun uploadPlotDataApi(coroutineScope: CoroutineScope, tag: String, surveyData: S
             Log.d(tag, "Unsuccessful! response: $response")
         }
     }
-
 }
