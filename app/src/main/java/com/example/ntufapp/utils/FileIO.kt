@@ -9,6 +9,8 @@ import android.provider.OpenableColumns
 import android.provider.Settings
 import android.util.Log
 import androidx.annotation.RequiresApi
+import com.example.ntufapp.api.dataType.plotInfoResponse.PlotInfoResponse
+import com.example.ntufapp.api.transformPlotInfoResponseToPlotData
 import com.example.ntufapp.data.ntufappInfo.Companion.outputDir
 import com.example.ntufapp.model.PlotData
 import com.google.gson.Gson
@@ -22,11 +24,12 @@ fun parseJsonToMetaData(uri: Uri, context: Context): PlotData? {
     val inputStream = context.contentResolver.openInputStream(uri)
     val jsonString = inputStream?.bufferedReader()?.use(BufferedReader::readText)
 
-    return try {
-        Gson().fromJson(jsonString, PlotData::class.java)
+    try {
+        val plotInfoResponse = Gson().fromJson(jsonString, PlotInfoResponse::class.java)
+        return transformPlotInfoResponseToPlotData(plotInfoResponse)
     } catch (e: Exception) {
         // Handle parsing errors here
-        null
+        return null
     } finally {
         // Close the InputStream after use
         inputStream?.close()

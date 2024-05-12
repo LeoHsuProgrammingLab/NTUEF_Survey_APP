@@ -10,6 +10,9 @@ data class Tree(
     var VisHeight: Double = 0.0,
     var MeasHeight: Double = 0.0,
     var ForkHeight: Double = 0.0,
+    var location_sid: String = "",
+    var location_wx: String = "",
+    var location_wy: String = "",
 ) {
     fun clone(): Tree {
         return Tree(

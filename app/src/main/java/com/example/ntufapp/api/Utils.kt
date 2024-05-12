@@ -9,6 +9,7 @@ import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import android.util.Base64
+import com.example.ntufapp.model.PlotData
 import java.io.File
 import java.io.FileInputStream
 import java.text.SimpleDateFormat
@@ -51,6 +52,73 @@ fun transformToUploadData(response: PlotInfoResponse): SurveyDataForUpload {
         location_mid = response.location_mid,
         photo_list = emptyList() // Assuming no photos are updated; adjust as needed
     )
+}
+
+fun transformPlotInfoResponseToPlotData(response: PlotInfoResponse): PlotData {
+    val locationInfo = response.body.location_info
+    val newestInvestigation = response.body.newest_investigation
+
+    val surveyors = newestInvestigation.investigation_user_list.map { it.user_name }.toMutableList()
+    val htSurveyors = listOf(newestInvestigation.investigation_treeHeight_user_list.user_name) // Assuming tree height surveyor is singular
+    val plotData = PlotData(
+        Date = newestInvestigation.investigation_date,
+        ManageUnit = locationInfo.area_name, // Assuming area_code represents the managing unit
+        SubUnit = locationInfo.location_name,
+
+        PlotName = locationInfo.area_kinds_name,
+        PlotNum = locationInfo.area_code,
+        PlotType = locationInfo.location_type_name,
+
+        PlotArea = 0.0,
+        TWD97_X = formatWxWy(locationInfo.location_wx),
+        TWD97_Y = formatWxWy(locationInfo.location_wy),
+
+        Altitude = locationInfo.area_elevation.toDoubleOrNull() ?: 0.0, // Using elevation as altitude for demonstration
+        Slope = locationInfo.area_slope.toDoubleOrNull() ?: 0.0,
+        Aspect = locationInfo.area_aspect,
+
+        Surveyor = surveyors,
+        HtSurveyor = htSurveyors as MutableList<String>,
+        PlotTrees = mutableListOf(), // Additional logic needed to populate trees if applicable
+
+        area_investigation_setup_id = locationInfo.area_investigation_setup_id,
+        location_mid = response.location_mid,
+    )
+
+    plotData.initPlotTrees(response.body.newest_location_count)
+    for (i in plotData.PlotTrees.indices) {
+        plotData.PlotTrees[i].location_sid = newestInvestigation.investigation_record_list[i].location_sid
+    }
+
+    return plotData
+}
+
+fun transformPlotDataToSurveyDataForUpload(plotData: PlotData): SurveyDataForUpload {
+    val investigationRecordList = plotData.PlotTrees.map { tree ->
+        InvestigationRecord(
+            investigation_item_code = , // TODO: using the Condition Code
+            investigation_item_result = ,
+            location_sid = tree.location_sid,
+            location_wx = tree.location_wx,
+            location_wy = tree.location_wy
+        )
+    }
+
+    return SurveyDataForUpload(
+        area_id = plotData.area_id,
+        area_investigation_setup_id = plotData.area_investigation_setup_id,
+        investigation_date = plotData.Date, // TODO
+        investigation_record_list = investigationRecordList,
+        investigation_treeHeight_user = plotData.HtSurveyor.first().toInt(), // TODO: using user code
+        investigation_user = plotData.Surveyor.joinToString(),
+        investigation_year = plotData.Date, // TODO
+        location_mid = plotData.location_mid,
+        photo_list = emptyList() // Assuming no photos are updated; adjust as needed
+    )
+}
+
+fun formatWxWy(w: String): String {
+    return String.format("%.0f", w.toDouble())
 }
 
 fun encodeImageToBase64(imagePath: String): String {

@@ -1,6 +1,7 @@
 package com.example.ntufapp.layout
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -90,7 +91,7 @@ fun PlotOptionsScreen(
                 modifier = Modifier.padding(end = 20.dp),
                 onClick = { showOldPlotUpload.value = true }
             ) {
-                Text("複查樣區", fontSize = 20.sp)
+                Text("開始調查", fontSize = 20.sp)
             }
             // Upload Old Plot by JSON
             if(showOldPlotUpload.value) {
@@ -103,13 +104,12 @@ fun PlotOptionsScreen(
                         if(selectedFileUri.value != null) {
                             try {
                                 plotData.value  = parseJsonToMetaData(selectedFileUri.value!!, context)!!
-                                if(plotData.value.ManageUnit == "" || plotData.value.PlotTrees.size == 0) {
-                                    showMessage(context, "你匯入了錯誤的檔案(.json)！")
-                                } else {
-                                    showOldUploadData.value = true
-                                    outputFilename.value = getFileName(context, selectedFileUri.value)
-                                }
+                                Log.i(tag, "plotData: ${plotData.value}")
+
+                                showOldUploadData.value = true
+                                outputFilename.value = getFileName(context, selectedFileUri.value)
                             } catch (e: Exception) {
+                                Log.i(tag, "exError: $e")
                                 showMessage(context, "檔案解析時發生錯誤！")
                             }
                         } else {
@@ -137,75 +137,77 @@ fun PlotOptionsScreen(
                 )
             }
 
-            // New Plot
-            Button(
-                onClick = { showNewPlotUploadChoices.value = true }
-            ) {
-                Text("新增樣區", fontSize = 20.sp)
-            }
+//            // New Plot
+//            Button(
+//                onClick = { showNewPlotUploadChoices.value = true }
+//            ) {
+//                Text("新增樣區", fontSize = 20.sp)
+//            }
 
-            if (showNewPlotUploadChoices.value) {
-                NewSurveyUploadChoiceDialog(
-                    onDismiss = { showNewPlotUploadChoices.value = false },
-                    onUploadTypeClick = {uploadType ->
-                        if (uploadType == "JSON") {
-                            showNewPlotUpload.value = true
-                        } else {
-                            showNewPlotManualInput.value = true
-                        }
-                        showNewPlotUploadChoices.value = false
-                        surveyType.value = "NewSurvey"
-                    },
-                )
-            }
+//            if (showNewPlotUploadChoices.value) {
+//                NewSurveyUploadChoiceDialog(
+//                    onDismiss = { showNewPlotUploadChoices.value = false },
+//                    onUploadTypeClick = {uploadType ->
+//                        if (uploadType == "JSON") {
+//                            showNewPlotUpload.value = true
+//                        } else {
+//                            showNewPlotManualInput.value = true
+//                        }
+//                        showNewPlotUploadChoices.value = false
+//                        surveyType.value = "NewSurvey"
+//                    },
+//                )
+//            }
             // Upload New Plot by JSON
-            if (showNewPlotUpload.value) {
-                UploadFileDialog(
-                    header = "請匯入樣區資料",
-                    mainButtonText = buttonText.value,
-                    nextButtonText = "匯入",
-                    onDismiss = {},
-                    onSendClick = {
-                        if(selectedFileUri.value != null) {
-                            try {
-                                plotData.value  = parseJsonToMetaData(selectedFileUri.value!!, context)!!
-                                if(plotData.value.ManageUnit == "") {
-                                    showMessage(context, "你匯入了錯誤的檔案(.json)！")
-                                } else {
-                                    showNewUploadData.value = true
-                                    outputFilename.value = getFileName(context, selectedFileUri.value!!)
-                                }
-                            } catch (e: Exception) {
-                                showMessage(context, "檔案解析時發生錯誤！")
-                            }
-                        } else {
-                            showMessage(context, "請選擇JSON檔案")
-                        }
-                        dismissDialog(true)
-                    },
-                    onCancelClick = { dismissDialog(true) },
-                    filePicker = filePickerLauncher
-                )
-            }
+//            if (showNewPlotUpload.value) {
+//                UploadFileDialog(
+//                    header = "請匯入樣區資料",
+//                    mainButtonText = buttonText.value,
+//                    nextButtonText = "匯入",
+//                    onDismiss = {},
+//                    onSendClick = {
+//                        if(selectedFileUri.value != null) {
+//                            try {
+//                                plotData.value  = parseJsonToMetaData(selectedFileUri.value!!, context)!!
+//
+//                                if(plotData.value.ManageUnit == "") {
+//                                    showMessage(context, "你匯入了錯誤的檔案(.json)！")
+//                                } else {
+//                                    showNewUploadData.value = true
+//                                    outputFilename.value = getFileName(context, selectedFileUri.value!!)
+//                                }
+//                            } catch (e: Exception) {
+//                                Log.d(tag, "exError: ${e.message}")
+//                                showMessage(context, "檔案解析時發生錯誤！")
+//                            }
+//                        } else {
+//                            showMessage(context, "請選擇JSON檔案")
+//                        }
+//                        dismissDialog(true)
+//                    },
+//                    onCancelClick = { dismissDialog(true) },
+//                    filePicker = filePickerLauncher
+//                )
+//            }
+//
+//
+//            if (showNewUploadData.value) {
+//                GeneralConfirmDialog(
+//                    reminder = confirmHeader,
+//                    confirmText = stringResource(id = R.string.next),
+//                    onDismiss = {},
+//                    onCancelClick = { showNewUploadData.value = false },
+//                    onConfirmClick = { onNextButtonClick(plotData.value, surveyType.value, outputFilename.value) }
+//                )
+//            }
 
-
-            if (showNewUploadData.value) {
-                GeneralConfirmDialog(
-                    reminder = confirmHeader,
-                    confirmText = stringResource(id = R.string.next),
-                    onDismiss = {},
-                    onCancelClick = { showNewUploadData.value = false },
-                    onConfirmClick = { onNextButtonClick(plotData.value, surveyType.value, outputFilename.value) }
-                )
-            }
-
-            // Manual Input New Plot
-            if (showNewPlotManualInput.value) {
-                ManualInputNewPlotDialog(
-                    onDismiss = { showNewPlotManualInput.value = false },
-                    onSendClick = { onNextButtonClick(it, surveyType.value, "") }
-                )
-            }
+//            // Manual Input New Plot
+//            if (showNewPlotManualInput.value) {
+//                ManualInputNewPlotDialog(
+//                    onDismiss = { showNewPlotManualInput.value = false },
+//                    onSendClick = { onNextButtonClick(it, surveyType.value, "") }
+//                )
+//            }
         }
     }
 }

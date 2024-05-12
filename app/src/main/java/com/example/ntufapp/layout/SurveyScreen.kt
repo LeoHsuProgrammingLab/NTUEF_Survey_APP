@@ -47,7 +47,7 @@ fun NewSurveyScreen(
     // // Store all the tree numbers in ReSurvey Layout
     val treeNumList = mutableListOf<String>()
     if (newPlotDataState.value.PlotTrees.size == 0) {
-        newPlotDataState.value.initPlotTrees()
+        newPlotDataState.value.initPlotTrees(defaultTreeNum)
         for (i in 0 until defaultTreeNum) {
             treeNumList.add((i + 1).toString())
         }

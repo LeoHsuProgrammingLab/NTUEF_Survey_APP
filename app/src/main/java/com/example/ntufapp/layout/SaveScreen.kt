@@ -78,18 +78,19 @@ fun SaveScreen(
                 OutlinedButton(
                     modifier = modifier,
                     onClick = {
-                        val lastIndexToKeep = newPlotData.PlotTrees.findLast {
-                            it.State.isNotEmpty() &&
-                            it.Species.isNotEmpty() &&
-                            it.DBH != 0.0 &&
-                            it.MeasHeight != 0.0 &&
-                            it.VisHeight != 0.0 &&
-                            it.ForkHeight != 0.0
-                        }
-                        if (lastIndexToKeep != null) {
-                            newPlotData.PlotTrees = newPlotData.PlotTrees.subList(0, lastIndexToKeep.SampleNum)
-                        }
+//                        val lastIndexToKeep = newPlotData.PlotTrees.findLast {
+//                            it.State.isNotEmpty() &&
+//                            it.Species.isNotEmpty() &&
+//                            it.DBH != 0.0 &&
+//                            it.MeasHeight != 0.0 &&
+//                            it.VisHeight != 0.0 &&
+//                            it.ForkHeight != 0.0
+//                        }
+//                        if (lastIndexToKeep != null) {
+//                            newPlotData.PlotTrees = newPlotData.PlotTrees.subList(0, lastIndexToKeep.SampleNum)
+//                        }
                         showOverwriteDialog.value = checkIfFileExists(context, validFilename)
+
                         if (!showOverwriteDialog.value) {
                             currentFilename.value = validFilename
                             saveFile(context, newPlotData, outputDir = outputDir, validFilename = currentFilename.value)

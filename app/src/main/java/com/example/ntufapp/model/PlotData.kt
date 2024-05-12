@@ -23,7 +23,11 @@ data class PlotData(
 
     var Surveyor: MutableList<String> = mutableListOf(), // 1
     var HtSurveyor: MutableList<String> = mutableListOf(), // 3
-    var PlotTrees: MutableList<Tree> = mutableListOf()
+    var PlotTrees: MutableList<Tree> = mutableListOf(),
+
+    var area_id: String = "",
+    var area_investigation_setup_id: String = "",
+    var location_mid: String = "",
 ) {
    fun setToday() {
        val today: LocalDate = LocalDate.now()
@@ -57,9 +61,9 @@ data class PlotData(
         PlotTrees.forEach { it.reset() }
     }
 
-    fun initPlotTrees() {
+    fun initPlotTrees(treeNumber: Int) {
         PlotTrees.clear()
-        PlotTrees.addAll((1..defaultTreeNum).map { Tree(SampleNum = it) })
+        PlotTrees.addAll((1..treeNumber).map { Tree(SampleNum = it) })
     }
 }
 
