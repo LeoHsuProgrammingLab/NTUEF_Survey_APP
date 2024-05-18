@@ -128,7 +128,7 @@ fun NTUEFApp(
 
                     if (isShowConfirmDialog.value) {
                         GeneralConfirmDialog(
-                            reminder = "確定要離開嗎？將會遺失所有為儲存資料！",
+                            reminder = "確定要離開嗎？將會遺失所有未儲存資料！",
                             confirmText = stringResource(R.string.leave),
                             onDismiss = {
                                 isShowConfirmDialog.value = false

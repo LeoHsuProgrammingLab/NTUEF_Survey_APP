@@ -6,6 +6,7 @@ import kotlin.math.abs
 
 data class PlotData(
     var Date: String = "",
+    var Year: String = "",
     var ManageUnit: String = "",
     var SubUnit: String = "", //1-55
 

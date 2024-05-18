@@ -47,7 +47,7 @@ import com.example.ntufapp.ui.theme.dropDownMenuModifier
 fun PlotSelectionDropDownMenu(
     label: String,
     allPlotsInfo: Map<String, Map<String, List<Pair<String, String>>>>, // dept_name to (area_name to Pair<location_name, location_mid>)
-    onChoose: (String) -> Unit,
+    onChoose: (String, String) -> Unit,
     widthType: String = "large",
 ) {
     val deptNameDropdownExpanded = remember { mutableStateOf(false) }
@@ -63,7 +63,7 @@ fun PlotSelectionDropDownMenu(
     }
     val areaName = remember { mutableStateOf("請選擇試驗地") }
 
-    // TODO: 林班地
+    // Warning: 林班地
     // locationList contains all the location_name in the selected area
     val locationList = remember { // List of location_name
         mutableStateOf(listOf("請選擇樣區") + (allPlotsInfo[deptName.value]?.get(areaName.value)?.map { it.first } ?: emptyList()))
@@ -192,7 +192,8 @@ fun PlotSelectionDropDownMenu(
             onItemsChange = {
                 location.value = it
                 onChoose(
-                    allPlotsInfo[deptName.value]?.get(areaName.value)?.find { pair -> pair.first == it }?.second ?: ""
+                    allPlotsInfo[deptName.value]?.get(areaName.value)?.find { pair -> pair.first == it }?.second ?: "",
+                    deptName.value
                 )
             }
         )

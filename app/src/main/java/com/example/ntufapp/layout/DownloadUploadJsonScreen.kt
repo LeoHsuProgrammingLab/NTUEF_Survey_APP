@@ -1,7 +1,10 @@
 package com.example.ntufapp.layout
 
+import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,15 +26,18 @@ import androidx.compose.ui.unit.dp
 import com.example.ntufapp.R
 import com.example.ntufapp.api.catalogueApi
 import com.example.ntufapp.api.dataType.plotsCatalogueResponse.PlotsCatalogueResponse
-import com.example.ntufapp.api.dataType.responseToSurveyData.SurveyDataForUpload
-import com.example.ntufapp.api.extractNumber
+import com.example.ntufapp.api.dataType.userAndConditionCodeResponse.User
+import com.example.ntufapp.api.dataType.userAndConditionCodeResponse.UserCode
 import com.example.ntufapp.api.getTodayDate
 import com.example.ntufapp.api.plotApi
-import com.example.ntufapp.api.transformToUploadData
 import com.example.ntufapp.api.uploadPlotDataApi
+import com.example.ntufapp.api.userAndConditionCodeApi
 import com.example.ntufapp.data.ntufappInfo.Companion.outputDir
 import com.example.ntufapp.ui.theme.LayoutDivider
 import com.example.ntufapp.ui.widget.dialog.ChoosePlotToDownloadDialog
+import com.example.ntufapp.ui.widget.dialog.UploadFileDialog
+import com.example.ntufapp.utils.getFileName
+import com.example.ntufapp.utils.parseJsonToSurveyDataForUpload
 import com.example.ntufapp.utils.showMessage
 import com.example.ntufapp.utils.writeToJson
 import com.google.gson.Gson
@@ -71,21 +77,20 @@ fun DownloadUploadJsonScreen () {
             Button(
                 modifier = Modifier.padding(5.dp),
                 onClick = {
-                    Log.d(tag, "Button clicked")
+                    Log.d(tag, "Download Info Button clicked")
 
                     catalogueApi(coroutineScope, tag) { response: PlotsCatalogueResponse?, log: String ->
                         if (response != null) {
                             val structuredMap = response.body.data_list.groupBy { it.dept_name }.mapValues { (dept, dataList) ->
-                                dataList.map { data ->
+                                dataList.associate { data ->
                                     val areaName = "${data.area_name} (${data.area_kinds_name})"
                                     val locationList = data.location_list.map { location ->
                                         Pair(location.location_name, location.location_mid)
                                     }
                                     areaName to locationList
-                                }.toMap()
+                                }
                             }
                             listOfPlots.value = structuredMap
-//                            Log.d(tag, "listOfPlots: $listOfPlots")
                             showDownloadDialog.value = true
                         } else {
                             Log.d(tag, log)
@@ -100,21 +105,26 @@ fun DownloadUploadJsonScreen () {
             if (showDownloadDialog.value) {
                 ChoosePlotToDownloadDialog(
                     allPlotsInfo = listOfPlots.value,
-                    onDownload = {
+                    onDownload = { location_mid, dept_name ->
                         coroutineScope.launch {
-                            val plotInfoRsp = plotApi(coroutineScope, tag, it)
+                            val userAndConditionCodeResponse = userAndConditionCodeApi(coroutineScope, tag)
+                            val plotInfoRsp = plotApi(coroutineScope, tag, location_mid)
                             val today = getTodayDate()
-                            var plotName = "調查樣區_${today}"
+                            var plotName = "${dept_name}_調查樣區_${today}"
                             if (plotInfoRsp?.body?.location_info?.location_name != null) {
                                 plotName = plotInfoRsp.body.location_info.location_name + "_" + plotInfoRsp.body.newest_investigation.investigation_date
                             }
 
+                            if (plotInfoRsp != null) {
+                                plotInfoRsp.userList = extractUserListWithDeptName(userAndConditionCodeResponse?.body?.user_code_list!!, dept_name)
+                            }
+
                             // save data to json
                             try {
-                                val file = File(outputDir, "$plotName.json")
+                                val file = File(outputDir, "${dept_name}_$plotName.json")
                                 val gson = Gson()
                                 val myJson = gson.toJson(plotInfoRsp)
-                                writeToJson(file, myJson)
+                                writeToJson(context, file, myJson)
                                 showMessage(context, "檔案${file.absoluteFile.name}儲存成功！\n${file.absoluteFile}")
                             } catch (e: Exception) {
                                 showMessage(context, "儲存失敗：${e.message}")
@@ -136,10 +146,52 @@ fun DownloadUploadJsonScreen () {
                 Text("上傳樣區資料")
             }
 
+            val selectedFileUri = remember { mutableStateOf<Uri?>(null) }
+            val buttonText = remember { mutableStateOf("請選擇JSON檔案") }
+            val filePickerLauncher = rememberLauncherForActivityResult(
+                ActivityResultContracts.GetContent()) { uri: Uri? ->
+                selectedFileUri.value = uri
+                buttonText.value = getFileName(context, uri).takeIf { it.isNotEmpty() } ?: "請選擇JSON檔案"
+            }
+
             if (showUploadDialog.value) {
-                // TODO: Let user choose the file to upload
-//                uploadPlotDataApi(coroutineScope, tag, SurveyDataForUpload)
+                UploadFileDialog(
+                    filePicker = filePickerLauncher,
+                    header = "請上傳完成調查之樣區",
+                    mainButtonText = buttonText.value,
+                    nextButtonText = "上傳",
+                    onDismiss = {},
+                    onSendClick = {
+                        if (selectedFileUri.value != null) {
+                            coroutineScope.launch {
+                                try {
+                                    val surveyDataForUpload = parseJsonToSurveyDataForUpload(selectedFileUri.value!!, context)
+                                    val uploadResponse = uploadPlotDataApi(coroutineScope, tag, surveyDataForUpload!!)
+                                    Log.d(tag, "uploadResponse: $uploadResponse")
+                                } catch (e: Exception) {
+                                    Log.i(tag, "exError: $e")
+                                    showMessage(context, "檔案解析時發生錯誤！")
+                                }
+                            }
+                        } else {
+                            showMessage(context, "請選擇JSON檔案")
+                        }
+                        showUploadDialog.value = false
+                    },
+                    onCancelClick = {
+                        buttonText.value = "請選擇JSON檔案"
+                        showUploadDialog.value = false
+                    }
+                )
             }
         }
+    }
+}
+
+fun extractUserListWithDeptName(userCodeList: List<UserCode>, TargetDeptName: String): List<User> {
+    return userCodeList.filter {
+        it.dept_name == TargetDeptName
+    }.flatMap {
+        it.user_list
     }
 }

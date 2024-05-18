@@ -4,12 +4,12 @@ import android.util.Log
 import com.example.ntufapp.BuildConfig
 import com.example.ntufapp.api.dataType.plotInfoResponse.PlotInfoResponse
 import com.example.ntufapp.api.dataType.plotsCatalogueResponse.PlotsCatalogueResponse
-import com.example.ntufapp.api.dataType.responseToSurveyData.SurveyDataForUpload
+import com.example.ntufapp.api.dataType.surveyDataForUpload.SurveyDataForUpload
+import com.example.ntufapp.api.dataType.uploadDataResponse.uploadDataResponse
 import com.example.ntufapp.api.dataType.userAndConditionCodeResponse.UserAndConditionCodeResponse
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -17,9 +17,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.Response
 import okhttp3.ResponseBody
-import org.json.JSONObject
 import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -125,50 +123,60 @@ suspend fun plotApi(coroutineScope: CoroutineScope, tag: String, locationMid: St
     }.await()
 }
 
-fun userAndConditionCodeApi(coroutineScope: CoroutineScope, tag: String) {
-    coroutineScope.launch {
+suspend fun userAndConditionCodeApi(coroutineScope: CoroutineScope, tag: String): UserAndConditionCodeResponse? {
+    return coroutineScope.async {
         val requestBody = createRequestBody(listOf("token" to BuildConfig.API_PARAMS_TOKEN))
+        try {
+            val response = withContext(Dispatchers.Default) {
+                RetrofitInstance.systemCodeApiService.getUserAndConditionCodeList(requestBody)
+            }
+            val responseBody = response.body()?.string()
 
-        val response = try {
-            RetrofitInstance.systemCodeApiService.getUserAndConditionCodeList(requestBody)
+            if (response.isSuccessful) {
+                val gson = Gson()
+                return@async gson.fromJson<UserAndConditionCodeResponse?>(
+                    responseBody,
+                    UserAndConditionCodeResponse::class.java
+                )
+            } else {
+                Log.d(tag, "Unsuccessful! response: $responseBody")
+                return@async null
+            }
         } catch (e: IOException) {
             Log.e(tag, "IOException: ${e.message}, you might not have internet connection, you gotta check it")
-            return@launch
+            return@async null
         } catch (e: HttpException) {
             Log.e(tag, "HttpException: ${e.message}, unexpected http response")
-            return@launch
+            return@async null
         }
-
-        if (response.isSuccessful) {
-            val gson = Gson()
-            val userAndConditionCodeRsp = gson.fromJson(response.body()?.string(), UserAndConditionCodeResponse::class.java)
-            Log.d(tag, "response: ${userAndConditionCodeRsp.body}")
-        } else {
-            Log.d(tag, "Unsuccessful! response: $response")
-        }
-    }
+    }.await()
 }
 
-fun uploadPlotDataApi(coroutineScope: CoroutineScope, tag: String, surveyData: SurveyDataForUpload) {
-    coroutineScope.launch {
+suspend fun uploadPlotDataApi(coroutineScope: CoroutineScope, tag: String, surveyData: SurveyDataForUpload): uploadDataResponse {
+    return coroutineScope.async {
         val gson = Gson()
         val surveyDataJson = gson.toJson(surveyData)
         val requestBody = surveyDataJson.toRequestBody("application/json".toMediaTypeOrNull())
 
-        val response = try {
-            RetrofitInstance.uploadPlotDataApiService.createInvestigationRecord(requestBody)
+        try {
+            val response = withContext(Dispatchers.Default) {
+                RetrofitInstance.uploadPlotDataApiService.createInvestigationRecord(requestBody)
+            }
+            val responseBody = response.body()?.string()
+
+            if (response.isSuccessful) {
+                val uploadDataRsp = gson.fromJson(responseBody, uploadDataResponse::class.java)
+                return@async uploadDataRsp
+            } else {
+                Log.d(tag, "Unsuccessful! response: ${response.body()?.string()}")
+                throw HttpException(response)
+            }
         } catch (e: IOException) {
             Log.e(tag, "IOException: ${e.message}, you might not have internet connection, you gotta check it")
-            return@launch
+            throw e
         } catch (e: HttpException) {
             Log.e(tag, "HttpException: ${e.message}, unexpected http response")
-            return@launch
+            throw e
         }
-
-        if (response.isSuccessful) {
-            Log.d(tag, "response: ${response.body()?.string()}")
-        } else {
-            Log.d(tag, "Unsuccessful! response: $response")
-        }
-    }
+    }.await()
 }

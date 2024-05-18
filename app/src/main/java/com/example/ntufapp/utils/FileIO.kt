@@ -2,6 +2,7 @@ package com.example.ntufapp.utils
 
 import android.content.Context
 import android.content.Intent
+import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -10,6 +11,8 @@ import android.provider.Settings
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.example.ntufapp.api.dataType.plotInfoResponse.PlotInfoResponse
+import com.example.ntufapp.api.dataType.surveyDataForUpload.SurveyDataForUpload
+import com.example.ntufapp.api.transformPlotDataToSurveyDataForUpload
 import com.example.ntufapp.api.transformPlotInfoResponseToPlotData
 import com.example.ntufapp.data.ntufappInfo.Companion.outputDir
 import com.example.ntufapp.model.PlotData
@@ -20,13 +23,29 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 
-fun parseJsonToMetaData(uri: Uri, context: Context): PlotData? {
+fun parseJsonToPlotData(uri: Uri, context: Context): PlotData? {
     val inputStream = context.contentResolver.openInputStream(uri)
     val jsonString = inputStream?.bufferedReader()?.use(BufferedReader::readText)
 
     try {
         val plotInfoResponse = Gson().fromJson(jsonString, PlotInfoResponse::class.java)
         return transformPlotInfoResponseToPlotData(plotInfoResponse)
+    } catch (e: Exception) {
+        // Handle parsing errors here
+        return null
+    } finally {
+        // Close the InputStream after use
+        inputStream?.close()
+    }
+}
+
+fun parseJsonToSurveyDataForUpload(uri: Uri, context: Context): SurveyDataForUpload? {
+    val inputStream = context.contentResolver.openInputStream(uri)
+    val jsonString = inputStream?.bufferedReader()?.use(BufferedReader::readText)
+
+    try {
+        val surveyDataForUpload = Gson().fromJson(jsonString, SurveyDataForUpload::class.java)
+        return surveyDataForUpload
     } catch (e: Exception) {
         // Handle parsing errors here
         return null
@@ -80,9 +99,10 @@ fun saveFile(context: Context, plotData: PlotData, outputDir: File, validFilenam
                 writeToCSV(file, flattenedPlotData)
             } else {
                 // Read the Json data
+                val uploadPlotData = transformPlotDataToSurveyDataForUpload(plotData)
                 val gson = Gson()
-                val myJson = gson.toJson(plotData)
-                writeToJson(file, myJson)
+                val myJson = gson.toJson(uploadPlotData)
+                writeToJson(context, file, myJson)
             }
             showMessage(context, "檔案${file.absoluteFile.name}儲存成功！\n${file.absoluteFile}")
         } catch (e: IOException) {
@@ -115,10 +135,15 @@ fun writeToCSV(outputFile: File, flattenedPlotData: List<List<String>>) {
     fileOutputStream.close()
 }
 
-fun writeToJson(outputFile: File, jsonString: String) {
+fun writeToJson(context: Context, outputFile: File, jsonString: String) {
     val fileOutputStream = FileOutputStream(outputFile)
     fileOutputStream.write(jsonString.toByteArray())
+    notifyMediaScanner(context, outputFile)
     fileOutputStream.close()
+}
+
+fun notifyMediaScanner(context: Context, file: File) {
+    MediaScannerConnection.scanFile(context, arrayOf(file.toString()), null, null)
 }
 
 fun getFileName(context: Context, uri: Uri?): String {

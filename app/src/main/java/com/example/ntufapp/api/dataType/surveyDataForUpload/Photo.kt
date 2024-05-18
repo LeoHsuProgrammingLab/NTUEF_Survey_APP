@@ -1,4 +1,4 @@
-package com.example.ntufapp.api.dataType.responseToSurveyData
+package com.example.ntufapp.api.dataType.surveyDataForUpload
 
 data class Photo(
     val file_name: String,

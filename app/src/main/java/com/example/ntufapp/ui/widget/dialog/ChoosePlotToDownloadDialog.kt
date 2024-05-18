@@ -22,11 +22,12 @@ import com.example.ntufapp.utils.showMessage
 @Composable
 fun ChoosePlotToDownloadDialog(
     allPlotsInfo: Map<String, Map<String, List<Pair<String, String>>>>,
-    onDownload: (String) -> Unit,
+    onDownload: (String, String) -> Unit,
     onDismiss: () -> Unit,
     onCancelClick: () -> Unit
 ) {
-    val midLocation = remember { mutableStateOf("") }
+    val locationMid = remember { mutableStateOf("") }
+    val deptName = remember { mutableStateOf("") }
     val context = LocalContext.current
     Dialog(
         onDismissRequest = { onDismiss.invoke() },
@@ -40,7 +41,10 @@ fun ChoosePlotToDownloadDialog(
                 PlotSelectionDropDownMenu(
                     label = "",
                     allPlotsInfo = allPlotsInfo,
-                    onChoose = { midLocation.value = it }
+                    onChoose = { location_mid, dept_name ->
+                        locationMid.value = location_mid
+                        deptName.value = dept_name
+                    }
                 )
 
                 Row(horizontalArrangement = Arrangement.SpaceEvenly) {
@@ -52,12 +56,12 @@ fun ChoosePlotToDownloadDialog(
                     ) {
                         Text(stringResource(id = R.string.cancel))
                     }
+                    
                     Button(
                         modifier = basicModifier,
                         onClick = {
-//                        Log.d("LoadJsonScreen", midLocation.value);
-                            if (midLocation.value != "") {
-                                onDownload(midLocation.value)
+                            if (locationMid.value != "") {
+                                onDownload(locationMid.value, deptName.value)
                             } else {
                                 showMessage(context, "請選擇樣區!")
                             }

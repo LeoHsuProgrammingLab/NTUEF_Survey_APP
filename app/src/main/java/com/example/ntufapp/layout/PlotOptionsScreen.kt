@@ -26,13 +26,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ntufapp.R
 import com.example.ntufapp.model.PlotData
-import com.example.ntufapp.ui.widget.dialog.ManualInputNewPlotDialog
-import com.example.ntufapp.ui.widget.dialog.NewSurveyUploadChoiceDialog
 import com.example.ntufapp.ui.widget.dialog.UploadFileDialog
 import com.example.ntufapp.ui.theme.LayoutDivider
 import com.example.ntufapp.ui.widget.dialog.GeneralConfirmDialog
 import com.example.ntufapp.utils.getFileName
-import com.example.ntufapp.utils.parseJsonToMetaData
+import com.example.ntufapp.utils.parseJsonToPlotData
 import com.example.ntufapp.utils.showMessage
 
 @Composable
@@ -103,9 +101,7 @@ fun PlotOptionsScreen(
                     onSendClick = {
                         if(selectedFileUri.value != null) {
                             try {
-                                plotData.value  = parseJsonToMetaData(selectedFileUri.value!!, context)!!
-                                Log.i(tag, "plotData: ${plotData.value}")
-
+                                plotData.value  = parseJsonToPlotData(selectedFileUri.value!!, context)!!
                                 showOldUploadData.value = true
                                 outputFilename.value = getFileName(context, selectedFileUri.value)
                             } catch (e: Exception) {

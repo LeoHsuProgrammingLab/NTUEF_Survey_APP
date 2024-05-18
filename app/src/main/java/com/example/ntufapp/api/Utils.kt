@@ -1,9 +1,9 @@
 package com.example.ntufapp.api
 
 import com.example.ntufapp.api.dataType.plotInfoResponse.PlotInfoResponse
-import com.example.ntufapp.api.dataType.responseToSurveyData.InvestigationRecord
-import com.example.ntufapp.api.dataType.responseToSurveyData.Photo
-import com.example.ntufapp.api.dataType.responseToSurveyData.SurveyDataForUpload
+import com.example.ntufapp.api.dataType.surveyDataForUpload.InvestigationRecord
+import com.example.ntufapp.api.dataType.surveyDataForUpload.Photo
+import com.example.ntufapp.api.dataType.surveyDataForUpload.SurveyDataForUpload
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -26,33 +26,33 @@ fun createRequestBody(jsonContent: List<Pair<String, String>>): RequestBody {
     return jsonString.toRequestBody("application/json".toMediaTypeOrNull())
 }
 
-fun transformToUploadData(response: PlotInfoResponse): SurveyDataForUpload {
-    val body = response.body
-    val newestInvestigation = body.newest_investigation
-    val investigationRecordList = newestInvestigation.investigation_record_list.flatMap { record ->
-        record.investigation_result_list.map {result ->
-            InvestigationRecord(
-                investigation_item_code = result.investigation_item_code,
-                investigation_item_result = result.investigation_result,
-                location_sid = record.location_sid,
-                location_wx = body.location_info.location_wx,
-                location_wy = body.location_info.location_wy
-            )
-        }
-    }
-
-    return SurveyDataForUpload(
-        area_id = body.location_info.area_id,
-        area_investigation_setup_id = body.location_info.area_investigation_setup_id,
-        investigation_date = newestInvestigation.investigation_date,
-        investigation_record_list = investigationRecordList,
-        investigation_treeHeight_user = newestInvestigation.investigation_treeHeight_user_list.user_id,
-        investigation_user = newestInvestigation.investigation_user_list.firstOrNull()?.user_name?: "", // Use empty string if no user is found
-        investigation_year = newestInvestigation.investigation_year,
-        location_mid = response.location_mid,
-        photo_list = emptyList() // Assuming no photos are updated; adjust as needed
-    )
-}
+//fun transformToUploadData(response: PlotInfoResponse): SurveyDataForUpload {
+//    val body = response.body
+//    val newestInvestigation = body.newest_investigation
+//    val investigationRecordList = newestInvestigation.investigation_record_list.flatMap { record ->
+//        record.investigation_result_list.map {result ->
+//            InvestigationRecord(
+//                investigation_item_code = result.investigation_item_code,
+//                investigation_item_result = result.investigation_result,
+//                location_sid = record.location_sid,
+//                location_wx = body.location_info.location_wx,
+//                location_wy = body.location_info.location_wy
+//            )
+//        }
+//    }
+//
+//    return SurveyDataForUpload(
+//        area_id = body.location_info.area_id,
+//        area_investigation_setup_id = body.location_info.area_investigation_setup_id,
+//        investigation_date = newestInvestigation.investigation_date,
+//        investigation_record_list = investigationRecordList,
+//        investigation_treeHeight_user = newestInvestigation.investigation_treeHeight_user_list.user_id,
+//        investigation_user = newestInvestigation.investigation_user_list.firstOrNull()?.user_name?: "", // Use empty string if no user is found
+//        investigation_year = newestInvestigation.investigation_year,
+//        location_mid = response.location_mid,
+//        photo_list = emptyList() // Assuming no photos are updated; adjust as needed
+//    )
+//}
 
 fun transformPlotInfoResponseToPlotData(response: PlotInfoResponse): PlotData {
     val locationInfo = response.body.location_info
@@ -62,6 +62,7 @@ fun transformPlotInfoResponseToPlotData(response: PlotInfoResponse): PlotData {
     val htSurveyors = listOf(newestInvestigation.investigation_treeHeight_user_list.user_name) // Assuming tree height surveyor is singular
     val plotData = PlotData(
         Date = newestInvestigation.investigation_date,
+        Year = newestInvestigation.investigation_year,
         ManageUnit = locationInfo.area_name, // Assuming area_code represents the managing unit
         SubUnit = locationInfo.location_name,
 
@@ -94,24 +95,40 @@ fun transformPlotInfoResponseToPlotData(response: PlotInfoResponse): PlotData {
 }
 
 fun transformPlotDataToSurveyDataForUpload(plotData: PlotData): SurveyDataForUpload {
-    val investigationRecordList = plotData.PlotTrees.map { tree ->
-        InvestigationRecord(
-            investigation_item_code = , // TODO: using the Condition Code
-            investigation_item_result = ,
-            location_sid = tree.location_sid,
-            location_wx = tree.location_wx,
-            location_wy = tree.location_wy
+    val investigationRecordList = plotData.PlotTrees.flatMap { tree ->
+        listOf(
+            InvestigationRecord(
+                investigation_item_code = "1",
+                investigation_item_result = tree.MeasHeight.toString(),
+                location_sid = tree.location_sid,
+                location_wx = tree.location_wx,
+                location_wy = tree.location_wy
+            ),
+            InvestigationRecord(
+                investigation_item_code = "5",
+                investigation_item_result = tree.DBH.toString(),
+                location_sid = tree.location_sid,
+                location_wx = tree.location_wx,
+                location_wy = tree.location_wy
+            ),
+            InvestigationRecord(
+                investigation_item_code = "8",
+                investigation_item_result = tree.State.joinToString(),
+                location_sid = tree.location_sid,
+                location_wx = tree.location_wx,
+                location_wy = tree.location_wy
+            ),
         )
     }
 
     return SurveyDataForUpload(
         area_id = plotData.area_id,
         area_investigation_setup_id = plotData.area_investigation_setup_id,
-        investigation_date = plotData.Date, // TODO
-        investigation_record_list = investigationRecordList,
-        investigation_treeHeight_user = plotData.HtSurveyor.first().toInt(), // TODO: using user code
+        investigation_date = plotData.Date,
+        investigation_record_list = investigationRecordList, // TODO
+        investigation_treeHeight_user = 1, // TODO: using user code
         investigation_user = plotData.Surveyor.joinToString(),
-        investigation_year = plotData.Date, // TODO
+        investigation_year = plotData.Date.substring(0, 4),
         location_mid = plotData.location_mid,
         photo_list = emptyList() // Assuming no photos are updated; adjust as needed
     )
