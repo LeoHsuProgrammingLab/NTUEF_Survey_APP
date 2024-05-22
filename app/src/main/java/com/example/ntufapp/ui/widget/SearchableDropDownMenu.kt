@@ -283,9 +283,11 @@ fun SearchableChooseCheckMenu(
     label: String = "搜尋",
     readOnly: Boolean = false,
     onChoose: (String) -> Unit,
+    onUpdateList: (List<String>) -> Unit,
     checkable: Boolean = false
 ) {
     val options = remember { mutableStateListOf<String>() }
+    val mutableOptions = remember { mutableStateListOf<String>() }
     val searchText = remember { mutableStateOf(defaultString) }
     val dropdownExpanded = remember { mutableStateOf(false) }
 
@@ -334,7 +336,7 @@ fun SearchableChooseCheckMenu(
                 modifier = dropDownMenuModifier
             ) {
                 if (checkable) {
-                    SelectableItemList(totalItemsList = options)
+                    SelectableItemList(totalItemsList = options, selectedItems = mutableOptions, onUpdateList = onUpdateList)
                 } else {
                     ReadItemList(
                         totalItemsList = options,
@@ -371,18 +373,16 @@ fun ReadItemList(
 }
 
 @Composable
-fun SelectableItemList(totalItemsList: List<String>) {
-    val selectedItems = remember { mutableStateListOf<String>() }
-
+fun SelectableItemList(totalItemsList: List<String>, selectedItems: MutableList<String>, onUpdateList: (List<String>) -> Unit) {
     Column(modifier = Modifier.padding(16.dp)) {
         totalItemsList.forEach { item ->
-            SelectableItem(item = item, selectedItems = selectedItems)
+            SelectableItem(item = item, selectedItems = selectedItems, onUpdateList = onUpdateList)
         }
     }
 }
 
 @Composable
-fun SelectableItem(item: String, selectedItems: MutableList<String>) {
+fun SelectableItem(item: String, selectedItems: MutableList<String>, onUpdateList: (List<String>) -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -404,6 +404,7 @@ fun SelectableItem(item: String, selectedItems: MutableList<String>) {
                 } else {
                     selectedItems.remove(item)
                 }
+                onUpdateList(selectedItems)
             },
             modifier = Modifier.size(24.dp)
         )

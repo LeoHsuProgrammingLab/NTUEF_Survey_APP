@@ -64,6 +64,10 @@ fun MetaDateView(newPlotData: PlotData) {
                 onChoose = {
 
                 },
+                onUpdateList = { stringList ->
+                    newPlotData.Surveyor = stringList.associate { it.split(":")[0].toInt() to it.split(":")[1] }
+                },
+                checkable = true
             )
             SearchableChooseCheckMenu(
                 mutableListOf(newPlotData.HtSurveyor.first.toString() + ": " + newPlotData.HtSurveyor.second),
@@ -73,6 +77,7 @@ fun MetaDateView(newPlotData: PlotData) {
                 onChoose = {
 
                 },
+                onUpdateList = {}
             )
         }
     }
