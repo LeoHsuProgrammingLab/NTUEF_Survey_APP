@@ -49,8 +49,8 @@ fun flattenPlotData(plotData: PlotData): List<List<String>> {
             plotData.Altitude.toString(),
             plotData.Slope.toString(),
             plotData.Aspect,
-            plotData.Surveyor.joinToString(";"),
-            plotData.HtSurveyor.joinToString(";"),
+            plotData.Surveyor.map{"${it.key}: ${it.value}"}.joinToString(","),
+            plotData.HtSurveyor.first.toString() + ": " + plotData.HtSurveyor.second,
         )
 
         flattenedPlotData.add(row)

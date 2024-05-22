@@ -1,14 +1,19 @@
 package com.example.ntufapp.ui.widget
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -20,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -195,7 +201,7 @@ fun SearchableChooseMenu(
     readOnly: Boolean = false,
     onChoose: (String) -> Unit,
 ) {
-    val speciesOptions = remember { mutableStateListOf<String>() }
+    val options = remember { mutableStateListOf<String>() }
     val searchText = remember { mutableStateOf(defaultString) }
     val dropdownExpanded = remember { mutableStateOf(false) }
     val addExpanded = remember { mutableStateOf(false) }
@@ -210,7 +216,7 @@ fun SearchableChooseMenu(
             onExpandedChange = {
                 dropdownExpanded.value = !dropdownExpanded.value
                 addExpanded.value = false
-                speciesOptions.reset(filterOptions(totalItemsList, searchText.value))
+                options.reset(filterOptions(totalItemsList, searchText.value))
             }
         ) {
             OutlinedTextField(
@@ -219,7 +225,7 @@ fun SearchableChooseMenu(
                 label = { Text(label) },
                 onValueChange = { text ->
                     searchText.value = text
-                    speciesOptions.reset(filterOptions(totalItemsList, text))
+                    options.reset(filterOptions(totalItemsList, text))
                 },
                 leadingIcon = {
                     Icon(imageVector = Icons.Filled.Search, contentDescription = null)
@@ -247,7 +253,7 @@ fun SearchableChooseMenu(
                 onDismissRequest = { dropdownExpanded.value = false },
                 modifier = Modifier.height(200.dp)
             ) {
-                speciesOptions.forEach { option ->
+                options.forEach { option ->
                     DropdownMenuItem(
                         text = {
                             Text(option)
@@ -269,11 +275,148 @@ fun SearchableChooseMenu(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@Composable
+fun SearchableChooseCheckMenu(
+    totalItemsList: List<String>,
+    defaultString: String = "",
+    label: String = "搜尋",
+    readOnly: Boolean = false,
+    onChoose: (String) -> Unit,
+    checkable: Boolean = false
+) {
+    val options = remember { mutableStateListOf<String>() }
+    val searchText = remember { mutableStateOf(defaultString) }
+    val dropdownExpanded = remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .width(200.dp)
+            .padding(vertical = 5.dp)
+    ) {
+        ExposedDropdownMenuBox(
+            expanded = dropdownExpanded.value,
+            onExpandedChange = {
+                dropdownExpanded.value = !dropdownExpanded.value
+                options.reset(filterOptions(totalItemsList, searchText.value))
+            }
+        ) {
+            OutlinedTextField(
+                value = searchText.value,
+                readOnly = readOnly,
+                label = { Text(label) },
+                onValueChange = { text ->
+                    searchText.value = text
+                    options.reset(filterOptions(totalItemsList, text))
+                },
+                leadingIcon = {
+                    Icon(imageVector = Icons.Filled.Search, contentDescription = null)
+                },
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(
+                        expanded = dropdownExpanded.value
+                    )
+                },
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Search,
+                    keyboardType = KeyboardType.Text
+                ),
+                singleLine = true,
+                textStyle = TextStyle(fontSize = 13.sp),
+                modifier = Modifier
+                    .menuAnchor() // super important
+                    .focusable(true), // for keyboard to work in the dropdown menu
+            )
+            // DropdownMenu
+            ExposedDropdownMenu(
+                expanded = dropdownExpanded.value,
+                onDismissRequest = { dropdownExpanded.value = false },
+                modifier = dropDownMenuModifier
+            ) {
+                if (checkable) {
+                    SelectableItemList(totalItemsList = options)
+                } else {
+                    ReadItemList(
+                        totalItemsList = options,
+                        onClick = {
+                            searchText.value = it
+                            dropdownExpanded.value = false
+                            onChoose(it)
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ReadItemList(
+    totalItemsList: MutableList<String>,
+    onClick: (String) -> Unit
+) {
+    totalItemsList.forEach { option ->
+        DropdownMenuItem(
+            text = {
+                Text(option)
+            },
+            onClick = {
+                onClick(option)
+            },
+            modifier = dropDownItemModifier
+        )
+
+        DropdownDivider()
+    }
+}
+
+@Composable
+fun SelectableItemList(totalItemsList: List<String>) {
+    val selectedItems = remember { mutableStateListOf<String>() }
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        totalItemsList.forEach { item ->
+            SelectableItem(item = item, selectedItems = selectedItems)
+        }
+    }
+}
+
+@Composable
+fun SelectableItem(item: String, selectedItems: MutableList<String>) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .clickable {
+                if (item in selectedItems) {
+                    selectedItems.remove(item)
+                } else {
+                    selectedItems.add(item)
+                }
+            }
+    ) {
+        Checkbox(
+            checked = item in selectedItems,
+            onCheckedChange = { isChecked ->
+                if (isChecked) {
+                    selectedItems.add(item)
+                } else {
+                    selectedItems.remove(item)
+                }
+            },
+            modifier = Modifier.size(24.dp)
+        )
+        Text(text = item, modifier = Modifier.padding(start = 8.dp))
+    }
+}
+
 fun filterOptions(options: List<String>, query: String): List<String> {
-    if (query.isEmpty()) {
+    val filteredOptions = options.filter { it.contains(query, ignoreCase = true) }
+    if (query.isEmpty() || filteredOptions.isEmpty()) {
         return options
     }
-    return options.filter { it.contains(query, ignoreCase = true) }
+    return filteredOptions
 }
 
 fun MutableList<String>.reset(options: List<String>) {

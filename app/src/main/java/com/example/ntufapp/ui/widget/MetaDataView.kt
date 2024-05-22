@@ -54,31 +54,25 @@ fun MetaDateView(newPlotData: PlotData) {
         ) {
             val modifier = Modifier
                 .height(65.dp)
-            SearchableAddMenu(
-                newPlotData.Surveyor,
+            SearchableChooseCheckMenu(
+                if (newPlotData.Surveyor.isNotEmpty()) {
+                    newPlotData.Surveyor.map { it.key.toString() + ": " + it.value }.toMutableList()
+                } else newPlotData.userList.map { it.user_code + ": " + it.user_name }.toMutableList(),
                 defaultString = "名單",
                 label = "樣區調查人員",
-                dialogType = "Name",
                 readOnly = true,
-                onChoose = {},
-                onAdd = {
-                    newPlotData.Surveyor.add(it)
+                onChoose = {
+
                 },
-                keyboardType = KeyboardType.Number,
-                modifier = modifier
             )
-            SearchableAddMenu(
-                newPlotData.HtSurveyor,
+            SearchableChooseCheckMenu(
+                mutableListOf(newPlotData.HtSurveyor.first.toString() + ": " + newPlotData.HtSurveyor.second),
                 defaultString = "名單",
                 label = "樹高調查人員",
-                dialogType = "Name",
                 readOnly = true,
-                onChoose = {},
-                onAdd = {
-                    newPlotData.HtSurveyor.add(it)
+                onChoose = {
+
                 },
-                keyboardType = KeyboardType.Number,
-                modifier = modifier
             )
         }
     }

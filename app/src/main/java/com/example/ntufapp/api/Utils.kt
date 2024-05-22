@@ -9,6 +9,7 @@ import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import android.util.Base64
+import android.util.Log
 import com.example.ntufapp.model.PlotData
 import java.io.File
 import java.io.FileInputStream
@@ -57,9 +58,10 @@ fun createRequestBody(jsonContent: List<Pair<String, String>>): RequestBody {
 fun transformPlotInfoResponseToPlotData(response: PlotInfoResponse): PlotData {
     val locationInfo = response.body.location_info
     val newestInvestigation = response.body.newest_investigation
+    Log.d("location mid", response.location_mid)
 
-    val surveyors = newestInvestigation.investigation_user_list.map { it.user_name }.toMutableList()
-    val htSurveyors = listOf(newestInvestigation.investigation_treeHeight_user_list.user_name) // Assuming tree height surveyor is singular
+    val surveyors = newestInvestigation.investigation_user_list.associate { it.user_id to it.user_name }
+    val htSurveyor = Pair(newestInvestigation.investigation_treeHeight_user_list.user_id, newestInvestigation.investigation_treeHeight_user_list.user_name) // Assuming tree height surveyor is singular
     val plotData = PlotData(
         Date = newestInvestigation.investigation_date,
         Year = newestInvestigation.investigation_year,
@@ -79,11 +81,14 @@ fun transformPlotInfoResponseToPlotData(response: PlotInfoResponse): PlotData {
         Aspect = locationInfo.area_aspect,
 
         Surveyor = surveyors,
-        HtSurveyor = htSurveyors as MutableList<String>,
+        HtSurveyor = htSurveyor,
         PlotTrees = mutableListOf(), // Additional logic needed to populate trees if applicable
 
+        userList = response.userList,
+        area_id = locationInfo.area_id,
         area_investigation_setup_id = locationInfo.area_investigation_setup_id,
         location_mid = response.location_mid,
+        investigation_user_map = newestInvestigation.investigation_user_list.associateBy({ it.user_id }, { it.user_name }).toMutableMap()
     )
 
     plotData.initPlotTrees(response.body.newest_location_count)
@@ -126,11 +131,13 @@ fun transformPlotDataToSurveyDataForUpload(plotData: PlotData): SurveyDataForUpl
         area_investigation_setup_id = plotData.area_investigation_setup_id,
         investigation_date = plotData.Date,
         investigation_record_list = investigationRecordList, // TODO
-        investigation_treeHeight_user = 1, // TODO: using user code
-        investigation_user = plotData.Surveyor.joinToString(),
+        investigation_treeHeight_user = plotData.HtSurveyor.first,
+        investigation_user = if (plotData.Surveyor.keys.isEmpty())
+            plotData.userList.first().user_code else plotData.Surveyor.keys.joinToString(","),
         investigation_year = plotData.Date.substring(0, 4),
         location_mid = plotData.location_mid,
-        photo_list = emptyList() // Assuming no photos are updated; adjust as needed
+        photo_list = emptyList(), // Assuming no photos are updated; adjust as needed
+        update_user = plotData.investigation_user_map.keys.firstOrNull() ?: plotData.userList.first().user_code.toInt()
     )
 }
 

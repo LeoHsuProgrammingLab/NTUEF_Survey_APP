@@ -10,6 +10,6 @@ data class SurveyDataForUpload(
     val investigation_year: String,
     val location_mid: String,
     val photo_list: List<Photo>,
-    val token: String = "",
+    var token: String = "",
     val update_user: Int = 1,
 )

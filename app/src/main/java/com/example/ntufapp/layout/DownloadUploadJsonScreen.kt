@@ -112,7 +112,7 @@ fun DownloadUploadJsonScreen () {
                             val today = getTodayDate()
                             var plotName = "${dept_name}_調查樣區_${today}"
                             if (plotInfoRsp?.body?.location_info?.location_name != null) {
-                                plotName = plotInfoRsp.body.location_info.location_name + "_" + plotInfoRsp.body.newest_investigation.investigation_date
+                                plotName = plotInfoRsp.body.location_info.area_name + plotInfoRsp.body.location_info.location_name + "_" + plotInfoRsp.body.newest_investigation.investigation_date
                             }
 
                             if (plotInfoRsp != null) {
@@ -121,7 +121,7 @@ fun DownloadUploadJsonScreen () {
 
                             // save data to json
                             try {
-                                val file = File(outputDir, "${dept_name}_$plotName.json")
+                                val file = File(outputDir, "$plotName.json")
                                 val gson = Gson()
                                 val myJson = gson.toJson(plotInfoRsp)
                                 writeToJson(context, file, myJson)
@@ -166,6 +166,8 @@ fun DownloadUploadJsonScreen () {
                             coroutineScope.launch {
                                 try {
                                     val surveyDataForUpload = parseJsonToSurveyDataForUpload(selectedFileUri.value!!, context)
+                                    Log.d(tag, "surveyDataForUpload: ${surveyDataForUpload?.investigation_treeHeight_user}, ${surveyDataForUpload?.update_user}")
+                                    Log.d(tag, "surveyDataForUpload: ${surveyDataForUpload?.investigation_user}, ${surveyDataForUpload?.location_mid}")
                                     val uploadResponse = uploadPlotDataApi(coroutineScope, tag, surveyDataForUpload!!)
                                     Log.d(tag, "uploadResponse: $uploadResponse")
                                 } catch (e: Exception) {

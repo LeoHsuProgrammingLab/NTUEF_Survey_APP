@@ -102,11 +102,12 @@ fun PlotOptionsScreen(
                         if(selectedFileUri.value != null) {
                             try {
                                 plotData.value  = parseJsonToPlotData(selectedFileUri.value!!, context)!!
+                                Log.d(tag, "plotData: ${plotData.value.location_mid}")
                                 showOldUploadData.value = true
                                 outputFilename.value = getFileName(context, selectedFileUri.value)
                             } catch (e: Exception) {
                                 Log.i(tag, "exError: $e")
-                                showMessage(context, "檔案解析時發生錯誤！")
+                                showMessage(context, "檔案解析時發生錯誤！（可能為空檔案）")
                             }
                         } else {
                             showMessage(context, "請選擇JSON檔案")

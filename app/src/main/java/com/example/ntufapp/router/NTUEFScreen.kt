@@ -178,6 +178,7 @@ fun NTUEFApp(
                     PlotOptionsScreen(
                         onNextButtonClick = {plotData, surveyType, outputFilename ->
                             viewModel.setNewData(plotData) // set the NewPlotData as the input json file and reset all trees
+
                             if (surveyType == "ReSurvey") {
                                 viewModel.setOldData(plotData) // set the OldPlotData as the input json file
                                 navController.navigate(Screens.ReSurvey.name)
@@ -205,7 +206,9 @@ fun NTUEFApp(
 
                 composable(route = "${Screens.ResultDisplay}/source={source}") {backStackEntry ->
                     val source = backStackEntry.arguments?.getString("source")
-                    Log.i(dTag, "source: $source")
+                    Log.d("location mid", "first: ${resultState.first.location_mid}")
+
+                    Log.d("location mid", "second: ${resultState.second.location_mid}")
 
                     ResultDisplayScreen(
                         oldPlotData = resultState.first,
@@ -224,6 +227,8 @@ fun NTUEFApp(
                 }
 
                 composable(route = Screens.SaveJson.name) {
+                    Log.d("location mid", "location mid_: ${resultState.second.location_mid}")
+
                     SaveScreen(
                         newPlotData = resultState.second,
                         outputFilename = viewModel.fileName,

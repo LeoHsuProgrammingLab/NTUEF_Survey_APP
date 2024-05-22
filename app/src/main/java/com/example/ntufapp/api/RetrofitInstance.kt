@@ -154,6 +154,7 @@ suspend fun userAndConditionCodeApi(coroutineScope: CoroutineScope, tag: String)
 
 suspend fun uploadPlotDataApi(coroutineScope: CoroutineScope, tag: String, surveyData: SurveyDataForUpload): uploadDataResponse {
     return coroutineScope.async {
+        surveyData.token = BuildConfig.API_PARAMS_TOKEN
         val gson = Gson()
         val surveyDataJson = gson.toJson(surveyData)
         val requestBody = surveyDataJson.toRequestBody("application/json".toMediaTypeOrNull())

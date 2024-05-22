@@ -1,6 +1,6 @@
 package com.example.ntufapp.model
 
-import com.example.ntufapp.data.ntufappInfo.Companion.defaultTreeNum
+import com.example.ntufapp.api.dataType.userAndConditionCodeResponse.User
 import java.time.LocalDate
 import kotlin.math.abs
 
@@ -22,13 +22,15 @@ data class PlotData(
     var Slope: Double = 0.0, //
     var Aspect: String = "",
 
-    var Surveyor: MutableList<String> = mutableListOf(), // 1
-    var HtSurveyor: MutableList<String> = mutableListOf(), // 3
+    var Surveyor: Map<Int, String> = emptyMap(), // 1
+    var HtSurveyor: Pair<Int, String> = Pair(0, ""), // 3
     var PlotTrees: MutableList<Tree> = mutableListOf(),
 
     var area_id: String = "",
     var area_investigation_setup_id: String = "",
     var location_mid: String = "",
+    var investigation_user_map: MutableMap<Int, String> = mutableMapOf(), // user_code, user_name
+    var userList: List<User> = listOf()
 ) {
    fun setToday() {
        val today: LocalDate = LocalDate.now()
@@ -41,6 +43,7 @@ data class PlotData(
     fun clone(): PlotData {
         return PlotData(
             Date = Date,
+            Year = Year,
             ManageUnit = ManageUnit,
             SubUnit = SubUnit,
             PlotName = PlotName,
@@ -52,9 +55,14 @@ data class PlotData(
             Altitude = Altitude,
             Slope = Slope,
             Aspect = Aspect,
-            Surveyor = Surveyor.toMutableList(),
-            HtSurveyor = HtSurveyor.toMutableList(),
-            PlotTrees = PlotTrees.toMutableList()
+            Surveyor = Surveyor,
+            HtSurveyor = HtSurveyor,
+            PlotTrees = PlotTrees.toMutableList(),
+            area_id = area_id,
+            area_investigation_setup_id = area_investigation_setup_id,
+            location_mid = location_mid,
+            investigation_user_map = investigation_user_map.toMutableMap(),
+            userList = userList
         )
     }
 
