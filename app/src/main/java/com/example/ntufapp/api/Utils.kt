@@ -27,34 +27,6 @@ fun createRequestBody(jsonContent: List<Pair<String, String>>): RequestBody {
     return jsonString.toRequestBody("application/json".toMediaTypeOrNull())
 }
 
-//fun transformToUploadData(response: PlotInfoResponse): SurveyDataForUpload {
-//    val body = response.body
-//    val newestInvestigation = body.newest_investigation
-//    val investigationRecordList = newestInvestigation.investigation_record_list.flatMap { record ->
-//        record.investigation_result_list.map {result ->
-//            InvestigationRecord(
-//                investigation_item_code = result.investigation_item_code,
-//                investigation_item_result = result.investigation_result,
-//                location_sid = record.location_sid,
-//                location_wx = body.location_info.location_wx,
-//                location_wy = body.location_info.location_wy
-//            )
-//        }
-//    }
-//
-//    return SurveyDataForUpload(
-//        area_id = body.location_info.area_id,
-//        area_investigation_setup_id = body.location_info.area_investigation_setup_id,
-//        investigation_date = newestInvestigation.investigation_date,
-//        investigation_record_list = investigationRecordList,
-//        investigation_treeHeight_user = newestInvestigation.investigation_treeHeight_user_list.user_id,
-//        investigation_user = newestInvestigation.investigation_user_list.firstOrNull()?.user_name?: "", // Use empty string if no user is found
-//        investigation_year = newestInvestigation.investigation_year,
-//        location_mid = response.location_mid,
-//        photo_list = emptyList() // Assuming no photos are updated; adjust as needed
-//    )
-//}
-
 fun transformPlotInfoResponseToPlotData(response: PlotInfoResponse): PlotData {
     val locationInfo = response.body.location_info
     val newestInvestigation = response.body.newest_investigation

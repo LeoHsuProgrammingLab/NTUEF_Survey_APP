@@ -12,6 +12,10 @@ class SurveyViewModel: ViewModel() { // <oldPlot, newPlot>
     private val _resultState = MutableStateFlow(Pair(PlotData(), PlotData()))
     val resultState: StateFlow<Pair<PlotData, PlotData>> = _resultState.asStateFlow()
     var fileName: String = ""
+        private set
+    fun setOutputFileName(name: String) {
+        fileName = name
+    }
 
     fun setOldData(oldPlot: PlotData){
         _resultState.update { currentState ->
@@ -22,8 +26,7 @@ class SurveyViewModel: ViewModel() { // <oldPlot, newPlot>
     }
 
     fun setNewData(newPlot: PlotData) {
-        val temp = newPlot.clone()
-        temp.resetAllTrees()
+        val temp = newPlot.clone().apply { resetAllTrees() }
         _resultState.update { currentState ->
             currentState.copy(
                 second = temp

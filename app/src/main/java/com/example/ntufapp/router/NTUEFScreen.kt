@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.Dataset
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.Dataset
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalDrawerSheet
@@ -18,6 +19,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -44,6 +46,7 @@ import com.example.ntufapp.layout.ResultDisplayScreen
 import com.example.ntufapp.layout.SaveScreen
 import com.example.ntufapp.ui.widget.NavigationItem
 import com.example.ntufapp.ui.widget.dialog.GeneralConfirmDialog
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 enum class Screens {
@@ -97,74 +100,21 @@ fun NTUEFApp(
         drawerContent = {
             ModalDrawerSheet {
                 items.forEachIndexed { id, item ->
-                    val isShowConfirmDialog = remember { mutableStateOf(false) }
-                    NavigationDrawerItem(
-                        label = { Text(text = item.title,) },
-                        selected = (selectedItemIndex.value == id),
-                        icon = {
-                            Icon(
-                                if (selectedItemIndex.value == id) item.selectedIcon else item.unselectedIcon,
-                                contentDescription = item.title
-                            )
-                        },
-                        onClick = {
-                            val isNoAffectPage = when (navController.currentDestination?.route) {
-                                Screens.Start.name, Screens.LoadJson.name -> true
-                                else -> false
-                            }
-
-                            if (isNoAffectPage) {
-                                selectedItemIndex.value = id
-                                scope.launch {
-                                    drawerState.close()
-                                }
-                                item.onClick()
-                            } else {
-                                isShowConfirmDialog.value = true    // show confirm dialog
-                            }
-                        },
-                        modifier = Modifier.padding(16.dp)
+                    NavigationDrawerItemWithDialog(
+                        item = item,
+                        id = id,
+                        selectedItemIndex = selectedItemIndex,
+                        navController = navController,
+                        drawerState = drawerState,
+                        scope = scope
                     )
-
-                    if (isShowConfirmDialog.value) {
-                        GeneralConfirmDialog(
-                            reminder = "確定要離開嗎？將會遺失所有未儲存資料！",
-                            confirmText = stringResource(R.string.leave),
-                            onDismiss = {
-                                isShowConfirmDialog.value = false
-                                scope.launch { drawerState.close() }
-                            },
-                            onCancelClick = {
-                                isShowConfirmDialog.value = false
-                                scope.launch { drawerState.close() }
-                            },
-                            onConfirmClick = {
-                                selectedItemIndex.value = id
-                                if (selectedItemIndex.value == 0) {
-                                    navController.navigate(Screens.Start.name)
-                                } else {
-                                    navController.navigate(Screens.LoadJson.name)
-                                }
-                                isShowConfirmDialog.value = false
-                                scope.launch { drawerState.close() }
-                            }
-                        )
-                    }
                 }
             }
         },
         drawerState = drawerState,
     ) {
         Scaffold(
-            topBar = {
-                NTUEFTopBar(
-                    onMenuClick = {
-                        scope.launch {
-                            drawerState.open()
-                        }
-                    }
-                )
-            }
+            topBar = { NTUEFTopBar { scope.launch { drawerState.open() } } }
         ) { paddingValues ->
 
             val resultState by viewModel.resultState.collectAsState()
@@ -185,7 +135,7 @@ fun NTUEFApp(
                             } else {
                                 navController.navigate(Screens.NewSurvey.name)
                             }
-                            viewModel.fileName = outputFilename
+                            viewModel.setOutputFileName(outputFilename)
                         }
                     )
                 }
@@ -244,5 +194,71 @@ fun NTUEFApp(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun NavigationDrawerItemWithDialog(
+    item: NavigationItem,
+    id: Int,
+    selectedItemIndex: MutableState<Int>,
+    navController: NavHostController,
+    drawerState: DrawerState,
+    scope: CoroutineScope
+) {
+    val isShowConfirmDialog = remember { mutableStateOf(false) }
+
+    NavigationDrawerItem(
+        label = { Text(text = item.title) },
+        selected = (selectedItemIndex.value == id),
+        icon = {
+            Icon(
+                if (selectedItemIndex.value == id) item.selectedIcon else item.unselectedIcon,
+                contentDescription = item.title
+            )
+        },
+        onClick = {
+            val isNoAffectPage = when (navController.currentDestination?.route) {
+                Screens.Start.name, Screens.LoadJson.name -> true
+                else -> false
+            }
+
+            if (isNoAffectPage) {
+                selectedItemIndex.value = id
+                scope.launch { drawerState.close() }
+                item.onClick()
+            } else {
+                isShowConfirmDialog.value = true
+            }
+        },
+        modifier = Modifier.padding(16.dp)
+    )
+
+    if (isShowConfirmDialog.value) {
+        GeneralConfirmDialog(
+            reminder = "確定要離開嗎？將會遺失所有未儲存資料！",
+            confirmText = stringResource(R.string.leave),
+            onDismiss = {
+                isShowConfirmDialog.value = false
+                scope.launch { drawerState.close() }
+            },
+            onCancelClick = {
+                isShowConfirmDialog.value = false
+                scope.launch { drawerState.close() }
+            },
+            onConfirmClick = {
+                selectedItemIndex.value = id
+                item.onClick()
+                isShowConfirmDialog.value = false
+                scope.launch {
+                    if (selectedItemIndex.value == 0) {
+                        navController.navigate(Screens.Start.name)
+                    } else {
+                        navController.navigate(Screens.LoadJson.name)
+                    }
+                    drawerState.close()
+                }
+            }
+        )
     }
 }

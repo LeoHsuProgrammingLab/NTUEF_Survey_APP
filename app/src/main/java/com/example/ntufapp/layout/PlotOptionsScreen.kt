@@ -1,5 +1,6 @@
 package com.example.ntufapp.layout
 
+import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -40,6 +42,26 @@ fun PlotOptionsScreen(
 //    DisableBackButtonHandler(from = "PlotOptionsScreen")
     BackHandler(enabled = true) {}
     val tag = "PlotOptions"
+    val context = LocalContext.current
+    val selectedFileUri = remember { mutableStateOf<Uri?>(null) }
+    val buttonText = remember { mutableStateOf("請選擇JSON檔案") }
+    val plotData = remember { mutableStateOf(PlotData()) }
+    val surveyType = remember { mutableStateOf("") }
+    val outputFilename = remember { mutableStateOf("") }
+
+    val showOldPlotUpload = remember { mutableStateOf(false) }
+    val showOldUploadData = remember { mutableStateOf(false) }
+    val showNewPlotUploadChoices = remember { mutableStateOf(false) }
+    val showNewPlotUpload = remember { mutableStateOf(false) }
+    val showNewUploadData = remember { mutableStateOf(false) }
+    val showNewPlotManualInput = remember { mutableStateOf(false) }
+
+    val filePickerLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        selectedFileUri.value = uri
+        buttonText.value = getFileName(context, uri).takeIf { it.isNotEmpty() } ?: "請選擇JSON檔案"
+    }
 
     Column(
         modifier = Modifier
@@ -57,40 +79,8 @@ fun PlotOptionsScreen(
         )
         LayoutDivider()
         Row {
-            val context = LocalContext.current
-            val selectedFileUri = remember { mutableStateOf<Uri?>(null) }
-            val buttonText = remember { mutableStateOf("請選擇JSON檔案") }
-            val filePickerLauncher = rememberLauncherForActivityResult(
-                ActivityResultContracts.GetContent()) { uri: Uri? ->
-                selectedFileUri.value = uri
-                buttonText.value = getFileName(context, uri).takeIf { it.isNotEmpty() } ?: "請選擇JSON檔案"
-            }
-            val plotData = remember { mutableStateOf(PlotData()) }
-            val surveyType = remember { mutableStateOf("") }
-            val outputFilename = remember { mutableStateOf("") }
-
-            val showOldPlotUpload = remember { mutableStateOf(false) }
-            val showOldUploadData = remember { mutableStateOf(false) }
-            val showNewPlotUploadChoices = remember { mutableStateOf(false) }
-            val showNewPlotUpload = remember { mutableStateOf(false) }
-            val showNewUploadData = remember { mutableStateOf(false) }
-            val showNewPlotManualInput = remember { mutableStateOf(false) }
-            val dismissDialog: (Boolean) -> Unit = { isNewPlot: Boolean ->
-                if (isNewPlot) {
-                    showNewPlotUpload.value = false
-                } else {
-                    showOldPlotUpload.value = false
-                }
-                buttonText.value = "請選擇JSON檔案"
-            }
-
             // Old Plot
-            Button(
-                modifier = Modifier.padding(end = 20.dp),
-                onClick = { showOldPlotUpload.value = true }
-            ) {
-                Text("開始調查", fontSize = 20.sp)
-            }
+            StartSurveyButton(showOldPlotUpload = showOldPlotUpload, buttonText = "開始調查")
             // Upload Old Plot by JSON
             if(showOldPlotUpload.value) {
                 UploadFileDialog(
@@ -99,29 +89,23 @@ fun PlotOptionsScreen(
                     nextButtonText = "匯入",
                     onDismiss = {},
                     onSendClick = {
-                        if(selectedFileUri.value != null) {
-                            try {
-                                plotData.value  = parseJsonToPlotData(selectedFileUri.value!!, context)!!
-                                Log.d(tag, "plotData: ${plotData.value.location_mid}")
-                                showOldUploadData.value = true
-                                outputFilename.value = getFileName(context, selectedFileUri.value)
-                            } catch (e: Exception) {
-                                Log.i(tag, "exError: $e")
-                                showMessage(context, "檔案解析時發生錯誤！（可能為空檔案）")
-                            }
-                        } else {
-                            showMessage(context, "請選擇JSON檔案")
-                        }
-                        dismissDialog(false)
+                       handleFileUpload(
+                            context,
+                            selectedFileUri,
+                            plotData,
+                            buttonText,
+                            outputFilename,
+                            showOldUploadData,
+                            showOldPlotUpload
+                        )
                     },
-                    onCancelClick = { dismissDialog(false) },
+                    onCancelClick = { showOldUploadData.value = false },
                     filePicker = filePickerLauncher,
                 )
             }
 
-            val confirmHeader = "您已匯入${plotData.value.ManageUnit}${plotData.value.SubUnit}的資料\n樣區名稱：${plotData.value.PlotName}\n樣區編號：${plotData.value.PlotNum}\n該樣區有${plotData.value.PlotTrees.size}棵樣樹"
-
             if(showOldUploadData.value) {
+                val confirmHeader = "您已匯入${plotData.value.ManageUnit}${plotData.value.SubUnit}的資料\n樣區名稱：${plotData.value.PlotName}\n樣區編號：${plotData.value.PlotNum}\n該樣區有${plotData.value.PlotTrees.size}棵樣樹"
                 GeneralConfirmDialog(
                     reminder = confirmHeader,
                     confirmText = stringResource(id = R.string.next),
@@ -207,4 +191,43 @@ fun PlotOptionsScreen(
 //            }
         }
     }
+}
+
+@Composable
+fun StartSurveyButton(
+    showOldPlotUpload: MutableState<Boolean>,
+    buttonText: String
+) {
+    Button(
+        modifier = Modifier.padding(end = 20.dp),
+        onClick = { showOldPlotUpload.value = true }
+    ) {
+        Text(buttonText, fontSize = 20.sp)
+    }
+}
+
+fun handleFileUpload(
+    context: Context,
+    selectedFileUri: MutableState<Uri?>,
+    plotData: MutableState<PlotData>,
+    buttonText: MutableState<String>,
+    outputFilename: MutableState<String>,
+    showOldUploadData: MutableState<Boolean>,
+    showOldPlotUpload: MutableState<Boolean>
+) {
+    if (selectedFileUri.value != null) {
+        try {
+            plotData.value = parseJsonToPlotData(selectedFileUri.value!!, context)!!
+            Log.d("PlotOptions", "plotData: ${plotData.value.location_mid}")
+            showOldUploadData.value = true
+            outputFilename.value = getFileName(context, selectedFileUri.value)
+        } catch (e: Exception) {
+            Log.i("PlotOptions", "exError: $e")
+            showMessage(context, "檔案解析時發生錯誤！（可能為空檔案）")
+        }
+    } else {
+        showMessage(context, "請選擇JSON檔案")
+    }
+    buttonText.value = "請選擇JSON檔案"
+    showOldPlotUpload.value = false
 }
