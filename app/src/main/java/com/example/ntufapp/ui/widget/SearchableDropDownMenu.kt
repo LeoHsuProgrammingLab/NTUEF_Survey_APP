@@ -1,5 +1,6 @@
 package com.example.ntufapp.ui.widget
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Column
@@ -276,16 +277,19 @@ fun SearchableChooseMenu(
     }
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun SearchableChooseCheckMenu(
     totalItemsList: List<String>,
+    selectionMode: SelectionMode,
     defaultString: String = "",
     label: String = "搜尋",
     readOnly: Boolean = false,
     onChoose: (String) -> Unit,
     onUpdateList: (List<String>) -> Unit,
-    checkable: Boolean = false
+    checkable: Boolean = false,
+    searchable: Boolean = true,
 ) {
     val options = remember { mutableStateListOf<String>() }
     val mutableOptions = remember { mutableStateListOf<String>() }
@@ -301,7 +305,11 @@ fun SearchableChooseCheckMenu(
             expanded = dropdownExpanded.value,
             onExpandedChange = {
                 dropdownExpanded.value = !dropdownExpanded.value
-                options.reset(filterOptions(totalItemsList, searchText.value))
+                if (searchable) {
+                    options.reset(filterOptions(totalItemsList, searchText.value))
+                } else {
+                    options.reset(totalItemsList)
+                }
             }
         ) {
             OutlinedTextField(
@@ -310,7 +318,11 @@ fun SearchableChooseCheckMenu(
                 label = { Text(label) },
                 onValueChange = { text ->
                     searchText.value = text
-                    options.reset(filterOptions(totalItemsList, text))
+                    if (searchable) {
+                        options.reset(filterOptions(totalItemsList, text))
+                    } else {
+                        options.reset(totalItemsList)
+                    }
                 },
                 leadingIcon = {
                     Icon(imageVector = Icons.Filled.Search, contentDescription = null)
@@ -340,6 +352,7 @@ fun SearchableChooseCheckMenu(
                     SelectableItemList(
                         totalItemsList = options,
                         selectedItems = mutableOptions,
+                        selectionMode = selectionMode,
                         onUpdateList = onUpdateList
                     )
                 } else {
@@ -377,15 +390,24 @@ fun ReadItemList(
     }
 }
 
+enum class SelectionMode {
+    SINGLE, MULTIPLE
+}
 @Composable
 fun SelectableItemList(
     totalItemsList: List<String>,
     selectedItems: SnapshotStateList<String>,
+    selectionMode: SelectionMode = SelectionMode.MULTIPLE,
     onUpdateList: (List<String>) -> Unit)
 {
     Column(modifier = Modifier.padding(16.dp)) {
         totalItemsList.forEach { item ->
-            SelectableItem(item = item, selectedItems = selectedItems, onUpdateList = onUpdateList)
+            SelectableItem(
+                item = item,
+                selectedItems = selectedItems,
+                selectionMode = selectionMode,
+                onUpdateList = onUpdateList
+            )
         }
     }
 }
@@ -394,6 +416,7 @@ fun SelectableItemList(
 fun SelectableItem(
     item: String,
     selectedItems: MutableList<String>,
+    selectionMode: SelectionMode,
     onUpdateList: (List<String>) -> Unit)
 {
     Row(
@@ -402,20 +425,38 @@ fun SelectableItem(
             .fillMaxWidth()
             .padding(vertical = 8.dp)
             .clickable {
-                if (item in selectedItems) {
-                    selectedItems.remove(item)
-                } else {
-                    selectedItems.add(item)
+                when (selectionMode) {
+                    SelectionMode.SINGLE -> {
+                        selectedItems.clear()
+                        selectedItems.add(item)
+                    }
+                    SelectionMode.MULTIPLE -> {
+                        if (item in selectedItems) {
+                            selectedItems.remove(item)
+                        } else {
+                            selectedItems.add(item)
+                        }
+                    }
                 }
             }
     ) {
         Checkbox(
             checked = item in selectedItems,
             onCheckedChange = { isChecked ->
-                if (isChecked) {
-                    selectedItems.add(item)
-                } else {
-                    selectedItems.remove(item)
+                when (selectionMode) {
+                    SelectionMode.SINGLE -> {
+                        selectedItems.clear()
+                        if (isChecked) {
+                            selectedItems.add(item)
+                        }
+                    }
+                    SelectionMode.MULTIPLE -> {
+                        if (isChecked) {
+                            selectedItems.add(item)
+                        } else {
+                            selectedItems.remove(item)
+                        }
+                    }
                 }
                 onUpdateList(selectedItems)
             },

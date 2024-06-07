@@ -1,5 +1,6 @@
 package com.example.ntufapp.ui.widget
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -52,31 +53,36 @@ fun MetaDateView(newPlotData: PlotData) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            val modifier = Modifier
-                .height(65.dp)
             SearchableChooseCheckMenu(
                 newPlotData.userList.map { it.user_code + ": " + it.user_name }.toMutableList(),
+                SelectionMode.MULTIPLE,
                 defaultString = "名單",
                 label = "樣區調查人員",
                 readOnly = true,
+                checkable = true,
                 onChoose = {
                     // For Read-Only Menu
                 },
                 onUpdateList = { stringList ->
                     // For Choosable Menu
                     newPlotData.Surveyor = stringList.associate { it.split(":")[0].toInt() to it.split(":")[1] } as MutableMap<Int, String>
-                },
-                checkable = true
+                }
             )
             SearchableChooseCheckMenu(
-                mutableListOf(newPlotData.HtSurveyor.first.toString() + ": " + newPlotData.HtSurveyor.second),
+                newPlotData.userList.map { it.user_code + ": " + it.user_name }.toMutableList(),
+                SelectionMode.SINGLE,
+                searchable = false,
                 defaultString = "名單",
                 label = "樹高調查人員",
                 readOnly = true,
+                checkable = true,
                 onChoose = {
-
+                    // For Read-Only Menu
                 },
-                onUpdateList = {}
+                onUpdateList = {
+                    // For Choosable Menu
+                    newPlotData.HtSurveyor = it[0].split(": ")[0].toInt() to it[0].split(": ")[1]
+                },
             )
         }
     }

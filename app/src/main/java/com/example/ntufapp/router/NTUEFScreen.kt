@@ -80,7 +80,7 @@ fun NTUEFApp(
             },
         ),
         NavigationItem(
-            title = "上下載Json頁面",
+            title = "上傳 & 下載Json頁面",
             selectedIcon = Icons.Filled.Dataset,
             unselectedIcon = Icons.Outlined.Dataset,
             onClick = {

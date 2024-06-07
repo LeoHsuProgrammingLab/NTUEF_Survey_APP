@@ -50,7 +50,7 @@ fun flattenPlotData(plotData: PlotData): List<List<String>> {
             plotData.Slope.toString(),
             plotData.Aspect,
             plotData.Surveyor.map{"${it.key}: ${it.value}"}.joinToString(","),
-            plotData.HtSurveyor.first.toString() + ": " + plotData.HtSurveyor.second,
+            plotData.HtSurveyor!!.first.toString() + ": " + plotData.HtSurveyor!!.second,
         )
 
         flattenedPlotData.add(row)

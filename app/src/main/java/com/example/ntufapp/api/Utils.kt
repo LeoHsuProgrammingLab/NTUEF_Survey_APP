@@ -136,9 +136,16 @@ fun transformPlotDataToSurveyDataForUpload(plotData: PlotData): SurveyDataForUpl
         area_investigation_setup_id = plotData.area_investigation_setup_id,
         investigation_date = plotData.Date,
         investigation_record_list = investigationRecordList,
-        investigation_treeHeight_user = plotData.HtSurveyor.first,
-        investigation_user = if (plotData.Surveyor.keys.isEmpty())
-            plotData.userList.first().user_code else plotData.Surveyor.keys.joinToString(","),
+        investigation_treeHeight_user = if (plotData.HtSurveyor == null) {
+            plotData.userList.first().user_code.toInt()
+        } else {
+            plotData.HtSurveyor!!.first
+        },
+        investigation_user = if (plotData.Surveyor.keys.isEmpty()) {
+            plotData.userList.first().user_code
+        } else {
+            plotData.Surveyor.keys.joinToString(",")
+        },
         investigation_year = plotData.Date.substring(0, 4),
         location_mid = plotData.location_mid,
         photo_list = emptyList(), // Assuming no photos are updated; adjust as needed

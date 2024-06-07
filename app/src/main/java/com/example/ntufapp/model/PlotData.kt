@@ -23,7 +23,7 @@ data class PlotData(
     var Aspect: String = "",
 
     var Surveyor: MutableMap<Int, String> = mutableMapOf(), // 1
-    var HtSurveyor: Pair<Int, String> = Pair(0, ""), // 3
+    var HtSurveyor: Pair<Int, String>? = null, // 3
     var PlotTrees: MutableList<Tree> = mutableListOf(),
 
     var area_id: String = "",
