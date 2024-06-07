@@ -22,7 +22,7 @@ data class PlotData(
     var Slope: Double = 0.0, //
     var Aspect: String = "",
 
-    var Surveyor: Map<Int, String> = emptyMap(), // 1
+    var Surveyor: MutableMap<Int, String> = mutableMapOf(), // 1
     var HtSurveyor: Pair<Int, String> = Pair(0, ""), // 3
     var PlotTrees: MutableList<Tree> = mutableListOf(),
 

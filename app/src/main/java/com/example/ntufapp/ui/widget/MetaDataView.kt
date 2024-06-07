@@ -55,17 +55,16 @@ fun MetaDateView(newPlotData: PlotData) {
             val modifier = Modifier
                 .height(65.dp)
             SearchableChooseCheckMenu(
-                if (newPlotData.Surveyor.isNotEmpty()) {
-                    newPlotData.Surveyor.map { it.key.toString() + ": " + it.value }.toMutableList()
-                } else newPlotData.userList.map { it.user_code + ": " + it.user_name }.toMutableList(),
+                newPlotData.userList.map { it.user_code + ": " + it.user_name }.toMutableList(),
                 defaultString = "名單",
                 label = "樣區調查人員",
                 readOnly = true,
                 onChoose = {
-
+                    // For Read-Only Menu
                 },
                 onUpdateList = { stringList ->
-                    newPlotData.Surveyor = stringList.associate { it.split(":")[0].toInt() to it.split(":")[1] }
+                    // For Choosable Menu
+                    newPlotData.Surveyor = stringList.associate { it.split(":")[0].toInt() to it.split(":")[1] } as MutableMap<Int, String>
                 },
                 checkable = true
             )

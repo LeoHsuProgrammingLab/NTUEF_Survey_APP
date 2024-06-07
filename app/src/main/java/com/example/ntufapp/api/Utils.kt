@@ -52,8 +52,8 @@ fun transformPlotInfoResponseToPlotData(response: PlotInfoResponse): PlotData {
         Slope = locationInfo.area_slope.toDoubleOrNull() ?: 0.0,
         Aspect = locationInfo.area_aspect,
 
-        Surveyor = surveyors,
-        HtSurveyor = htSurveyor,
+        // Surveyor doesn't need to be assigned
+        // HtSurveyor = htSurveyor,
         PlotTrees = mutableListOf(), // Additional logic needed to populate trees if applicable
 
         userList = response.userList,

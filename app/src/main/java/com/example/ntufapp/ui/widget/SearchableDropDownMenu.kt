@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -336,7 +337,11 @@ fun SearchableChooseCheckMenu(
                 modifier = dropDownMenuModifier
             ) {
                 if (checkable) {
-                    SelectableItemList(totalItemsList = options, selectedItems = mutableOptions, onUpdateList = onUpdateList)
+                    SelectableItemList(
+                        totalItemsList = options,
+                        selectedItems = mutableOptions,
+                        onUpdateList = onUpdateList
+                    )
                 } else {
                     ReadItemList(
                         totalItemsList = options,
@@ -373,7 +378,11 @@ fun ReadItemList(
 }
 
 @Composable
-fun SelectableItemList(totalItemsList: List<String>, selectedItems: MutableList<String>, onUpdateList: (List<String>) -> Unit) {
+fun SelectableItemList(
+    totalItemsList: List<String>,
+    selectedItems: SnapshotStateList<String>,
+    onUpdateList: (List<String>) -> Unit)
+{
     Column(modifier = Modifier.padding(16.dp)) {
         totalItemsList.forEach { item ->
             SelectableItem(item = item, selectedItems = selectedItems, onUpdateList = onUpdateList)
@@ -382,7 +391,11 @@ fun SelectableItemList(totalItemsList: List<String>, selectedItems: MutableList<
 }
 
 @Composable
-fun SelectableItem(item: String, selectedItems: MutableList<String>, onUpdateList: (List<String>) -> Unit) {
+fun SelectableItem(
+    item: String,
+    selectedItems: MutableList<String>,
+    onUpdateList: (List<String>) -> Unit)
+{
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
