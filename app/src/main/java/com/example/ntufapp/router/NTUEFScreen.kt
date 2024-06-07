@@ -139,7 +139,7 @@ fun NTUEFApp(
                         }
                     )
                 }
-
+                // Currently Only ReSurvey
                 composable(route = Screens.ReSurvey.name) {
                     ReSurveyScreen(
                         onNextButtonClick = { navController.navigate("${Screens.ResultDisplay}/source=${Screens.ReSurvey.name}") },
@@ -157,7 +157,6 @@ fun NTUEFApp(
                 composable(route = "${Screens.ResultDisplay}/source={source}") {backStackEntry ->
                     val source = backStackEntry.arguments?.getString("source")
                     Log.d("location mid", "first: ${resultState.first.location_mid}")
-
                     Log.d("location mid", "second: ${resultState.second.location_mid}")
 
                     ResultDisplayScreen(

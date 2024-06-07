@@ -99,7 +99,7 @@ fun PlotOptionsScreen(
                             showOldPlotUpload
                         )
                     },
-                    onCancelClick = { showOldUploadData.value = false },
+                    onCancelClick = { showOldPlotUpload.value = false },
                     filePicker = filePickerLauncher,
                 )
             }

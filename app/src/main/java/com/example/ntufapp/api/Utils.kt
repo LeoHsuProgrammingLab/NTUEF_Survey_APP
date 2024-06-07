@@ -64,8 +64,24 @@ fun transformPlotInfoResponseToPlotData(response: PlotInfoResponse): PlotData {
     )
 
     plotData.initPlotTrees(response.body.newest_location_count)
+    val investigationDBHCode = locationInfo.area_investigation_setup_list
+        .firstOrNull { it.investigation_item_name == "基徑" }
+        ?.investigation_item_code
+    val investigationHeightCode = locationInfo.area_investigation_setup_list
+        .firstOrNull { it.investigation_item_name == "樹高" }
+        ?.investigation_item_code
+    val investigationStateCode = locationInfo.area_investigation_setup_list
+        .firstOrNull { it.investigation_item_name == "生長狀態" }
+        ?.investigation_item_code
+
     for (i in plotData.PlotTrees.indices) {
         plotData.PlotTrees[i].location_sid = newestInvestigation.investigation_record_list[i].location_sid
+        plotData.PlotTrees[i].DBH =
+            newestInvestigation.investigation_record_list[i].investigation_result_list.firstOrNull { it.investigation_item_code == investigationDBHCode }?.investigation_result?.toDoubleOrNull() ?: 0.0
+        plotData.PlotTrees[i].MeasHeight =
+            newestInvestigation.investigation_record_list[i].investigation_result_list.firstOrNull { it.investigation_item_code == investigationHeightCode }?.investigation_result?.toDoubleOrNull() ?: 0.0
+        plotData.PlotTrees[i].State =
+            (newestInvestigation.investigation_record_list[i].investigation_result_list.firstOrNull { it.investigation_item_code == investigationStateCode }?.investigation_result?.split(",") ?: emptyList()).toMutableList()
     }
 
     return plotData
