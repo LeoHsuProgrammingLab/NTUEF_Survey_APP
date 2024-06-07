@@ -243,6 +243,11 @@ suspend fun handleUpload(
             Log.d(tag, "surveyDataForUpload: ${surveyDataForUpload?.investigation_user}, ${surveyDataForUpload?.location_mid}")
             val uploadResponse = uploadPlotDataApi(coroutineScope, tag, surveyDataForUpload!!)
             Log.d(tag, "uploadResponse: $uploadResponse")
+            if (uploadResponse.result) {
+                showMessage(context, "檔案上傳成功！")
+            } else {
+                showMessage(context, "檔案上傳失敗！")
+            }
         } catch (e: Exception) {
             Log.i(tag, "exError: $e")
             showMessage(context, "檔案解析時發生錯誤！")

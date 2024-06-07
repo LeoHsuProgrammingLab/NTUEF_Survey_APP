@@ -1,12 +1,14 @@
 package com.example.ntufapp.api
 
 import android.util.Log
+import androidx.compose.ui.platform.LocalContext
 import com.example.ntufapp.BuildConfig
 import com.example.ntufapp.api.dataType.plotInfoResponse.PlotInfoResponse
 import com.example.ntufapp.api.dataType.plotsCatalogueResponse.PlotsCatalogueResponse
 import com.example.ntufapp.api.dataType.surveyDataForUpload.SurveyDataForUpload
 import com.example.ntufapp.api.dataType.uploadDataResponse.uploadDataResponse
 import com.example.ntufapp.api.dataType.userAndConditionCodeResponse.UserAndConditionCodeResponse
+import com.example.ntufapp.utils.showMessage
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import kotlinx.coroutines.CoroutineScope
@@ -167,6 +169,7 @@ suspend fun uploadPlotDataApi(coroutineScope: CoroutineScope, tag: String, surve
 
             if (response.isSuccessful) {
                 val uploadDataRsp = gson.fromJson(responseBody, uploadDataResponse::class.java)
+                Log.d(tag, "response: $uploadDataRsp")
                 return@async uploadDataRsp
             } else {
                 Log.d(tag, "Unsuccessful! response: ${response.body()?.string()}")
