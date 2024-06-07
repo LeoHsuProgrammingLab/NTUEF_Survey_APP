@@ -28,6 +28,7 @@ data class PlotData(
 
     var area_id: String = "",
     var area_investigation_setup_id: String = "",
+    var area_investigation_setup_list: MutableMap<String, String> = mutableMapOf(),
     var location_mid: String = "",
     var investigation_user_map: MutableMap<Int, String> = mutableMapOf(), // user_code, user_name
     var userList: List<User> = listOf()
@@ -60,6 +61,7 @@ data class PlotData(
             PlotTrees = PlotTrees.toMutableList(),
             area_id = area_id,
             area_investigation_setup_id = area_investigation_setup_id,
+            area_investigation_setup_list = area_investigation_setup_list,
             location_mid = location_mid,
             investigation_user_map = investigation_user_map.toMutableMap(),
             userList = userList
@@ -68,6 +70,22 @@ data class PlotData(
 
     fun resetAllTrees() {
         PlotTrees.forEach { it.reset() }
+    }
+
+    fun getDBHCode(): String? {
+        return area_investigation_setup_list["基徑"]
+    }
+
+    fun getHeightCode(): String? {
+        return area_investigation_setup_list["樹高"]
+    }
+
+    fun getStateCode(): String? {
+        return area_investigation_setup_list["生長狀態"]
+    }
+
+    fun getForkedHeightCode(): String? {
+        return area_investigation_setup_list["分叉高"]
     }
 
     fun initPlotTrees(treeNumber: Int) {
