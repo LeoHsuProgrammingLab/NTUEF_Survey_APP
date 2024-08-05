@@ -284,7 +284,7 @@ fun LazyColumnInputTextField(
     if (textContent.value == "0.0") {
         textContent.value = ""
     }
-    Log.d("LazyColumnInputTextField", "tree.SampleNum: ${tree.SampleNum}, ${textContent.value}")
+//    Log.d("LazyColumnInputTextField", "tree.SampleNum: ${tree.SampleNum}, ${textContent.value}")
 
     fun updateTree(newValue: Double?) {
         if (newValue != null) {

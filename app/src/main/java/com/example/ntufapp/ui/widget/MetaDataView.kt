@@ -43,8 +43,9 @@ fun MetaDateView(newPlotData: PlotData) {
         Column(
             modifier = Modifier.padding(5.dp)
         ) {
-            MetaDataRow(info1 = dateInfo, info2 = mangeUnitInfo, info3 = subUnitInfo, info4 = altitudeInfo)
-            MetaDataRow(info1 = plotNameInfo, info2 = plotNumInfo, info3 = plotTypeInfo, info4 = plotAreaInfo)
+//            MetaDataRow(info1 = dateInfo, info2 = mangeUnitInfo, info3 = subUnitInfo, info4 = altitudeInfo)
+            MetaDataRowThreeCol(info1 = dateInfo, info2 = mangeUnitInfo, info3 = subUnitInfo)
+            MetaDataRow(info1 = plotNameInfo, info2 = plotNumInfo, info3 = plotTypeInfo, info4 = altitudeInfo)
             MetaDataRow(info1 = slopeInfo, info2 = aspectInfo, info3 = TWD97_X, info4 = TWD97_Y)
         }
 
@@ -103,12 +104,23 @@ fun MetaDataRow(info1: Pair<String, String>, info2: Pair<String, String>, info3:
 }
 
 @Composable
-fun MetaDataBlock(blockName: String, blockVal: String) {
+fun MetaDataRowThreeCol(info1: Pair<String, String>, info2: Pair<String, String>, info3: Pair<String, String>) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        MetaDataBlock(blockName = info1.first, blockVal = info1.second)
+        MetaDataBlock(blockName = info2.first, blockVal = info2.second, width = 480 + 10) // width + 2 * padding
+        MetaDataBlock(blockName = info3.first, blockVal = info3.second)
+    }
+}
+
+@Composable
+fun MetaDataBlock(blockName: String, blockVal: String, width: Int = 240, height: Int = 40) {
     Card(
         modifier = Modifier
             .padding(5.dp)
-            .width(240.dp)
-            .height(40.dp)
+            .width(width.dp)
+            .height(height.dp)
     ) {
         Row(modifier = Modifier.padding(5.dp)) {
             Text(

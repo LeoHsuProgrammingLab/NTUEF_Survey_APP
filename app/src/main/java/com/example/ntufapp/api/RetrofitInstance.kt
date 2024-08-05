@@ -1,14 +1,12 @@
 package com.example.ntufapp.api
 
 import android.util.Log
-import androidx.compose.ui.platform.LocalContext
 import com.example.ntufapp.BuildConfig
 import com.example.ntufapp.api.dataType.plotInfoResponse.PlotInfoResponse
 import com.example.ntufapp.api.dataType.plotsCatalogueResponse.PlotsCatalogueResponse
 import com.example.ntufapp.api.dataType.surveyDataForUpload.SurveyDataForUpload
 import com.example.ntufapp.api.dataType.uploadDataResponse.uploadDataResponse
 import com.example.ntufapp.api.dataType.userAndConditionCodeResponse.UserAndConditionCodeResponse
-import com.example.ntufapp.utils.showMessage
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import kotlinx.coroutines.CoroutineScope
@@ -19,7 +17,6 @@ import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.ResponseBody
 import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -154,7 +151,7 @@ suspend fun userAndConditionCodeApi(coroutineScope: CoroutineScope, tag: String)
     }.await()
 }
 
-suspend fun uploadPlotDataApi(coroutineScope: CoroutineScope, tag: String, surveyData: SurveyDataForUpload): uploadDataResponse {
+suspend fun uploadPlotDataApi(coroutineScope: CoroutineScope, tag: String, surveyData: SurveyDataForUpload): uploadDataResponse? {
     return coroutineScope.async {
         surveyData.token = BuildConfig.API_PARAMS_TOKEN
         val gson = Gson()
@@ -173,14 +170,14 @@ suspend fun uploadPlotDataApi(coroutineScope: CoroutineScope, tag: String, surve
                 return@async uploadDataRsp
             } else {
                 Log.d(tag, "Unsuccessful! response: ${response.body()?.string()}")
-                throw HttpException(response)
+                return@async null
             }
         } catch (e: IOException) {
             Log.e(tag, "IOException: ${e.message}, you might not have internet connection, you gotta check it")
-            throw e
+            return@async null
         } catch (e: HttpException) {
             Log.e(tag, "HttpException: ${e.message}, unexpected http response")
-            throw e
+            return@async null
         }
     }.await()
 }

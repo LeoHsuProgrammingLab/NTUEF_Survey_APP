@@ -1,5 +1,6 @@
 package com.example.ntufapp.model
 
+import android.util.Log
 import com.example.ntufapp.api.dataType.userAndConditionCodeResponse.User
 import java.time.LocalDate
 import kotlin.math.abs
@@ -99,6 +100,7 @@ fun compareTwoPlots(oldPlot: PlotData, newPlot: PlotData, threshold: Double, tar
 
     oldPlot.PlotTrees.forEach { oldTree ->
         val newTree = newPlot.getTreeBySampleNum(oldTree.SampleNum)
+
         if (newTree != null && checkThreshold(oldTree.getFieldValue(target), newTree.getFieldValue(target), threshold)) {
             targetSet.add(newTree)
         }

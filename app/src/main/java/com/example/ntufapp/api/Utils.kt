@@ -67,7 +67,7 @@ fun transformPlotInfoResponseToPlotData(response: PlotInfoResponse): PlotData {
     // find corresponding investigation item code
     plotData.initPlotTrees(response.body.newest_location_count)
     val investigationDBHCode = locationInfo.area_investigation_setup_list
-        .firstOrNull { it.investigation_item_name == "基徑" }
+        .firstOrNull { it.investigation_item_name == "胸徑" }
         ?.investigation_item_code
     val investigationHeightCode = locationInfo.area_investigation_setup_list
         .firstOrNull { it.investigation_item_name == "樹高" }
@@ -75,6 +75,7 @@ fun transformPlotInfoResponseToPlotData(response: PlotInfoResponse): PlotData {
     val investigationStateCode = locationInfo.area_investigation_setup_list
         .firstOrNull { it.investigation_item_name == "生長狀態" }
         ?.investigation_item_code
+//    Log.d("code", "DBH: $investigationDBHCode, Height: $investigationHeightCode, State: $investigationStateCode")
     // get data from newest investigation record by the corresponding investigation item code
     for (i in plotData.PlotTrees.indices) {
         plotData.PlotTrees[i].location_sid = newestInvestigation.investigation_record_list[i].location_sid
@@ -84,6 +85,8 @@ fun transformPlotInfoResponseToPlotData(response: PlotInfoResponse): PlotData {
             newestInvestigation.investigation_record_list[i].investigation_result_list.firstOrNull { it.investigation_item_code == investigationHeightCode }?.investigation_result?.toDoubleOrNull() ?: 0.0
         plotData.PlotTrees[i].State =
             (newestInvestigation.investigation_record_list[i].investigation_result_list.firstOrNull { it.investigation_item_code == investigationStateCode }?.investigation_result?.split(",") ?: emptyList()).toMutableList()
+
+//        Log.d("tree", "$i, DBH: ${plotData.PlotTrees[i].DBH}, Height: ${plotData.PlotTrees[i].MeasHeight}")
     }
 
     return plotData
@@ -119,15 +122,15 @@ fun transformPlotDataToSurveyDataForUpload(plotData: PlotData): SurveyDataForUpl
                     location_wy = tree.location_wy
                 )
             },
-            plotData.getForkedHeightCode()?.let {
-                InvestigationRecord(
-                    investigation_item_code = it,
-                    investigation_item_result = tree.ForkHeight.toString(),
-                    location_sid = tree.location_sid,
-                    location_wx = tree.location_wx,
-                    location_wy = tree.location_wy
-                )
-            }
+//            plotData.getForkedHeightCode()?.let {
+//                InvestigationRecord(
+//                    investigation_item_code = it,
+//                    investigation_item_result = tree.ForkHeight.toString(),
+//                    location_sid = tree.location_sid,
+//                    location_wx = tree.location_wx,
+//                    location_wy = tree.location_wy
+//                )
+//            }
         )
     }
 
@@ -149,6 +152,7 @@ fun transformPlotDataToSurveyDataForUpload(plotData: PlotData): SurveyDataForUpl
         investigation_year = plotData.Date.substring(0, 4),
         location_mid = plotData.location_mid,
         photo_list = emptyList(), // Assuming no photos are updated; adjust as needed
+        update_user = plotData.userList.first().user_code.toInt()
     )
 }
 

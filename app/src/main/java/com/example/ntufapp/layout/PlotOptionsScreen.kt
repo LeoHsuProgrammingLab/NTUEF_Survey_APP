@@ -106,12 +106,15 @@ fun PlotOptionsScreen(
 
             if(showOldUploadData.value) {
                 val confirmHeader = "您已匯入${plotData.value.ManageUnit}${plotData.value.SubUnit}的資料\n樣區名稱：${plotData.value.PlotName}\n樣區編號：${plotData.value.PlotNum}\n該樣區有${plotData.value.PlotTrees.size}棵樣樹"
+//                for (i in plotData.value.PlotTrees.indices)
+//                    Log.d("tree", "upload $i, DBH: ${plotData.value.PlotTrees[i].DBH}, Height: ${plotData.value.PlotTrees[i].MeasHeight}")
                 GeneralConfirmDialog(
                     reminder = confirmHeader,
                     confirmText = stringResource(id = R.string.next),
                     onDismiss = {},
                     onCancelClick = { showOldUploadData.value = false },
                     onConfirmClick = {
+                        showOldPlotUpload.value = false
                         surveyType.value = "ReSurvey"
                         onNextButtonClick(plotData.value, surveyType.value, outputFilename.value)
                     }
