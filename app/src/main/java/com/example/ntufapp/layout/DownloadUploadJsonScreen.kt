@@ -39,6 +39,7 @@ import com.example.ntufapp.ui.theme.LayoutDivider
 import com.example.ntufapp.ui.widget.dialog.ChoosePlotToDownloadDialog
 import com.example.ntufapp.ui.widget.dialog.UploadFileDialog
 import com.example.ntufapp.utils.getFileName
+import com.example.ntufapp.utils.notifyMediaScanner
 import com.example.ntufapp.utils.parseJsonToSurveyDataForUpload
 import com.example.ntufapp.utils.showMessage
 import com.example.ntufapp.utils.writeToJson
@@ -154,7 +155,7 @@ fun DownloadButton(
     Button(
         modifier = Modifier.padding(5.dp),
         onClick = {
-            Log.d(tag, "Download Info Button clicked")
+//            Log.d(tag, "Download Info Button clicked")
             catalogueApi(coroutineScope, tag) { response: PlotsCatalogueResponse?, log: String ->
                 if (response != null) {
                     val structuredMap = response.body.data_list.groupBy { it.dept_name }.mapValues { (dept, dataList) ->
@@ -169,7 +170,7 @@ fun DownloadButton(
                     listOfPlots.value = structuredMap
                     showDownloadDialog.value = true
                 } else {
-                    Log.d(tag, log)
+//                    Log.d(tag, log)
                     showMessage(context, log)
                 }
             }
@@ -215,9 +216,15 @@ suspend fun handleDownload(
     }
 
     plotInfoRsp.userList = extractUserListWithDeptName(userAndConditionCodeResponse?.body?.user_code_list!!, dept_name)
+    Log.d(tag, "plotInfoRsp: ${plotInfoRsp.userList.size} users")
 
     // Save data to json
     try {
+        if (!outputDir.exists()) {
+            outputDir.mkdirs()
+            showMessage(context, "建立NTUEF_APP資料夾")
+            notifyMediaScanner(context, outputDir)
+        }
         val file = File(outputDir, "$plotName.json")
         val gson = Gson()
         val myJson = gson.toJson(plotInfoRsp)

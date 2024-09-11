@@ -27,6 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ntufapp.R
+import com.example.ntufapp.api.getTodayDate
 import com.example.ntufapp.model.PlotData
 import com.example.ntufapp.ui.widget.dialog.UploadFileDialog
 import com.example.ntufapp.ui.theme.LayoutDivider
@@ -223,7 +224,7 @@ fun handleFileUpload(
             plotData.value = parseJsonToPlotData(selectedFileUri.value!!, context)!!
             Log.d("PlotOptions", "plotData: ${plotData.value.location_mid}")
             showOldUploadData.value = true
-            outputFilename.value = getFileName(context, selectedFileUri.value)
+            outputFilename.value = getFileName(context, selectedFileUri.value).split("_")[0] + "_" + getTodayDate() + ".json"
         } catch (e: Exception) {
             Log.i("PlotOptions", "exError: $e")
             showMessage(context, "檔案解析時發生錯誤！（可能為空檔案）")

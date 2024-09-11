@@ -1,6 +1,7 @@
 package com.example.ntufapp.layout
 
 import android.os.Build
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
@@ -68,6 +69,7 @@ fun SaveScreen(
                 val showOverwriteDialog = remember { mutableStateOf(false) }
                 val showBackDialog = remember { mutableStateOf(false) }
                 val validFilename = getFilenameWithFormat(newPlotData, outputFilename)
+                Log.d("saveFile", "validFilename: $validFilename")
                 val currentFilename = remember { mutableStateOf(validFilename) }
                 OutlinedButton(
                     modifier = modifier,

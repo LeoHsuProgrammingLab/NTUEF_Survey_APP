@@ -12,6 +12,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import com.example.ntufapp.api.dataType.plotInfoResponse.PlotInfoResponse
 import com.example.ntufapp.api.dataType.surveyDataForUpload.SurveyDataForUpload
+import com.example.ntufapp.api.getTodayDate
 import com.example.ntufapp.api.transformPlotDataToSurveyDataForUpload
 import com.example.ntufapp.api.transformPlotInfoResponseToPlotData
 import com.example.ntufapp.data.ntufappInfo.Companion.outputDir
@@ -164,6 +165,8 @@ fun getFileName(context: Context, uri: Uri?): String {
 fun generateUniqueFilename(context: Context, baseFilename: String, format: String = ".json"): String {
     var version = 0
     var uniqueFilename = baseFilename + format
+    Log.d("saveFile", "unique: $uniqueFilename")
+
     while (checkIfFileExists(context, uniqueFilename)) {
         version++
         uniqueFilename = baseFilename + "_$version" + format
