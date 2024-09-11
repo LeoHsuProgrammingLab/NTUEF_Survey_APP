@@ -252,13 +252,13 @@ suspend fun handleUpload(
         try {
             val surveyDataForUpload = parseJsonToSurveyDataForUpload(selectedFileUri.value!!, context)
             Log.d(tag, "surveyDataForUpload: ${surveyDataForUpload?.investigation_treeHeight_user}, ${surveyDataForUpload?.update_user}")
-            Log.d(tag, "surveyDataForUpload: ${surveyDataForUpload?.investigation_user}, ${surveyDataForUpload?.location_mid}")
+            Log.d(tag, "surveyDataForUpload: ${surveyDataForUpload?.investigation_user}, ${surveyDataForUpload?.location_mid}, ${surveyDataForUpload?.investigation_record_list?.size}")
             val uploadResponse = uploadPlotDataApi(coroutineScope, tag, surveyDataForUpload!!)
             Log.d(tag, "uploadResponse: $uploadResponse")
             if (uploadResponse!!.result) {
                 showMessage(context, "檔案上傳成功！")
             } else {
-                showMessage(context, "檔案上傳失敗！")
+                showMessage(context, "檔案上傳失敗！ ${uploadResponse.body}")
             }
         } catch (e: Exception) {
             Log.i(tag, "exError: $e")
