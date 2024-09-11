@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import com.example.ntufapp.R
 import com.example.ntufapp.api.catalogueApi
 import com.example.ntufapp.api.dataType.plotsCatalogueResponse.PlotsCatalogueResponse
+import com.example.ntufapp.api.dataType.userAndConditionCodeResponse.ForestDept
 import com.example.ntufapp.api.dataType.userAndConditionCodeResponse.User
 import com.example.ntufapp.api.dataType.userAndConditionCodeResponse.UserCode
 import com.example.ntufapp.api.getTodayDate
@@ -214,9 +215,13 @@ suspend fun handleDownload(
         showMessage(context, "樣區名稱為空，該資料尚未建置")
         return
     }
-
-    plotInfoRsp.userList = extractUserListWithDeptName(userAndConditionCodeResponse?.body?.user_code_list!!, dept_name)
-    Log.d(tag, "plotInfoRsp: ${plotInfoRsp.userList.size} users")
+    plotInfoRsp.dept_name = dept_name
+//    Log.d(tag, "dept: ${userAndConditionCodeResponse?.body?.forest_dept_list_count}")
+    if (userAndConditionCodeResponse?.body?.forest_dept_list_count != 0) {
+        plotInfoRsp.area_compart_name = extractAreaCompartName(userAndConditionCodeResponse?.body?.forest_dept_list!!, dept_name, plotInfoRsp.body.location_info.area_compart)
+    }
+    plotInfoRsp.species_list = userAndConditionCodeResponse.body.breed_list
+    plotInfoRsp.userList = extractUserListWithDeptName(userAndConditionCodeResponse.body.user_code_list, dept_name)
 
     // Save data to json
     try {
@@ -271,4 +276,14 @@ fun extractUserListWithDeptName(userCodeList: List<UserCode>, TargetDeptName: St
     }.flatMap {
         it.user_list
     }
+}
+
+fun extractAreaCompartName(
+    forestDeptList: List<ForestDept>,
+    TargetDeptName: String,
+    areaCompartNo: Int
+): String {
+    val targetDept = forestDeptList.find { it.forest_dept_name == TargetDeptName }
+    Log.d("LoadJsonScreen", "targetDept: $targetDept")
+    return targetDept?.area_compart_list?.find { it.area_compart_code == areaCompartNo }?.area_compart_name ?: ""
 }
