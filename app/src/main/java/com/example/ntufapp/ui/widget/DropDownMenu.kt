@@ -200,7 +200,7 @@ fun PlotSelectionDropDownMenu(
             itemList = areaNameList.value,
             onItemsChange = { it ->
                 areaName.value = it
-                locationList.value = listOf("請選擇樣區") + (allPlotsInfo[deptName.value]?.get(compart.value)?.get(it)?.map { it.first } ?: emptyList())
+                locationList.value = listOf("請選擇樣區") + (allPlotsInfo[deptName.value]?.get(compart.value)?.get(it)?.map { it.first }?.sorted() ?: emptyList())
                 location.value = locationList.value.firstOrNull() ?: "尚無"
             }
         )
