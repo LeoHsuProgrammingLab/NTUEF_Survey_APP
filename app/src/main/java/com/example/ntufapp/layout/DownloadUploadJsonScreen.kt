@@ -78,7 +78,7 @@ fun DownloadUploadJsonScreen () {
             val context = LocalContext.current
             val showDownloadDialog = remember { mutableStateOf(false) }
             val showUploadDialog = remember { mutableStateOf(false) }
-            val listOfPlots = remember { mutableStateOf(emptyMap<String, Map<String, List<Pair<String, String>>>>()) }
+            val listOfPlots = remember { mutableStateOf(emptyMap<String, Map<String, Map<String, List<Pair<String, String>>>>>()) }
             val selectedFileUri = remember { mutableStateOf<Uri?>(null) }
             val buttonText = remember { mutableStateOf("請選擇JSON檔案") }
 
@@ -150,7 +150,7 @@ fun DownloadButton(
     coroutineScope: CoroutineScope,
     context: Context,
     showDownloadDialog: MutableState<Boolean>,
-    listOfPlots: MutableState<Map<String, Map<String, List<Pair<String, String>>>>>
+    listOfPlots: MutableState<Map<String, Map<String, Map<String, List<Pair<String, String>>>>>>
 ) {
     val tag = "LoadJsonScreen"
     Button(
@@ -161,11 +161,15 @@ fun DownloadButton(
                 if (response != null) {
                     val structuredMap = response.body.data_list.groupBy { it.dept_name }.mapValues { (dept, dataList) ->
                         dataList.associate { data ->
+                            val compartNo = data.area_compart.toString()
                             val areaName = "${data.area_name} (${data.area_kinds_name})"
-                            val locationList = data.location_list.map { location ->
-                                Pair(location.location_name, location.location_mid)
-                            }
-                            areaName to locationList
+                            val area2LocationList = mapOf(
+                                areaName to data.location_list.map { location ->
+                                    Pair(location.location_name, location.location_mid)
+                                }
+                            )
+
+                            compartNo to area2LocationList
                         }
                     }
                     listOfPlots.value = structuredMap
