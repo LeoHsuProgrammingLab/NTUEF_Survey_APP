@@ -54,11 +54,10 @@ fun SpeciesConditionView(
     surveyType: String = "NewSurvey"
 ) {
     val coroutineScope = rememberCoroutineScope()
-    Log.d("SpeciesConditionView", "totalTreesNumList: ${totalTreesNumList.size}")
     for (i in totalTreesNumList.size downTo 1) {
-        if (speciesTreeSet.value.contains(i.toString())) {
-            break
-        }
+//        if (speciesTreeSet.value.contains(i.toString())) {
+//            continue
+//        }
         speciesTreeSet.value.add(i.toString())
         conditionTreeSet.value.add(i.toString())
     }
@@ -260,7 +259,11 @@ fun SpeciesConditionView(
                             conditionTreeSet.value.remove(currentTreeNum.value)
                         }
                     )
-
+                    val speciesList = remember {
+                        mutableStateOf(newPlotData.speciesList.map { it.code_name })
+                    }
+                    Log.d("species", "speciesList: ${newPlotData.speciesList.size}")
+                    Log.d("species", "speciesList: ${speciesList.value.size}")
                     TreeSpeciesWidget(
                         currentTree = currentTree.value,
                         onUpdateTreeSet = {
@@ -268,7 +271,8 @@ fun SpeciesConditionView(
                             tempSet.remove(currentTreeNum.value)
                             speciesTreeSet.value = tempSet
                             showMessage(context, "您已新增樣樹${currentTree.value.SampleNum}之樹種\n${currentTree.value.Species}")
-                        }
+                        },
+                        speciesList = speciesList
                     )
                 }
             }
@@ -279,7 +283,8 @@ fun SpeciesConditionView(
 @Composable
 fun TreeSpeciesWidget(
     currentTree: Tree,
-    onUpdateTreeSet: () -> Unit
+    onUpdateTreeSet: () -> Unit,
+    speciesList: MutableState<List<String>>
 ) {
     val showDialog = remember { mutableStateOf(false) }
     val currentTreeSpecies = remember { mutableStateOf(currentTree.Species) }
@@ -318,6 +323,7 @@ fun TreeSpeciesWidget(
 
         if (showDialog.value) {
             AdjustSpeciesDialog(
+                speciesList = speciesList,
                 onDismiss = {},
                 onCancelClick = { showDialog.value = false },
                 onNextButtonClick = {

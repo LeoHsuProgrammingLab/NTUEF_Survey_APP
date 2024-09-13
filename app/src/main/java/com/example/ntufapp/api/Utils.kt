@@ -62,7 +62,8 @@ fun transformPlotInfoResponseToPlotData(response: PlotInfoResponse): PlotData {
         area_investigation_setup_list = locationInfo.area_investigation_setup_list.associateBy({ it.investigation_item_name }, { it.investigation_item_code }).toMutableMap(),
         location_mid = response.location_mid,
         investigation_user_map = newestInvestigation.investigation_user_list.associateBy({ it.user_id }, { it.user_name }).toMutableMap(),
-        area_compart = locationInfo.area_compart.toString()
+        area_compart = locationInfo.area_compart.toString(),
+        speciesList = response.species_list
     )
 
     // find corresponding investigation item code

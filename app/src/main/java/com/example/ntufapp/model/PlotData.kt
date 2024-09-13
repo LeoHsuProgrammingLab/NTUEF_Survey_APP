@@ -1,6 +1,7 @@
 package com.example.ntufapp.model
 
 import android.util.Log
+import com.example.ntufapp.api.dataType.userAndConditionCodeResponse.SpeciesItem
 import com.example.ntufapp.api.dataType.userAndConditionCodeResponse.User
 import java.time.LocalDate
 import kotlin.math.abs
@@ -33,7 +34,9 @@ data class PlotData(
     var area_investigation_setup_list: MutableMap<String, String> = mutableMapOf(),
     var location_mid: String = "",
     var investigation_user_map: MutableMap<Int, String> = mutableMapOf(), // user_code, user_name
-    var userList: List<User> = listOf()
+    var userList: List<User> = listOf(),
+
+    var speciesList: List<SpeciesItem> = listOf(),
 ) {
    fun setToday() {
        val today: LocalDate = LocalDate.now()
@@ -67,7 +70,8 @@ data class PlotData(
             location_mid = location_mid,
             investigation_user_map = investigation_user_map.toMutableMap(),
             userList = userList,
-            area_compart = area_compart
+            area_compart = area_compart,
+            speciesList = speciesList
         )
     }
 
