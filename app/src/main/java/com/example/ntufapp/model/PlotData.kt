@@ -27,6 +27,7 @@ data class PlotData(
     var HtSurveyor: Pair<Int, String>? = null, // 3
     var PlotTrees: MutableList<Tree> = mutableListOf(),
 
+    val area_compart: String = "",
     var area_id: String = "",
     var area_investigation_setup_id: String = "",
     var area_investigation_setup_list: MutableMap<String, String> = mutableMapOf(),
@@ -65,7 +66,8 @@ data class PlotData(
             area_investigation_setup_list = area_investigation_setup_list,
             location_mid = location_mid,
             investigation_user_map = investigation_user_map.toMutableMap(),
-            userList = userList
+            userList = userList,
+            area_compart = area_compart
         )
     }
 
