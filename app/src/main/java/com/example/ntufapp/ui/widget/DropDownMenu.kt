@@ -61,7 +61,7 @@ fun PlotSelectionDropDownMenu(
 
     // 林班地 compartment
     val compartList = remember {
-        mutableStateOf(allPlotsInfo[deptName.value]?.keys?.toList() ?: emptyList())
+        mutableStateOf(allPlotsInfo[deptName.value]?.keys?.toList()?.sortedBy { it.toInt() } ?: emptyList())
     }
     val compart = remember { mutableStateOf("請選擇林班地") }
 
@@ -174,9 +174,9 @@ fun PlotSelectionDropDownMenu(
             onExpandChange = { deptNameDropdownExpanded.value = it },
             currentValue = deptName.value,
             itemList = deptNameList,
-            onItemsChange = {
+            onItemsChange = { it ->
                 deptName.value = it
-                compartList.value = listOf("請選擇林班地") + (allPlotsInfo[it]?.keys?.sorted() ?: emptyList())
+                compartList.value = listOf("請選擇林班地") + (allPlotsInfo[it]?.keys?.sortedBy{ s -> s.toInt() } ?: emptyList())
                 compart.value = compartList.value.first()
             }
         )
