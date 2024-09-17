@@ -119,7 +119,7 @@ fun transformPlotDataToSurveyDataForUpload(plotData: PlotData): SurveyDataForUpl
             plotData.getStateCode()?.let {
                 InvestigationRecord(
                     investigation_item_code = it,
-                    investigation_item_result = tree.State.joinToString(","),
+                    investigation_item_result = extractStateCodeFromStateString(tree.State),
                     location_sid = tree.location_sid,
                     location_wx = tree.location_wx,
                     location_wy = tree.location_wy
@@ -187,4 +187,8 @@ fun getTodayDate(): String {
 fun extractNumber(s: String): Int {
     val regex = "\\d+".toRegex()
     return regex.find(s)?.value?.toInt() ?: 0
+}
+
+fun extractStateCodeFromStateString(stateList: MutableList<String>): String {
+    return DataSource.GrowthCodeList.filter { it.code_name in stateList || stateList.any { state -> state.contains(it.code_name) } }.joinToString(",") { it.code }
 }
