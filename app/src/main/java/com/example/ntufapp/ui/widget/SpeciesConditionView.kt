@@ -55,9 +55,9 @@ fun SpeciesConditionView(
 ) {
     val coroutineScope = rememberCoroutineScope()
     for (i in totalTreesNumList.size downTo 1) {
-//        if (speciesTreeSet.value.contains(i.toString())) {
-//            continue
-//        }
+        if (speciesTreeSet.value.contains(i.toString())) {
+            continue
+        }
         speciesTreeSet.value.add(i.toString())
         conditionTreeSet.value.add(i.toString())
     }
@@ -115,7 +115,9 @@ fun SpeciesConditionView(
                     modifier = unaddressedModifier,
                     onChoose = {
                         currentTreeNum.value = it
-                        coroutineScope.launch{}
+                        coroutineScope.launch{
+                            // do nothing
+                        }
                     }
                 )
 
@@ -126,7 +128,9 @@ fun SpeciesConditionView(
                     modifier = unaddressedModifier,
                     onChoose = {
                         currentTreeNum.value = it
-                        coroutineScope.launch{}
+                        coroutineScope.launch{
+                            // do nothing
+                        }
                     }
                 )
             }

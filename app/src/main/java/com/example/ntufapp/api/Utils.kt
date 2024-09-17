@@ -10,6 +10,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import android.util.Base64
 import android.util.Log
+import com.example.ntufapp.data.DataSource
 import com.example.ntufapp.model.PlotData
 import java.io.File
 import java.io.FileInputStream
@@ -85,8 +86,8 @@ fun transformPlotInfoResponseToPlotData(response: PlotInfoResponse): PlotData {
             newestInvestigation.investigation_record_list[i].investigation_result_list.firstOrNull { it.investigation_item_code == investigationDBHCode }?.investigation_result?.toDoubleOrNull() ?: 0.0
         plotData.PlotTrees[i].MeasHeight =
             newestInvestigation.investigation_record_list[i].investigation_result_list.firstOrNull { it.investigation_item_code == investigationHeightCode }?.investigation_result?.toDoubleOrNull() ?: 0.0
-        plotData.PlotTrees[i].State =
-            (newestInvestigation.investigation_record_list[i].investigation_result_list.firstOrNull { it.investigation_item_code == investigationStateCode }?.investigation_result?.split(",") ?: emptyList()).toMutableList()
+        val growthStateCodeList = newestInvestigation.investigation_record_list[i].investigation_result_list.firstOrNull { it.investigation_item_code == investigationStateCode }?.investigation_result?.split(",") ?: emptyList()
+        plotData.PlotTrees[i].State = DataSource.GrowthCodeList.filter { it.code in growthStateCodeList }.map { it.code_name }.toMutableList()
 
 //        Log.d("tree", "$i, DBH: ${plotData.PlotTrees[i].DBH}, Height: ${plotData.PlotTrees[i].MeasHeight}")
     }
