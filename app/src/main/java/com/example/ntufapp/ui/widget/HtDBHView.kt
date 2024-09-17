@@ -75,15 +75,6 @@ fun HtDBHView(
     visHtTreeSet: MutableState<MutableSet<String>>,
     newPlotData: PlotData
 ) {
-    for (i in totalTreesNumList.size downTo 1) {
-        if (dbhTreeSet.value.contains(i.toString())) {
-            break
-        }
-        dbhTreeSet.value.add(i.toString())
-        visHtTreeSet.value.add(i.toString())
-        forkHtTreeSet.value.add(i.toString())
-        measHtTreeSet.value.add(i.toString())
-    }
 
     // Adjust the height
     val windowInfo = rememberWindowInfo()

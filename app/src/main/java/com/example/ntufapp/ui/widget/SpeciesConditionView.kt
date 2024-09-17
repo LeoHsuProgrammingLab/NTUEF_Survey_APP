@@ -54,13 +54,6 @@ fun SpeciesConditionView(
     surveyType: String = "NewSurvey"
 ) {
     val coroutineScope = rememberCoroutineScope()
-    for (i in totalTreesNumList.size downTo 1) {
-        if (speciesTreeSet.value.contains(i.toString())) {
-            continue
-        }
-        speciesTreeSet.value.add(i.toString())
-        conditionTreeSet.value.add(i.toString())
-    }
 
     val context = LocalContext.current
     val modifier = Modifier.width(530.dp)
@@ -260,7 +253,6 @@ fun SpeciesConditionView(
                             val tempSet = conditionTreeSet.value.toMutableSet()
                             tempSet.remove(currentTreeNum.value)
                             conditionTreeSet.value = tempSet
-                            conditionTreeSet.value.remove(currentTreeNum.value)
                         }
                     )
                     val speciesList = remember {
