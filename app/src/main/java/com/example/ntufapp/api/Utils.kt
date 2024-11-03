@@ -10,6 +10,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import android.util.Base64
 import android.util.Log
+import com.example.ntufapp.data.DataSource
 import com.example.ntufapp.model.PlotData
 import java.io.File
 import java.io.FileInputStream
@@ -52,20 +53,43 @@ fun transformPlotInfoResponseToPlotData(response: PlotInfoResponse): PlotData {
         Slope = locationInfo.area_slope.toDoubleOrNull() ?: 0.0,
         Aspect = locationInfo.area_aspect,
 
-        Surveyor = surveyors,
-        HtSurveyor = htSurveyor,
+        // Surveyor doesn't need to be assigned
+        // HtSurveyor = htSurveyor,
         PlotTrees = mutableListOf(), // Additional logic needed to populate trees if applicable
 
         userList = response.userList,
         area_id = locationInfo.area_id,
         area_investigation_setup_id = locationInfo.area_investigation_setup_id,
+        area_investigation_setup_list = locationInfo.area_investigation_setup_list.associateBy({ it.investigation_item_name }, { it.investigation_item_code }).toMutableMap(),
         location_mid = response.location_mid,
-        investigation_user_map = newestInvestigation.investigation_user_list.associateBy({ it.user_id }, { it.user_name }).toMutableMap()
+        investigation_user_map = newestInvestigation.investigation_user_list.associateBy({ it.user_id }, { it.user_name }).toMutableMap(),
+        area_compart = locationInfo.area_compart.toString(),
+        speciesList = response.species_list
     )
 
+    // find corresponding investigation item code
     plotData.initPlotTrees(response.body.newest_location_count)
+    val investigationDBHCode = locationInfo.area_investigation_setup_list
+        .firstOrNull { it.investigation_item_name == "胸徑" }
+        ?.investigation_item_code
+    val investigationHeightCode = locationInfo.area_investigation_setup_list
+        .firstOrNull { it.investigation_item_name == "樹高" }
+        ?.investigation_item_code
+    val investigationStateCode = locationInfo.area_investigation_setup_list
+        .firstOrNull { it.investigation_item_name == "生長狀態" }
+        ?.investigation_item_code
+//    Log.d("code", "DBH: $investigationDBHCode, Height: $investigationHeightCode, State: $investigationStateCode")
+    // get data from newest investigation record by the corresponding investigation item code
     for (i in plotData.PlotTrees.indices) {
         plotData.PlotTrees[i].location_sid = newestInvestigation.investigation_record_list[i].location_sid
+        plotData.PlotTrees[i].DBH =
+            newestInvestigation.investigation_record_list[i].investigation_result_list.firstOrNull { it.investigation_item_code == investigationDBHCode }?.investigation_result?.toDoubleOrNull() ?: 0.0
+        plotData.PlotTrees[i].MeasHeight =
+            newestInvestigation.investigation_record_list[i].investigation_result_list.firstOrNull { it.investigation_item_code == investigationHeightCode }?.investigation_result?.toDoubleOrNull() ?: 0.0
+        val growthStateCodeList = newestInvestigation.investigation_record_list[i].investigation_result_list.firstOrNull { it.investigation_item_code == investigationStateCode }?.investigation_result?.split(",") ?: emptyList()
+        plotData.PlotTrees[i].State = DataSource.GrowthCodeList.filter { it.code in growthStateCodeList }.map { it.code_name }.toMutableList()
+
+//        Log.d("tree", "$i, DBH: ${plotData.PlotTrees[i].DBH}, Height: ${plotData.PlotTrees[i].MeasHeight}")
     }
 
     return plotData
@@ -74,27 +98,42 @@ fun transformPlotInfoResponseToPlotData(response: PlotInfoResponse): PlotData {
 fun transformPlotDataToSurveyDataForUpload(plotData: PlotData): SurveyDataForUpload {
     val investigationRecordList = plotData.PlotTrees.flatMap { tree ->
         listOf(
-            InvestigationRecord(
-                investigation_item_code = "1",
-                investigation_item_result = tree.MeasHeight.toString(),
-                location_sid = tree.location_sid,
-                location_wx = tree.location_wx,
-                location_wy = tree.location_wy
-            ),
-            InvestigationRecord(
-                investigation_item_code = "5",
-                investigation_item_result = tree.DBH.toString(),
-                location_sid = tree.location_sid,
-                location_wx = tree.location_wx,
-                location_wy = tree.location_wy
-            ),
-            InvestigationRecord(
-                investigation_item_code = "8",
-                investigation_item_result = tree.State.joinToString(),
-                location_sid = tree.location_sid,
-                location_wx = tree.location_wx,
-                location_wy = tree.location_wy
-            ),
+            plotData.getHeightCode()?.let {
+                InvestigationRecord(
+                    investigation_item_code = it,
+                    investigation_item_result = tree.MeasHeight.toString(),
+                    location_sid = tree.location_sid,
+                    location_wx = tree.location_wx,
+                    location_wy = tree.location_wy
+                )
+            },
+            plotData.getDBHCode()?.let {
+                InvestigationRecord(
+                    investigation_item_code = it,
+                    investigation_item_result = tree.DBH.toString(),
+                    location_sid = tree.location_sid,
+                    location_wx = tree.location_wx,
+                    location_wy = tree.location_wy
+                )
+            },
+            plotData.getStateCode()?.let {
+                InvestigationRecord(
+                    investigation_item_code = it,
+                    investigation_item_result = extractStateCodeFromStateString(tree.State),
+                    location_sid = tree.location_sid,
+                    location_wx = tree.location_wx,
+                    location_wy = tree.location_wy
+                )
+            },
+//            plotData.getForkedHeightCode()?.let {
+//                InvestigationRecord(
+//                    investigation_item_code = it,
+//                    investigation_item_result = tree.ForkHeight.toString(),
+//                    location_sid = tree.location_sid,
+//                    location_wx = tree.location_wx,
+//                    location_wy = tree.location_wy
+//                )
+//            }
         )
     }
 
@@ -102,14 +141,21 @@ fun transformPlotDataToSurveyDataForUpload(plotData: PlotData): SurveyDataForUpl
         area_id = plotData.area_id,
         area_investigation_setup_id = plotData.area_investigation_setup_id,
         investigation_date = plotData.Date,
-        investigation_record_list = investigationRecordList, // TODO
-        investigation_treeHeight_user = plotData.HtSurveyor.first,
-        investigation_user = if (plotData.Surveyor.keys.isEmpty())
-            plotData.userList.first().user_code else plotData.Surveyor.keys.joinToString(","),
+        investigation_record_list = investigationRecordList,
+        investigation_treeHeight_user = if (plotData.HtSurveyor == null) {
+            plotData.userList.first().user_code.toInt()
+        } else {
+            plotData.HtSurveyor!!.first
+        },
+        investigation_user = if (plotData.Surveyor.keys.isEmpty()) {
+            plotData.userList.first().user_code
+        } else {
+            plotData.Surveyor.keys.joinToString(",")
+        },
         investigation_year = plotData.Date.substring(0, 4),
         location_mid = plotData.location_mid,
         photo_list = emptyList(), // Assuming no photos are updated; adjust as needed
-        update_user = plotData.investigation_user_map.keys.firstOrNull() ?: plotData.userList.first().user_code.toInt()
+        update_user = plotData.userList.first().user_code.toInt()
     )
 }
 
@@ -141,4 +187,8 @@ fun getTodayDate(): String {
 fun extractNumber(s: String): Int {
     val regex = "\\d+".toRegex()
     return regex.find(s)?.value?.toInt() ?: 0
+}
+
+fun extractStateCodeFromStateString(stateList: MutableList<String>): String {
+    return DataSource.GrowthCodeList.filter { it.code_name in stateList || stateList.any { state -> state.contains(it.code_name) } }.joinToString(",") { it.code }
 }

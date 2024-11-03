@@ -1,5 +1,6 @@
 package com.example.ntufapp.ui.widget
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,10 +28,10 @@ fun MetaDateView(newPlotData: PlotData) {
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         val dateInfo = Pair("調查日期", newPlotData.Date)
-        val mangeUnitInfo = Pair("營林區", newPlotData.ManageUnit)
-        val subUnitInfo = Pair("林班", newPlotData.SubUnit)
+        val mangeUnitInfo = Pair("試驗地", newPlotData.ManageUnit)
+        val subUnitInfo = Pair("林班", newPlotData.area_compart)
         val plotNumInfo = Pair("樣區編號", newPlotData.PlotNum)
-        val plotNameInfo = Pair("樣區名稱", newPlotData.PlotName)
+        val plotNameInfo = Pair("樣區種類", newPlotData.PlotName)
         val plotAreaInfo = Pair("樣區面積(m2)", newPlotData.PlotArea.toString())
         val plotTypeInfo = Pair("樣區型態", newPlotData.PlotType)
         val TWD97_X = Pair("TWD97_X", newPlotData.TWD97_X)
@@ -42,8 +43,9 @@ fun MetaDateView(newPlotData: PlotData) {
         Column(
             modifier = Modifier.padding(5.dp)
         ) {
-            MetaDataRow(info1 = dateInfo, info2 = mangeUnitInfo, info3 = subUnitInfo, info4 = altitudeInfo)
-            MetaDataRow(info1 = plotNameInfo, info2 = plotNumInfo, info3 = plotTypeInfo, info4 = plotAreaInfo)
+//            MetaDataRow(info1 = dateInfo, info2 = mangeUnitInfo, info3 = subUnitInfo, info4 = altitudeInfo)
+            MetaDataRowThreeCol(info1 = dateInfo, info2 = mangeUnitInfo, info3 = subUnitInfo)
+            MetaDataRow(info1 = plotNameInfo, info2 = plotNumInfo, info3 = plotTypeInfo, info4 = altitudeInfo)
             MetaDataRow(info1 = slopeInfo, info2 = aspectInfo, info3 = TWD97_X, info4 = TWD97_Y)
         }
 
@@ -52,32 +54,36 @@ fun MetaDateView(newPlotData: PlotData) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            val modifier = Modifier
-                .height(65.dp)
             SearchableChooseCheckMenu(
-                if (newPlotData.Surveyor.isNotEmpty()) {
-                    newPlotData.Surveyor.map { it.key.toString() + ": " + it.value }.toMutableList()
-                } else newPlotData.userList.map { it.user_code + ": " + it.user_name }.toMutableList(),
+                newPlotData.userList.map { it.user_code + ": " + it.user_name }.toMutableList(),
+                SelectionMode.MULTIPLE,
                 defaultString = "名單",
                 label = "樣區調查人員",
                 readOnly = true,
+                checkable = true,
                 onChoose = {
-
+                    // For Read-Only Menu
                 },
                 onUpdateList = { stringList ->
-                    newPlotData.Surveyor = stringList.associate { it.split(":")[0].toInt() to it.split(":")[1] }
-                },
-                checkable = true
+                    // For Choosable Menu
+                    newPlotData.Surveyor = stringList.associate { it.split(":")[0].toInt() to it.split(":")[1] } as MutableMap<Int, String>
+                }
             )
             SearchableChooseCheckMenu(
-                mutableListOf(newPlotData.HtSurveyor.first.toString() + ": " + newPlotData.HtSurveyor.second),
+                newPlotData.userList.map { it.user_code + ": " + it.user_name }.toMutableList(),
+                SelectionMode.SINGLE,
+                searchable = false,
                 defaultString = "名單",
                 label = "樹高調查人員",
                 readOnly = true,
+                checkable = true,
                 onChoose = {
-
+                    // For Read-Only Menu
                 },
-                onUpdateList = {}
+                onUpdateList = {
+                    // For Choosable Menu
+                    newPlotData.HtSurveyor = it[0].split(": ")[0].toInt() to it[0].split(": ")[1]
+                },
             )
         }
     }
@@ -98,12 +104,23 @@ fun MetaDataRow(info1: Pair<String, String>, info2: Pair<String, String>, info3:
 }
 
 @Composable
-fun MetaDataBlock(blockName: String, blockVal: String) {
+fun MetaDataRowThreeCol(info1: Pair<String, String>, info2: Pair<String, String>, info3: Pair<String, String>) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        MetaDataBlock(blockName = info1.first, blockVal = info1.second)
+        MetaDataBlock(blockName = info2.first, blockVal = info2.second, width = 480 + 10) // width + 2 * padding
+        MetaDataBlock(blockName = info3.first, blockVal = info3.second)
+    }
+}
+
+@Composable
+fun MetaDataBlock(blockName: String, blockVal: String, width: Int = 240, height: Int = 40) {
     Card(
         modifier = Modifier
             .padding(5.dp)
-            .width(240.dp)
-            .height(40.dp)
+            .width(width.dp)
+            .height(height.dp)
     ) {
         Row(modifier = Modifier.padding(5.dp)) {
             Text(

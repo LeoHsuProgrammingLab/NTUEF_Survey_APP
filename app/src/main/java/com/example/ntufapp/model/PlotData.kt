@@ -1,5 +1,7 @@
 package com.example.ntufapp.model
 
+import android.util.Log
+import com.example.ntufapp.api.dataType.userAndConditionCodeResponse.SpeciesItem
 import com.example.ntufapp.api.dataType.userAndConditionCodeResponse.User
 import java.time.LocalDate
 import kotlin.math.abs
@@ -22,15 +24,19 @@ data class PlotData(
     var Slope: Double = 0.0, //
     var Aspect: String = "",
 
-    var Surveyor: Map<Int, String> = emptyMap(), // 1
-    var HtSurveyor: Pair<Int, String> = Pair(0, ""), // 3
+    var Surveyor: MutableMap<Int, String> = mutableMapOf(), // 1
+    var HtSurveyor: Pair<Int, String>? = null, // 3
     var PlotTrees: MutableList<Tree> = mutableListOf(),
 
+    val area_compart: String = "",
     var area_id: String = "",
     var area_investigation_setup_id: String = "",
+    var area_investigation_setup_list: MutableMap<String, String> = mutableMapOf(),
     var location_mid: String = "",
     var investigation_user_map: MutableMap<Int, String> = mutableMapOf(), // user_code, user_name
-    var userList: List<User> = listOf()
+    var userList: List<User> = listOf(),
+
+    var speciesList: List<SpeciesItem> = listOf(),
 ) {
    fun setToday() {
        val today: LocalDate = LocalDate.now()
@@ -60,14 +66,33 @@ data class PlotData(
             PlotTrees = PlotTrees.toMutableList(),
             area_id = area_id,
             area_investigation_setup_id = area_investigation_setup_id,
+            area_investigation_setup_list = area_investigation_setup_list,
             location_mid = location_mid,
             investigation_user_map = investigation_user_map.toMutableMap(),
-            userList = userList
+            userList = userList,
+            area_compart = area_compart,
+            speciesList = speciesList
         )
     }
 
     fun resetAllTrees() {
         PlotTrees.forEach { it.reset() }
+    }
+
+    fun getDBHCode(): String? {
+        return area_investigation_setup_list["基徑"]
+    }
+
+    fun getHeightCode(): String? {
+        return area_investigation_setup_list["樹高"]
+    }
+
+    fun getStateCode(): String? {
+        return area_investigation_setup_list["生長狀態"]
+    }
+
+    fun getForkedHeightCode(): String? {
+        return area_investigation_setup_list["分叉高"]
     }
 
     fun initPlotTrees(treeNumber: Int) {
@@ -81,6 +106,7 @@ fun compareTwoPlots(oldPlot: PlotData, newPlot: PlotData, threshold: Double, tar
 
     oldPlot.PlotTrees.forEach { oldTree ->
         val newTree = newPlot.getTreeBySampleNum(oldTree.SampleNum)
+
         if (newTree != null && checkThreshold(oldTree.getFieldValue(target), newTree.getFieldValue(target), threshold)) {
             targetSet.add(newTree)
         }

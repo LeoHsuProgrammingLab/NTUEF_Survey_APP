@@ -183,9 +183,9 @@ fun TreeConditionChips(//https://semicolonspace.com/jetpack-compose-filterchip/
                 Text(stringResource(id = R.string.input))
             }
 
-            TreeSpeciesWidget(
-                currentTree = currentTree
-            ) {}
+//            TreeSpeciesWidget(
+//                currentTree = currentTree
+//            ) {}
         }
     }
 

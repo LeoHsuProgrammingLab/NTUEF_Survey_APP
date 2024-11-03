@@ -46,27 +46,35 @@ import com.example.ntufapp.ui.theme.dropDownMenuModifier
 @Composable
 fun PlotSelectionDropDownMenu(
     label: String,
-    allPlotsInfo: Map<String, Map<String, List<Pair<String, String>>>>, // dept_name to (area_name to Pair<location_name, location_mid>)
+    allPlotsInfo: Map<String, Map<String, Map<String, List<Pair<String, String>>>>>, // dept_name to (area_name to Pair<location_name, location_mid>)
     onChoose: (String, String) -> Unit,
     widthType: String = "large",
 ) {
     val deptNameDropdownExpanded = remember { mutableStateOf(false) }
+    val compartDropdownExpanded = remember { mutableStateOf(false) }
     val areaNameDropdownExpanded = remember { mutableStateOf(false) }
     val locationDropdownExpanded = remember { mutableStateOf(false) }
 
     // deptNameList will be expanded in the future, currently only one dept
     val deptNameList = allPlotsInfo.keys.toList()
     val deptName = remember { mutableStateOf(allPlotsInfo.keys.first()) }
+
+    // 林班地 compartment
+    val compartList = remember {
+        mutableStateOf(allPlotsInfo[deptName.value]?.keys?.toList()?.sortedBy { it.toInt() } ?: emptyList())
+    }
+    val compart = remember { mutableStateOf("請選擇林班地") }
+
+
     // areaNameList contains all the area_name in the selected dept
     val areaNameList = remember {
-        mutableStateOf( allPlotsInfo.values.map { it.keys }.flatten() ) // it.keys is a list, so flatten it
+        mutableStateOf( allPlotsInfo[deptName.value]?.get(compart.value)?.keys?.toList() ?: emptyList())
     }
     val areaName = remember { mutableStateOf("請選擇試驗地") }
 
-    // Warning: 林班地
     // locationList contains all the location_name in the selected area
     val locationList = remember { // List of location_name
-        mutableStateOf(listOf("請選擇樣區") + (allPlotsInfo[deptName.value]?.get(areaName.value)?.map { it.first } ?: emptyList()))
+        mutableStateOf((allPlotsInfo[deptName.value]?.get(compart.value)?.get(areaName.value)?.map { it.first } ?: emptyList()))
     }
     val location = remember { mutableStateOf("請選擇樣區") }
 
@@ -81,7 +89,9 @@ fun PlotSelectionDropDownMenu(
                     else -> 90.dp
                 }
             )
-        val boxModifier = Modifier.padding(horizontal = 10.dp).height(80.dp)
+        val boxModifier = Modifier
+            .padding(horizontal = 10.dp)
+            .height(80.dp)
 
         @Composable
         fun DropdownBox (
@@ -164,9 +174,21 @@ fun PlotSelectionDropDownMenu(
             onExpandChange = { deptNameDropdownExpanded.value = it },
             currentValue = deptName.value,
             itemList = deptNameList,
-            onItemsChange = {
+            onItemsChange = { it ->
                 deptName.value = it
-                areaNameList.value = listOf("請選擇樣區") + (allPlotsInfo[it]?.keys?.sorted() ?: emptyList())
+                compartList.value = listOf("請選擇林班地") + (allPlotsInfo[it]?.keys?.sortedBy{ s -> s.toInt() } ?: emptyList())
+                compart.value = compartList.value.first()
+            }
+        )
+
+        DropdownBox(
+            expanded = compartDropdownExpanded.value,
+            onExpandChange = {compartDropdownExpanded.value = it},
+            currentValue = compart.value,
+            itemList = compartList.value,
+            onItemsChange = {
+                compart.value = it
+                areaNameList.value = listOf("請選擇試驗地") + (allPlotsInfo[deptName.value]?.get(it)?.keys?.sorted() ?: emptyList())
                 areaName.value = areaNameList.value.first()
             }
         )
@@ -176,10 +198,9 @@ fun PlotSelectionDropDownMenu(
             onExpandChange = { areaNameDropdownExpanded.value = it },
             currentValue = areaName.value,
             itemList = areaNameList.value,
-            onItemsChange = {
+            onItemsChange = { it ->
                 areaName.value = it
-                locationList.value = listOf("請選擇樣區") + (allPlotsInfo[deptName.value]?.get(it)
-                    ?.map { pair -> pair.first }?.sortedWith(compareBy { locationName -> extractNumber(locationName) }) ?: emptyList())
+                locationList.value = listOf("請選擇樣區") + (allPlotsInfo[deptName.value]?.get(compart.value)?.get(it)?.map { it.first }?.sorted() ?: emptyList())
                 location.value = locationList.value.firstOrNull() ?: "尚無"
             }
         )
@@ -192,7 +213,7 @@ fun PlotSelectionDropDownMenu(
             onItemsChange = {
                 location.value = it
                 onChoose(
-                    allPlotsInfo[deptName.value]?.get(areaName.value)?.find { pair -> pair.first == it }?.second ?: "",
+                    allPlotsInfo[deptName.value]?.get(compart.value)?.get(areaName.value)?.find { pair -> pair.first == it }?.second ?: "",
                     deptName.value
                 )
             }

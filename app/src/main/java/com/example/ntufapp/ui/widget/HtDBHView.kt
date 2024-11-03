@@ -75,15 +75,6 @@ fun HtDBHView(
     visHtTreeSet: MutableState<MutableSet<String>>,
     newPlotData: PlotData
 ) {
-    for (i in totalTreesNumList.size downTo 1) {
-        if (dbhTreeSet.value.contains(i.toString())) {
-            break
-        }
-        dbhTreeSet.value.add(i.toString())
-        visHtTreeSet.value.add(i.toString())
-        forkHtTreeSet.value.add(i.toString())
-        measHtTreeSet.value.add(i.toString())
-    }
 
     // Adjust the height
     val windowInfo = rememberWindowInfo()
@@ -284,7 +275,7 @@ fun LazyColumnInputTextField(
     if (textContent.value == "0.0") {
         textContent.value = ""
     }
-    Log.d("LazyColumnInputTextField", "tree.SampleNum: ${tree.SampleNum}, ${textContent.value}")
+//    Log.d("LazyColumnInputTextField", "tree.SampleNum: ${tree.SampleNum}, ${textContent.value}")
 
     fun updateTree(newValue: Double?) {
         if (newValue != null) {

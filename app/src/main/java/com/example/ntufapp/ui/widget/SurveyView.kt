@@ -1,5 +1,6 @@
 package com.example.ntufapp.ui.widget
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -104,9 +105,11 @@ fun updateUnaddressedSet(
             forkHtSet.value.remove(tree.SampleNum.toString())
         }
         if (tree.Species != "") {
+            Log.d("species", "${tree.Species}")
             speciesSet.value.remove(tree.SampleNum.toString())
         }
         if (tree.State.isNotEmpty()) {
+            Log.d("treeState", "${tree.State.size} ${tree.State}")
             conditionSet.value.remove(tree.SampleNum.toString())
         }
     }

@@ -27,6 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ntufapp.R
+import com.example.ntufapp.api.getTodayDate
 import com.example.ntufapp.model.PlotData
 import com.example.ntufapp.ui.widget.dialog.UploadFileDialog
 import com.example.ntufapp.ui.theme.LayoutDivider
@@ -99,19 +100,23 @@ fun PlotOptionsScreen(
                             showOldPlotUpload
                         )
                     },
-                    onCancelClick = { showOldUploadData.value = false },
+                    onCancelClick = { showOldPlotUpload.value = false },
                     filePicker = filePickerLauncher,
                 )
             }
+            Log.d(tag, "size: ${plotData.value.speciesList.size}")
 
             if(showOldUploadData.value) {
                 val confirmHeader = "您已匯入${plotData.value.ManageUnit}${plotData.value.SubUnit}的資料\n樣區名稱：${plotData.value.PlotName}\n樣區編號：${plotData.value.PlotNum}\n該樣區有${plotData.value.PlotTrees.size}棵樣樹"
+//                for (i in plotData.value.PlotTrees.indices)
+//                    Log.d("tree", "upload $i, DBH: ${plotData.value.PlotTrees[i].DBH}, Height: ${plotData.value.PlotTrees[i].MeasHeight}")
                 GeneralConfirmDialog(
                     reminder = confirmHeader,
                     confirmText = stringResource(id = R.string.next),
                     onDismiss = {},
                     onCancelClick = { showOldUploadData.value = false },
                     onConfirmClick = {
+                        showOldPlotUpload.value = false
                         surveyType.value = "ReSurvey"
                         onNextButtonClick(plotData.value, surveyType.value, outputFilename.value)
                     }
@@ -218,9 +223,9 @@ fun handleFileUpload(
     if (selectedFileUri.value != null) {
         try {
             plotData.value = parseJsonToPlotData(selectedFileUri.value!!, context)!!
-            Log.d("PlotOptions", "plotData: ${plotData.value.location_mid}")
+            Log.d("PlotOptions", "plotData: ${plotData.value.speciesList.size}")
             showOldUploadData.value = true
-            outputFilename.value = getFileName(context, selectedFileUri.value)
+            outputFilename.value = getFileName(context, selectedFileUri.value).split("_")[0] + "_" + getTodayDate() + ".json"
         } catch (e: Exception) {
             Log.i("PlotOptions", "exError: $e")
             showMessage(context, "檔案解析時發生錯誤！（可能為空檔案）")
