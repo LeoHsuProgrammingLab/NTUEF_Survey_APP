@@ -79,7 +79,7 @@ fun catalogueApi(coroutineScope: CoroutineScope, tag: String, callback: (PlotsCa
             }
         } catch (e: IOException) {
             Log.d(tag, "IOException: ${e.message}, you might not have internet connection, you gotta check it")
-            callback(null, "沒有網路，請檢查網路連線")
+            callback(null, "網路連線錯誤")
             return@launch
         } catch (e: HttpException) {
             Log.d(tag, "HttpException: ${e.message}, unexpected http response")
