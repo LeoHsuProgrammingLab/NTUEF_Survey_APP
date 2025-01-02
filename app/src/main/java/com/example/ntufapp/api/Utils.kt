@@ -78,7 +78,7 @@ fun transformPlotInfoResponseToPlotData(response: PlotInfoResponse): PlotData {
     val investigationStateCode = locationInfo.area_investigation_setup_list
         .firstOrNull { it.investigation_item_name == "生長狀態" }
         ?.investigation_item_code
-//    Log.d("code", "DBH: $investigationDBHCode, Height: $investigationHeightCode, State: $investigationStateCode")
+
     // get data from newest investigation record by the corresponding investigation item code
     for (i in plotData.PlotTrees.indices) {
         plotData.PlotTrees[i].location_sid = newestInvestigation.investigation_record_list[i].location_sid
@@ -88,8 +88,6 @@ fun transformPlotInfoResponseToPlotData(response: PlotInfoResponse): PlotData {
             newestInvestigation.investigation_record_list[i].investigation_result_list.firstOrNull { it.investigation_item_code == investigationHeightCode }?.investigation_result?.toDoubleOrNull() ?: 0.0
         val growthStateCodeList = newestInvestigation.investigation_record_list[i].investigation_result_list.firstOrNull { it.investigation_item_code == investigationStateCode }?.investigation_result?.split(",") ?: emptyList()
         plotData.PlotTrees[i].State = DataSource.GrowthCodeList.filter { it.code in growthStateCodeList }.map { it.code_name }.toMutableList()
-
-//        Log.d("tree", "$i, DBH: ${plotData.PlotTrees[i].DBH}, Height: ${plotData.PlotTrees[i].MeasHeight}")
     }
 
     return plotData

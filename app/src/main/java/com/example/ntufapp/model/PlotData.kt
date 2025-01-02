@@ -3,6 +3,7 @@ package com.example.ntufapp.model
 import android.util.Log
 import com.example.ntufapp.api.dataType.userAndConditionCodeResponse.SpeciesItem
 import com.example.ntufapp.api.dataType.userAndConditionCodeResponse.User
+import com.example.ntufapp.utils.showMessage
 import java.time.LocalDate
 import kotlin.math.abs
 
@@ -63,15 +64,15 @@ data class PlotData(
             Aspect = Aspect,
             Surveyor = Surveyor,
             HtSurveyor = HtSurveyor,
-            PlotTrees = PlotTrees.toMutableList(),
+            PlotTrees = PlotTrees.map { it.clone() }.toMutableList(), // Deep copy of trees
             area_id = area_id,
             area_investigation_setup_id = area_investigation_setup_id,
-            area_investigation_setup_list = area_investigation_setup_list,
+            area_investigation_setup_list = area_investigation_setup_list.toMutableMap(), // Deep copy if needed
             location_mid = location_mid,
-            investigation_user_map = investigation_user_map.toMutableMap(),
-            userList = userList,
+            investigation_user_map = investigation_user_map.toMutableMap(), // Deep copy of map
+            userList = userList.toMutableList(),
             area_compart = area_compart,
-            speciesList = speciesList
+            speciesList = speciesList.map { it.copy() } // Deep copy for species list
         )
     }
 
@@ -108,7 +109,8 @@ fun compareTwoPlots(oldPlot: PlotData, newPlot: PlotData, threshold: Double, tar
         val newTree = newPlot.getTreeBySampleNum(oldTree.SampleNum)
 
         if (newTree != null && checkThreshold(oldTree.getFieldValue(target), newTree.getFieldValue(target), threshold)) {
-            targetSet.add(newTree)
+            val invalidTree = newTree.clone()
+            targetSet.add(invalidTree)
         }
     }
 
@@ -129,7 +131,8 @@ fun createTreeQuotaPair(invalidSet: MutableSet<Tree>): MutableMap<Int, Int> {
 }
 
 fun checkThreshold(old: Double, new: Double, threshold: Double): Boolean {
-    return abs(old - new) > threshold * old
+    Log.d("compare", "old: $old, new: $new, threshold: $threshold, result:${abs(old - new) > threshold * old || new == 0.0}")
+    return abs(old - new) > threshold * old || new == 0.0
 }
 
 fun checkThresholdByInterval(old: Double, new: Double, threshold: Double): Boolean {

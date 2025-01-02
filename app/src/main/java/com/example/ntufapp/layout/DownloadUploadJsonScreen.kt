@@ -159,19 +159,31 @@ fun DownloadButton(
 //            Log.d(tag, "Download Info Button clicked")
             catalogueApi(coroutineScope, tag) { response: PlotsCatalogueResponse?, log: String ->
                 if (response != null) {
-                    val structuredMap = response.body.data_list.groupBy { it.dept_name }.mapValues { (dept, dataList) ->
-                        dataList.associate { data ->
-                            val compartNo = data.area_compart.toString()
-                            val areaName = "${data.area_name} (${data.area_kinds_name})"
-                            val area2LocationList = mapOf(
-                                areaName to data.location_list.map { location ->
-                                    Pair(location.location_name, location.location_mid)
-                                }
-                            )
-
-                            compartNo to area2LocationList
+                    val structuredMap = response.body.data_list
+                        .filter { data ->
+                            listOf("作業", "教學", "企劃").any { keyword -> data.dept_name.contains(keyword) }
                         }
-                    }
+                        .groupBy { it.dept_name }
+                        .mapValues { (dept, dataList) ->
+                            dataList.associate { data ->
+                                val compartNo = data.area_compart.toString()
+                                val areaName = "${data.area_name} (${data.area_kinds_name})"
+                                val area_code = data.area_code
+                                // area is for 教研組, code is for 企劃組 and 作業組
+                                val areaOrCode2LocationList = mapOf(
+                                (if (dept.contains("教學")) areaName else area_code) to
+                                        data.location_list
+                                            .map { location ->
+                                                Pair(location.location_name, location.location_mid)
+                                            }
+                                            .sortedBy { pair ->
+                                                // Extract the numeric part from location_name using a regex
+                                                Regex("\\d+").find(pair.first)?.value?.toIntOrNull() ?: Int.MAX_VALUE
+                                            }
+                                )
+                                compartNo to areaOrCode2LocationList
+                            }
+                        }
                     listOfPlots.value = structuredMap
                     showDownloadDialog.value = true
                 } else {
@@ -213,14 +225,15 @@ suspend fun handleDownload(
     val plotInfoRsp = plotApi(coroutineScope, tag, location_mid)
     val today = getTodayDate()
     var plotName = ""
-    if (plotInfoRsp?.body?.location_info?.location_name != null) {
+    if (plotInfoRsp != null && plotInfoRsp.body.location_info.area_name.isNotEmpty() && plotInfoRsp.body.location_info.location_name.isNotEmpty()) {
         plotName = plotInfoRsp.body.location_info.area_name + plotInfoRsp.body.location_info.location_name + "_" + plotInfoRsp.body.newest_investigation.investigation_date
     } else {
         showMessage(context, "樣區名稱為空，該資料尚未建置")
         return
     }
+
     plotInfoRsp.dept_name = dept_name
-//    Log.d(tag, "dept: ${userAndConditionCodeResponse?.body?.forest_dept_list_count}")
+
     if (userAndConditionCodeResponse?.body?.forest_dept_list_count != 0) {
         plotInfoRsp.area_compart_name = extractAreaCompartName(userAndConditionCodeResponse?.body?.forest_dept_list!!, dept_name, plotInfoRsp.body.location_info.area_compart)
     }
@@ -238,7 +251,7 @@ suspend fun handleDownload(
         val gson = Gson()
         val myJson = gson.toJson(plotInfoRsp)
         writeToJson(context, file, myJson)
-        showMessage(context, "檔案${file.absoluteFile.name}儲存成功！\n${file.absoluteFile}")
+        showMessage(context, "檔案${file.absoluteFile.name}儲存成功！\n${file.absoluteFile} \n${plotName}")
     } catch (e: Exception) {
         showMessage(context, "儲存失敗：${e.message}")
         e.printStackTrace()

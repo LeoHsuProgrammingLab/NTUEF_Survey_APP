@@ -1,6 +1,7 @@
 package com.example.ntufapp.layout
 
 import android.content.Context
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.foundation.Canvas
@@ -257,7 +258,7 @@ fun TabbedValidationResult(
         .padding(10.dp)
         .width(450.dp)
 
-    val tabList = listOf("量測樹高", "目視樹高", "分岔樹高", "胸徑")
+    val tabList = listOf("量測樹高", "胸徑") // "目視樹高", "分岔樹高",
     val stringList = listOf("Meas", "Vis", "Fork", "DBH")
     val tabSelected = remember { mutableStateOf(0) }
 
@@ -288,12 +289,12 @@ fun TabbedValidationResult(
 
         val invalidDBHSet = remember { mutableStateOf(compareTwoPlots(oldPlotData, newPlotData, dbhThreshold, stringList[3])) }
         val invalidMeasHtSet = remember { mutableStateOf(compareTwoPlots(oldPlotData, newPlotData, htThreshold, stringList[0])) }
-        val invalidVisHtSet = remember { mutableStateOf(compareTwoPlots(oldPlotData, newPlotData, htThreshold, stringList[1])) }
-        val invalidForkHtSet = remember { mutableStateOf(compareTwoPlots(oldPlotData, newPlotData, htThreshold, stringList[2])) }
+//        val invalidVisHtSet = remember { mutableStateOf(compareTwoPlots(oldPlotData, newPlotData, htThreshold, stringList[1])) }
+//        val invalidForkHtSet = remember { mutableStateOf(compareTwoPlots(oldPlotData, newPlotData, htThreshold, stringList[2])) }
         val invalidDBHQuota = remember { mutableStateOf(createTreeQuotaPair(invalidDBHSet.value)) }
         val invalidMeasHtQuota = remember { mutableStateOf(createTreeQuotaPair(invalidMeasHtSet.value)) }
-        val invalidVisHtQuota = remember { mutableStateOf(createTreeQuotaPair(invalidVisHtSet.value)) }
-        val invalidForkHtQuota = remember { mutableStateOf(createTreeQuotaPair(invalidForkHtSet.value)) }
+//        val invalidVisHtQuota = remember { mutableStateOf(createTreeQuotaPair(invalidVisHtSet.value)) }
+//        val invalidForkHtQuota = remember { mutableStateOf(createTreeQuotaPair(invalidForkHtSet.value)) }
 
         Box(
             modifier = modifier
@@ -314,25 +315,25 @@ fun TabbedValidationResult(
                         threshold = htThreshold
                     )
                 }
+//                1 -> {
+//                    ValidationLazyColumn(
+//                        inValidTreeQuotaMap = invalidVisHtQuota,
+//                        inValidTreeList = invalidVisHtSet,
+//                        oldPlotData = oldPlotData,
+//                        type = stringList[1],
+//                        threshold = htThreshold
+//                    )
+//                }
+//                2 -> {
+//                    ValidationLazyColumn(
+//                        inValidTreeQuotaMap = invalidForkHtQuota,
+//                        inValidTreeList = invalidForkHtSet,
+//                        oldPlotData = oldPlotData,
+//                        type = stringList[2],
+//                        threshold = htThreshold
+//                    )
+//                }
                 1 -> {
-                    ValidationLazyColumn(
-                        inValidTreeQuotaMap = invalidVisHtQuota,
-                        inValidTreeList = invalidVisHtSet,
-                        oldPlotData = oldPlotData,
-                        type = stringList[1],
-                        threshold = htThreshold
-                    )
-                }
-                2 -> {
-                    ValidationLazyColumn(
-                        inValidTreeQuotaMap = invalidForkHtQuota,
-                        inValidTreeList = invalidForkHtSet,
-                        oldPlotData = oldPlotData,
-                        type = stringList[2],
-                        threshold = htThreshold
-                    )
-                }
-                3 -> {
                     ValidationLazyColumn(
                         inValidTreeQuotaMap = invalidMeasHtQuota,
                         inValidTreeList = invalidDBHSet,
@@ -352,7 +353,7 @@ fun ValidationLazyColumn(
     inValidTreeList: MutableState<MutableSet<Tree>>,
     oldPlotData: PlotData,
     type: String,
-    threshold: Double
+    threshold: Double,
 ) {
     val context = LocalContext.current
     LazyColumn(
@@ -383,8 +384,8 @@ fun ValidationLazyColumn(
                 // Store the value re-measured then check if it is valid
                 val treeDBH = remember { mutableStateOf(tree.DBH.toString()) }
                 val treeMeasHt = remember { mutableStateOf(tree.MeasHeight.toString()) }
-                val treeVisHt = remember { mutableStateOf(tree.VisHeight.toString()) }
-                val treeForkHt = remember { mutableStateOf(tree.ForkHeight.toString()) }
+//                val treeVisHt = remember { mutableStateOf(tree.VisHeight.toString()) }
+//                val treeForkHt = remember { mutableStateOf(tree.ForkHeight.toString()) }
                 val treeQuota = remember { mutableStateOf(inValidTreeQuotaMap.value[tree.SampleNum]) }
 
                 ValidationLazyColumnInputTextField(
@@ -393,9 +394,9 @@ fun ValidationLazyColumn(
                         .width(120.dp),
                     textContent = when(type) {
                         "DBH" -> treeDBH
-                        "Vis" -> treeVisHt
-                        "Meas" -> treeMeasHt
-                        else -> treeForkHt
+//                        "Vis" -> treeVisHt
+                         else -> treeMeasHt // "Meas"
+//                        "Fork" -> treeForkHt
                     },
                     changeQuota = inValidTreeQuotaMap.value[tree.SampleNum]!!
                 )
@@ -407,9 +408,9 @@ fun ValidationLazyColumn(
                     onClick = {
                         val newValue = when(type) {
                             "DBH" -> treeDBH
-                            "Vis" -> treeVisHt
-                            "Meas" -> treeMeasHt
-                            else -> treeForkHt
+//                            "Vis" -> treeVisHt
+                            else -> treeMeasHt // "Meas"
+//                            "Fork" -> treeForkHt
                         }.value.toDoubleOrNull()
 
                         if(newValue != null) {
@@ -427,14 +428,18 @@ fun ValidationLazyColumn(
                                 "Meas" -> oldPlotData.getTreeBySampleNum(tree.SampleNum)!!.MeasHeight
                                 else -> oldPlotData.getTreeBySampleNum(tree.SampleNum)!!.ForkHeight
                             }
-                            // Check if the new value is valid
-                            if(checkThreshold(oldValue, newValue, threshold)) {
-                                inValidTreeList.value.remove(tree)
-                            }
+
                             // Update the quota
                             if (treeQuota.value!! > 0) {
                                 treeQuota.value = treeQuota.value!! - 1
                                 inValidTreeQuotaMap.value[tree.SampleNum] = inValidTreeQuotaMap.value[tree.SampleNum]!! - 1
+                            }
+
+                            // Check if the new value is valid
+                            if(!checkThreshold(oldValue, newValue, threshold)) {
+                                inValidTreeList.value = inValidTreeList.value.toMutableSet().apply {
+                                    remove(tree)
+                                }
                             }
                         } else {
                             showMessage(context, "請輸入欲修改之數字")
