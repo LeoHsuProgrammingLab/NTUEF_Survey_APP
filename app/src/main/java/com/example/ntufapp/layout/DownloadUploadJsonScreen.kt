@@ -78,7 +78,7 @@ fun DownloadUploadJsonScreen () {
             val context = LocalContext.current
             val showDownloadDialog = remember { mutableStateOf(false) }
             val showUploadDialog = remember { mutableStateOf(false) }
-            val listOfPlots = remember { mutableStateOf(emptyMap<String, Map<String, Map<String, List<Pair<String, String>>>>>()) }
+            val listOfPlots = remember { mutableStateOf(emptyMap<String, Map<String, List<Map<String, List<Pair<String, String>>>>>>()) }
             val selectedFileUri = remember { mutableStateOf<Uri?>(null) }
             val buttonText = remember { mutableStateOf("請選擇JSON檔案") }
 
@@ -150,7 +150,7 @@ fun DownloadButton(
     coroutineScope: CoroutineScope,
     context: Context,
     showDownloadDialog: MutableState<Boolean>,
-    listOfPlots: MutableState<Map<String, Map<String, Map<String, List<Pair<String, String>>>>>>
+    listOfPlots: MutableState<Map<String, Map<String, List<Map<String, List<Pair<String, String>>>>>>>
 ) {
     val tag = "LoadJsonScreen"
     Button(
@@ -165,25 +165,44 @@ fun DownloadButton(
                         }
                         .groupBy { it.dept_name }
                         .mapValues { (dept, dataList) ->
-                            dataList.associate { data ->
-                                val compartNo = data.area_compart.toString()
-                                val areaName = "${data.area_name} (${data.area_kinds_name})"
-                                val area_code = data.area_code
-                                // area is for 教研組, code is for 企劃組 and 作業組
-                                val areaOrCode2LocationList = mapOf(
-                                (if (dept.contains("教學")) areaName else area_code) to
-                                        data.location_list
-                                            .map { location ->
-                                                Pair(location.location_name, location.location_mid)
-                                            }
-                                            .sortedBy { pair ->
-                                                // Extract the numeric part from location_name using a regex
-                                                Regex("\\d+").find(pair.first)?.value?.toIntOrNull() ?: Int.MAX_VALUE
-                                            }
-                                )
-                                compartNo to areaOrCode2LocationList
+                            dataList.groupBy { it.area_compart.toString() }
+                                .mapValues { (compartNo, compartDataList) ->
+                                    compartDataList.map {data ->
+                                        val areaName = "${data.area_name} (${data.area_kinds_name})"
+                                        val area_code = data.area_code
+                                        val areaOrCode2LocationList = mapOf(
+                                            (if (dept.contains("教學研究")) areaName else area_code) to
+                                                data.location_list
+                                                    .map { location ->
+                                                        Pair(location.location_name, location.location_mid)
+                                                    }
+                                                    .sortedBy { pair ->
+                                                        // Extract the numeric part from location_name using a regex
+                                                        Regex("\\d+").find(pair.first)?.value?.toIntOrNull() ?: Int.MAX_VALUE
+                                                    }
+                                        )
+                                        areaOrCode2LocationList
+                                    }
+                                }
+
+//                            dataList.associate { data ->
+//                                val compartNo = data.area_compart.toString()
+//                                val areaName = "${data.area_name} (${data.area_kinds_name})"
+//                                val area_code = data.area_code
+//                                // area is for 教研組, code is for 企劃組 and 作業組
+//                                val areaOrCode2LocationList = mapOf(
+//                                (if (dept.contains("教學")) areaName else area_code) to
+//                                        data.location_list
+//                                            .map { location ->
+//                                                Pair(location.location_name, location.location_mid)
+//                                            }
+//                                            .sortedBy { pair ->
+//                                                // Extract the numeric part from location_name using a regex
+//                                                Regex("\\d+").find(pair.first)?.value?.toIntOrNull() ?: Int.MAX_VALUE
+//                                            }
+//                                )
+//                                compartNo to areaOrCode2LocationList
                             }
-                        }
                     listOfPlots.value = structuredMap
                     showDownloadDialog.value = true
                 } else {
