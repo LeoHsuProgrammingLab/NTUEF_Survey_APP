@@ -55,20 +55,17 @@ object DataSource {
         "葉部病害",
         "附生植物",
         "蟲害",
+        "鼠害",
     )
 
     val TreeSingleConditionList = listOf(
         "正常", // single
-        "風倒(死亡)", // single
-        "枯立(死亡)", // single
-        "死亡", // single
+        "風倒", // single
+        "枯立", // single
     )
 
-    val SquirrelConditionList = listOf(
-        "鼠害早期",
-        "鼠害中期",
-        "鼠害晚期"
-    )
+//    val SquirrelConditionList = listOf(
+//    )
 
     val GrowthCodeList = listOf(
         GrowthCode(code = "0", code_name = "正常", sort = 1, enabled = true),

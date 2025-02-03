@@ -35,10 +35,15 @@ fun transformPlotInfoResponseToPlotData(response: PlotInfoResponse): PlotData {
 
     val surveyors = newestInvestigation.investigation_user_list.associate { it.user_id to it.user_name }
     val htSurveyor = Pair(newestInvestigation.investigation_treeHeight_user_list.user_id, newestInvestigation.investigation_treeHeight_user_list.user_name) // Assuming tree height surveyor is singular
+    val manageUnit = if (response.dept_name.contains("教學")) {
+        locationInfo.area_name
+    } else {
+        locationInfo.area_code
+    }
     val plotData = PlotData(
         Date = newestInvestigation.investigation_date,
         Year = newestInvestigation.investigation_year,
-        ManageUnit = locationInfo.area_name, // Assuming area_code represents the managing unit
+        ManageUnit = manageUnit, // Assuming area_code represents the managing unit
         SubUnit = locationInfo.location_name,
 
         PlotName = locationInfo.area_kinds_name,
@@ -82,6 +87,8 @@ fun transformPlotInfoResponseToPlotData(response: PlotInfoResponse): PlotData {
     // get data from newest investigation record by the corresponding investigation item code
     for (i in plotData.PlotTrees.indices) {
         plotData.PlotTrees[i].location_sid = newestInvestigation.investigation_record_list[i].location_sid
+        Log.d("location_sid", "${newestInvestigation.investigation_record_list[i].location_sid} ${plotData.PlotTrees[i].location_sid}")
+
         plotData.PlotTrees[i].DBH =
             newestInvestigation.investigation_record_list[i].investigation_result_list.firstOrNull { it.investigation_item_code == investigationDBHCode }?.investigation_result?.toDoubleOrNull() ?: 0.0
         plotData.PlotTrees[i].MeasHeight =
@@ -95,7 +102,8 @@ fun transformPlotInfoResponseToPlotData(response: PlotInfoResponse): PlotData {
 
 fun transformPlotDataToSurveyDataForUpload(plotData: PlotData): SurveyDataForUpload {
     val investigationRecordList = plotData.PlotTrees.flatMap { tree ->
-        listOf(
+        Log.d("location_sid", "${tree.location_sid}")
+        listOfNotNull(
             plotData.getHeightCode()?.let {
                 InvestigationRecord(
                     investigation_item_code = it,
@@ -123,15 +131,33 @@ fun transformPlotDataToSurveyDataForUpload(plotData: PlotData): SurveyDataForUpl
                     location_wy = tree.location_wy
                 )
             },
-//            plotData.getForkedHeightCode()?.let {
-//                InvestigationRecord(
-//                    investigation_item_code = it,
-//                    investigation_item_result = tree.ForkHeight.toString(),
-//                    location_sid = tree.location_sid,
-//                    location_wx = tree.location_wx,
-//                    location_wy = tree.location_wy
-//                )
-//            }
+            plotData.getForkedHeightCode()?.let {
+                InvestigationRecord(
+                    investigation_item_code = it,
+                    investigation_item_result = tree.ForkHeight.toString(),
+                    location_sid = tree.location_sid,
+                    location_wx = tree.location_wx,
+                    location_wy = tree.location_wy
+                )
+            },
+            plotData.getBaseDiameterCode()?.let {
+                InvestigationRecord(
+                    investigation_item_code = it,
+                    investigation_item_result = "0",
+                    location_sid = tree.location_sid,
+                    location_wx = tree.location_wx,
+                    location_wy = tree.location_wy
+                )
+            },
+            plotData.getVisHeightCode()?.let {
+                InvestigationRecord(
+                    investigation_item_code = it,
+                    investigation_item_result = tree.VisHeight.toString(),
+                    location_sid = tree.location_sid,
+                    location_wx = tree.location_wx,
+                    location_wy = tree.location_wy
+                )
+            }
         )
     }
 

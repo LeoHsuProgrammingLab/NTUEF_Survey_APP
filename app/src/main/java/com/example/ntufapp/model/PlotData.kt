@@ -81,7 +81,7 @@ data class PlotData(
     }
 
     fun getDBHCode(): String? {
-        return area_investigation_setup_list["基徑"]
+        return area_investigation_setup_list["胸徑"]
     }
 
     fun getHeightCode(): String? {
@@ -92,8 +92,16 @@ data class PlotData(
         return area_investigation_setup_list["生長狀態"]
     }
 
+    fun getVisHeightCode(): String? {
+        return area_investigation_setup_list["目視樹高"]
+    }
+
     fun getForkedHeightCode(): String? {
         return area_investigation_setup_list["分叉高"]
+    }
+
+    fun getBaseDiameterCode(): String? {
+        return area_investigation_setup_list["基徑"]
     }
 
     fun initPlotTrees(treeNumber: Int) {

@@ -100,6 +100,7 @@ fun saveFile(context: Context, plotData: PlotData, outputDir: File, validFilenam
                 writeToCSV(file, flattenedPlotData)
             } else {
                 // Read the Json data
+                Log.d("check location_sid", "location_sid: ${plotData.PlotTrees[0].location_sid}")
                 val uploadPlotData = transformPlotDataToSurveyDataForUpload(plotData)
                 val gson = Gson()
                 val myJson = gson.toJson(uploadPlotData)

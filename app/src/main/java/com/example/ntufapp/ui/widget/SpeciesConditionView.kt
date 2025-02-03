@@ -135,7 +135,7 @@ fun SpeciesConditionView(
 
             val singleItemList = DataSource.TreeSingleConditionList // only one item can be selected
             val multiItemList = DataSource.TreeMultiConditionList // multiple items can be selected
-            val squirrelItemList = DataSource.SquirrelConditionList // multiple items can be selected
+//            val squirrelItemList = DataSource.SquirrelConditionList // multiple items can be selected
             val selectedItems = remember { mutableStateListOf<String>() }
             val currentTree = remember { mutableStateOf(Tree()) }
             currentTree.value = newPlotData.PlotTrees.find { it.SampleNum == currentTreeNum.value.toInt() }!!
@@ -188,54 +188,85 @@ fun SpeciesConditionView(
                     }
                 }
 
-                LazyRow( modifier = modifier) {
-                    itemsIndexed(squirrelItemList) {id, item ->
-                        FilterChip(
-                            modifier = Modifier.padding(horizontal = 6.dp), // gap between items
-                            selected = selectedItems.contains(item),
-                            onClick = {
-                                if (selectedItems.contains(item)) {
-                                    selectedItems.remove(item)
-                                } else {
-                                    selectedItems.removeAll(squirrelItemList)
-                                    selectedItems.removeAll(singleItemList)
-                                    selectedItems.add(item)
-                                }
-                            },
-                            label = {
-                                Text(
-                                    text = item,
-                                    style = TextStyle(
-                                        fontSize = 18.sp
-                                    )
-                                )
-                            }
-                        )
-                    }
-                }
+//                LazyRow( modifier = modifier) {
+//                    itemsIndexed(squirrelItemList) {id, item ->
+//                        FilterChip(
+//                            modifier = Modifier.padding(horizontal = 6.dp), // gap between items
+//                            selected = selectedItems.contains(item),
+//                            onClick = {
+//                                if (selectedItems.contains(item)) {
+//                                    selectedItems.remove(item)
+//                                } else {
+//                                    selectedItems.removeAll(squirrelItemList)
+//                                    selectedItems.removeAll(singleItemList)
+//                                    selectedItems.add(item)
+//                                }
+//                            },
+//                            label = {
+//                                Text(
+//                                    text = item,
+//                                    style = TextStyle(
+//                                        fontSize = 18.sp
+//                                    )
+//                                )
+//                            }
+//                        )
+//                    }
+//                }
 
-                LazyRow( modifier = modifier) {
-                    itemsIndexed(multiItemList) { id, item ->
-                        FilterChip(
-                            modifier = Modifier.padding(horizontal = 6.dp), // gap between items
-                            selected = selectedItems.contains(item),
-                            onClick = {
-                                if (selectedItems.contains(item)) {
-                                    selectedItems.remove(item)
-                                } else {
-                                    selectedItems.removeAll(singleItemList)
-                                    selectedItems.add(item)
-                                }
-                            },
-                            label = {
-                                Text(
-                                    text = item,
-                                    style = TextStyle(
-                                        fontSize = 18.sp
+                Column(modifier = modifier) {
+                    val halfSize = (multiItemList.size + 1) / 2
+                    val firstHalf = multiItemList.subList(0, halfSize)
+                    val secondHalf = multiItemList.subList(halfSize, multiItemList.size)
+
+                    LazyRow(modifier = modifier) {
+                        itemsIndexed(firstHalf) { id, item ->
+                            FilterChip(
+                                modifier = Modifier.padding(horizontal = 6.dp), // gap between items
+                                selected = selectedItems.contains(item),
+                                onClick = {
+                                    if (selectedItems.contains(item)) {
+                                        selectedItems.remove(item)
+                                    } else {
+                                        selectedItems.removeAll(singleItemList)
+                                        selectedItems.add(item)
+                                    }
+                                },
+                                label = {
+                                    Text(
+                                        text = item,
+                                        style = TextStyle(
+                                            fontSize = 18.sp
+                                        )
                                     )
-                                )
-                            }
-                        )
+                                }
+                            )
+                        }
+                    }
+
+                    LazyRow(modifier = modifier) {
+                        itemsIndexed(secondHalf) { id, item ->
+                            FilterChip(
+                                modifier = Modifier.padding(horizontal = 6.dp), // gap between items
+                                selected = selectedItems.contains(item),
+                                onClick = {
+                                    if (selectedItems.contains(item)) {
+                                        selectedItems.remove(item)
+                                    } else {
+                                        selectedItems.removeAll(singleItemList)
+                                        selectedItems.add(item)
+                                    }
+                                },
+                                label = {
+                                    Text(
+                                        text = item,
+                                        style = TextStyle(
+                                            fontSize = 18.sp
+                                        )
+                                    )
+                                }
+                            )
+                        }
                     }
                 }
 

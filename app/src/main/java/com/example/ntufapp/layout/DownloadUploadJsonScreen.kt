@@ -243,9 +243,19 @@ suspend fun handleDownload(
     val userAndConditionCodeResponse = userAndConditionCodeApi(coroutineScope, tag)
     val plotInfoRsp = plotApi(coroutineScope, tag, location_mid)
     val today = getTodayDate()
-    var plotName = ""
-    if (plotInfoRsp != null && plotInfoRsp.body.location_info.area_name.isNotEmpty() && plotInfoRsp.body.location_info.location_name.isNotEmpty()) {
-        plotName = plotInfoRsp.body.location_info.area_name + plotInfoRsp.body.location_info.location_name + "_" + plotInfoRsp.body.newest_investigation.investigation_date
+    var plotName = if (dept_name.contains("教學")) {
+        "教研-"
+    } else if(dept_name.contains("企劃")) {
+        "企劃-"
+    } else {
+        "作業-"
+    }
+    if (plotInfoRsp != null) {
+        if (dept_name.contains("教學")) {
+            plotName += plotInfoRsp.body.location_info.area_name + plotInfoRsp.body.location_info.location_name + "_" + plotInfoRsp.body.newest_investigation.investigation_date
+        } else {
+            plotName += plotInfoRsp.body.location_info.area_code + plotInfoRsp.body.location_info.location_name + "_" + plotInfoRsp.body.newest_investigation.investigation_date
+        }
     } else {
         showMessage(context, "樣區名稱為空，該資料尚未建置")
         return
@@ -270,7 +280,7 @@ suspend fun handleDownload(
         val gson = Gson()
         val myJson = gson.toJson(plotInfoRsp)
         writeToJson(context, file, myJson)
-        showMessage(context, "檔案${file.absoluteFile.name}儲存成功！\n${file.absoluteFile} \n${plotName}")
+        showMessage(context, "檔案 ${file.absoluteFile.name} 儲存成功！\n${file.absoluteFile} \n${plotName}")
     } catch (e: Exception) {
         showMessage(context, "儲存失敗：${e.message}")
         e.printStackTrace()
