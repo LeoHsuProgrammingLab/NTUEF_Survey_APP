@@ -1,6 +1,7 @@
 package com.example.ntufapp.model
 
 import android.util.Log
+import com.example.ntufapp.api.dataType.plotInfoResponse.NewestLocation
 import com.example.ntufapp.api.dataType.userAndConditionCodeResponse.SpeciesItem
 import com.example.ntufapp.api.dataType.userAndConditionCodeResponse.User
 import com.example.ntufapp.utils.showMessage
@@ -104,9 +105,12 @@ data class PlotData(
         return area_investigation_setup_list["基徑"]
     }
 
-    fun initPlotTrees(treeNumber: Int) {
+    fun initPlotTrees(treeNumber: Int, location_sid_list: List<String>) {
         PlotTrees.clear()
         PlotTrees.addAll((1..treeNumber).map { Tree(SampleNum = it) })
+        PlotTrees.forEachIndexed { index, tree ->
+            tree.location_sid = location_sid_list[index]
+        }
     }
 }
 

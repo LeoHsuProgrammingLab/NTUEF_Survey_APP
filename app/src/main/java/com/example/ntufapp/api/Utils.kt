@@ -31,6 +31,7 @@ fun createRequestBody(jsonContent: List<Pair<String, String>>): RequestBody {
 fun transformPlotInfoResponseToPlotData(response: PlotInfoResponse): PlotData {
     val locationInfo = response.body.location_info
     val newestInvestigation = response.body.newest_investigation
+    val newestLocation = response.body.newest_location
     Log.d("location mid", response.location_mid)
 
     val surveyors = newestInvestigation.investigation_user_list.associate { it.user_id to it.user_name }
@@ -73,7 +74,7 @@ fun transformPlotInfoResponseToPlotData(response: PlotInfoResponse): PlotData {
     )
 
     // find corresponding investigation item code
-    plotData.initPlotTrees(response.body.newest_location_count)
+    plotData.initPlotTrees(response.body.newest_location_count, newestLocation.map { it.location_sid })
     val investigationDBHCode = locationInfo.area_investigation_setup_list
         .firstOrNull { it.investigation_item_name == "胸徑" }
         ?.investigation_item_code
@@ -83,18 +84,31 @@ fun transformPlotInfoResponseToPlotData(response: PlotInfoResponse): PlotData {
     val investigationStateCode = locationInfo.area_investigation_setup_list
         .firstOrNull { it.investigation_item_name == "生長狀態" }
         ?.investigation_item_code
+//    val investigationForkedHeightCode = locationInfo.area_investigation_setup_list
+//        .firstOrNull { it.investigation_item_name == "分岔樹高" }
+//        ?.investigation_item_code
+//    val investigationBaseDiameterCode = locationInfo.area_investigation_setup_list
+//        .firstOrNull { it.investigation_item_name == "基徑" }
+//        ?.investigation_item_code
 
     // get data from newest investigation record by the corresponding investigation item code
-    for (i in plotData.PlotTrees.indices) {
-        plotData.PlotTrees[i].location_sid = newestInvestigation.investigation_record_list[i].location_sid
-        Log.d("location_sid", "${newestInvestigation.investigation_record_list[i].location_sid} ${plotData.PlotTrees[i].location_sid}")
+    // Step 1: Create a map of location_sid to Tree objects
+    val locationSidToTreeMap = plotData.PlotTrees.associateBy { it.location_sid }
 
-        plotData.PlotTrees[i].DBH =
-            newestInvestigation.investigation_record_list[i].investigation_result_list.firstOrNull { it.investigation_item_code == investigationDBHCode }?.investigation_result?.toDoubleOrNull() ?: 0.0
-        plotData.PlotTrees[i].MeasHeight =
-            newestInvestigation.investigation_record_list[i].investigation_result_list.firstOrNull { it.investigation_item_code == investigationHeightCode }?.investigation_result?.toDoubleOrNull() ?: 0.0
-        val growthStateCodeList = newestInvestigation.investigation_record_list[i].investigation_result_list.firstOrNull { it.investigation_item_code == investigationStateCode }?.investigation_result?.split(",") ?: emptyList()
-        plotData.PlotTrees[i].State = DataSource.GrowthCodeList.filter { it.code in growthStateCodeList }.map { it.code_name }.toMutableList()
+    // Step 2: Iterate through newestInvestigation.investigation_record_list and find the corresponding Tree object
+    newestInvestigation.investigation_record_list.forEach { record ->
+        val tree = locationSidToTreeMap[record.location_sid]
+        if (tree != null) {
+            // Step 3: Assign the DBH, MeasHeight, and State values to the found Tree object
+            tree.DBH = record.investigation_result_list
+                .firstOrNull { it.investigation_item_code == investigationDBHCode }?.investigation_result?.toDoubleOrNull() ?: 0.0
+            tree.MeasHeight = record.investigation_result_list
+                .firstOrNull { it.investigation_item_code == investigationHeightCode }?.investigation_result?.toDoubleOrNull() ?: 0.0
+
+            val growthStateCodeList = record.investigation_result_list
+                .firstOrNull { it.investigation_item_code == investigationStateCode }?.investigation_result?.split(",") ?: emptyList()
+            tree.State = DataSource.GrowthCodeList.filter { it.code in growthStateCodeList }.map { it.code_name }.toMutableList()
+        }
     }
 
     return plotData
@@ -102,7 +116,6 @@ fun transformPlotInfoResponseToPlotData(response: PlotInfoResponse): PlotData {
 
 fun transformPlotDataToSurveyDataForUpload(plotData: PlotData): SurveyDataForUpload {
     val investigationRecordList = plotData.PlotTrees.flatMap { tree ->
-        Log.d("location_sid", "${tree.location_sid}")
         listOfNotNull(
             plotData.getHeightCode()?.let {
                 InvestigationRecord(

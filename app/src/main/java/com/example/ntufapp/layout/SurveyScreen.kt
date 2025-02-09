@@ -43,11 +43,7 @@ fun NewSurveyScreen(
     // Save the final return data
     val newPlotDataState = remember { mutableStateOf(newPlotData) }
     newPlotDataState.value.setToday()
-    // Init the tree number if there is no tree data in the plot
-    if (newPlotDataState.value.PlotTrees.isEmpty()) {
-        showMessage(context,"There are no tree data in the plot, use default tree number $defaultTreeNum.")
-        newPlotDataState.value.initPlotTrees(defaultTreeNum)
-    }
+
     // Store all the tree numbers in ReSurvey Layout
     val totalTreesNumList = remember { mutableStateListOf(*List(newPlotData.PlotTrees.size){ (it+1).toString() }.toTypedArray()) }
     SurveyView(totalTreesNumList = totalTreesNumList, newPlotData = newPlotDataState.value, onNextButtonClick = onNextButtonClick)
