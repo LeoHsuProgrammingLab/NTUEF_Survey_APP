@@ -30,7 +30,7 @@ fun parseJsonToPlotData(uri: Uri, context: Context): PlotData? {
 
     try {
         val plotInfoResponse = Gson().fromJson(jsonString, PlotInfoResponse::class.java)
-        return transformPlotInfoResponseToPlotData(plotInfoResponse)
+        return transformPlotInfoResponseToPlotData(plotInfoResponse, context)
     } catch (e: Exception) {
         // Handle parsing errors here
         return null

@@ -210,6 +210,7 @@ fun StartSurveyButton(
     }
 }
 
+
 fun handleFileUpload(
     context: Context,
     selectedFileUri: MutableState<Uri?>,
@@ -225,8 +226,8 @@ fun handleFileUpload(
             showOldUploadData.value = true
             outputFilename.value = getFileName(context, selectedFileUri.value).split("_")[0] + "_" + getTodayDate() + ".json"
         } catch (e: Exception) {
-            Log.i("PlotOptions", "exError: $e")
-            showMessage(context, "檔案解析時發生錯誤！（可能為空檔案）")
+            Log.d("PlotOptions", "exError: $e")
+            showMessage(context, "檔案解析時發生錯誤！\n資料不齊全！")
         }
     } else {
         showMessage(context, "請選擇JSON檔案")

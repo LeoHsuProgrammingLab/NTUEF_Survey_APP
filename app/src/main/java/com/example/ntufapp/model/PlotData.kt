@@ -1,6 +1,8 @@
 package com.example.ntufapp.model
 
+import android.content.Context
 import android.util.Log
+import androidx.compose.ui.platform.LocalContext
 import com.example.ntufapp.api.dataType.plotInfoResponse.NewestLocation
 import com.example.ntufapp.api.dataType.userAndConditionCodeResponse.SpeciesItem
 import com.example.ntufapp.api.dataType.userAndConditionCodeResponse.User
@@ -111,6 +113,14 @@ data class PlotData(
         PlotTrees.forEachIndexed { index, tree ->
             tree.location_sid = location_sid_list[index]
         }
+    }
+
+    fun checkPlotData(context: Context): Boolean {
+        if (PlotTrees.isEmpty()) {
+            showMessage(context, "樣區樹木數量為0")
+            return false
+        }
+        return true
     }
 }
 

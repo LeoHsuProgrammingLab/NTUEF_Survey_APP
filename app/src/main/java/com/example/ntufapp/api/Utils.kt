@@ -1,5 +1,6 @@
 package com.example.ntufapp.api
 
+import android.content.Context
 import com.example.ntufapp.api.dataType.plotInfoResponse.PlotInfoResponse
 import com.example.ntufapp.api.dataType.surveyDataForUpload.InvestigationRecord
 import com.example.ntufapp.api.dataType.surveyDataForUpload.Photo
@@ -10,6 +11,8 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import android.util.Base64
 import android.util.Log
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import com.example.ntufapp.data.DataSource
 import com.example.ntufapp.model.PlotData
 import java.io.File
@@ -28,7 +31,10 @@ fun createRequestBody(jsonContent: List<Pair<String, String>>): RequestBody {
     return jsonString.toRequestBody("application/json".toMediaTypeOrNull())
 }
 
-fun transformPlotInfoResponseToPlotData(response: PlotInfoResponse): PlotData {
+fun transformPlotInfoResponseToPlotData(
+    response: PlotInfoResponse,
+    context: Context
+): PlotData? {
     val locationInfo = response.body.location_info
     val newestInvestigation = response.body.newest_investigation
     val newestLocation = response.body.newest_location
@@ -72,9 +78,9 @@ fun transformPlotInfoResponseToPlotData(response: PlotInfoResponse): PlotData {
         area_compart = locationInfo.area_compart.toString(),
         speciesList = response.species_list
     )
-
-    // find corresponding investigation item code
+    // init tree data
     plotData.initPlotTrees(response.body.newest_location_count, newestLocation.map { it.location_sid })
+    // find corresponding investigation item code
     val investigationDBHCode = locationInfo.area_investigation_setup_list
         .firstOrNull { it.investigation_item_name == "胸徑" }
         ?.investigation_item_code
@@ -111,7 +117,14 @@ fun transformPlotInfoResponseToPlotData(response: PlotInfoResponse): PlotData {
         }
     }
 
-    return plotData
+    // check if the data is intact
+    if (plotData.checkPlotData(context)) {
+        return plotData
+    } else {
+        return null
+    }
+
+
 }
 
 fun transformPlotDataToSurveyDataForUpload(plotData: PlotData): SurveyDataForUpload {
@@ -197,6 +210,9 @@ fun transformPlotDataToSurveyDataForUpload(plotData: PlotData): SurveyDataForUpl
 }
 
 fun formatWxWy(w: String): String {
+    if (w.isEmpty()) {
+        return "X"
+    }
     return String.format("%.0f", w.toDouble())
 }
 
