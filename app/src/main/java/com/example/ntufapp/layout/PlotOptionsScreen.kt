@@ -90,7 +90,7 @@ fun PlotOptionsScreen(
                     nextButtonText = "匯入",
                     onDismiss = {},
                     onSendClick = {
-                       handleFileUpload(
+                       handleFileInput(
                             context,
                             selectedFileUri,
                             plotData,
@@ -107,7 +107,7 @@ fun PlotOptionsScreen(
             Log.d(tag, "size: ${plotData.value.speciesList.size}")
 
             if(showOldUploadData.value) {
-                val confirmHeader = "您已匯入 ${plotData.value.ManageUnit}${plotData.value.SubUnit} 的資料\n樣區名稱：${plotData.value.PlotName}\n樣區編號：${plotData.value.PlotNum}\n該樣區有${plotData.value.PlotTrees.size}棵樣樹"
+                val confirmHeader = "您已匯入 ${plotData.value.ManageUnit}${plotData.value.SubUnit} 的資料\n樣區種類：${plotData.value.AreaKind}\n調查區編號：${plotData.value.AreaNum}\n該樣區有${plotData.value.PlotTrees.size}棵樣樹"
 
                 GeneralConfirmDialog(
                     reminder = confirmHeader,
@@ -211,7 +211,7 @@ fun StartSurveyButton(
 }
 
 
-fun handleFileUpload(
+fun handleFileInput(
     context: Context,
     selectedFileUri: MutableState<Uri?>,
     plotData: MutableState<PlotData>,

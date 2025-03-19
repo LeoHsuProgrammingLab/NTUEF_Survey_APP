@@ -61,8 +61,8 @@ fun ManualInputNewPlotDialog(
     fun updatePlotData() {
         plotData.value.ManageUnit = manageUnit.value
         plotData.value.SubUnit = subUnit.value
-        plotData.value.PlotName = plotName.value
-        plotData.value.PlotNum = plotNum.value
+        plotData.value.AreaKind = plotName.value
+        plotData.value.AreaNum = plotNum.value
         plotData.value.PlotType = plotType.value
         plotData.value.PlotArea = plotArea.value.toDouble()
         plotData.value.Altitude = altitude.value.toDouble()

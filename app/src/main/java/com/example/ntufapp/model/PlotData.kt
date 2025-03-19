@@ -15,9 +15,10 @@ data class PlotData(
     var Year: String = "",
     var ManageUnit: String = "",
     var SubUnit: String = "", //1-55
+    var location_code: String = "",
 
-    var PlotName: String = "",
-    var PlotNum: String = "0",
+    var AreaKind: String = "",
+    var AreaNum: String = "0",
     var PlotType: String = "",
 
     var PlotArea: Double = 0.0,
@@ -56,8 +57,8 @@ data class PlotData(
             Year = Year,
             ManageUnit = ManageUnit,
             SubUnit = SubUnit,
-            PlotName = PlotName,
-            PlotNum = PlotNum,
+            AreaKind = AreaKind,
+            AreaNum = AreaNum,
             PlotType = PlotType,
             PlotArea = PlotArea,
             TWD97_X = TWD97_X,
@@ -75,7 +76,8 @@ data class PlotData(
             investigation_user_map = investigation_user_map.toMutableMap(), // Deep copy of map
             userList = userList.toMutableList(),
             area_compart = area_compart,
-            speciesList = speciesList.map { it.copy() } // Deep copy for species list
+            speciesList = speciesList.map { it.copy() }, // Deep copy for species list
+            location_code = location_code
         )
     }
 
@@ -154,7 +156,7 @@ fun createTreeQuotaPair(invalidSet: MutableSet<Tree>): MutableMap<Int, Int> {
 
 fun checkThreshold(old: Double, new: Double, threshold: Double): Boolean {
     Log.d("compare", "old: $old, new: $new, threshold: $threshold, result:${abs(old - new) > threshold * old || new == 0.0}")
-    return abs(old - new) > threshold * old || new == 0.0
+    return abs(old - new) >= threshold * old || new == 0.0
 }
 
 fun checkThresholdByInterval(old: Double, new: Double, threshold: Double): Boolean {

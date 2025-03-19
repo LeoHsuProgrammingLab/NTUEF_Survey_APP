@@ -28,10 +28,10 @@ fun MetaDateView(newPlotData: PlotData) {
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         val dateInfo = Pair("調查日期", newPlotData.Date)
-        val mangeUnitInfo = Pair("試驗地", newPlotData.ManageUnit)
+        val mangeUnitInfo = Pair("試驗地", newPlotData.ManageUnit + " " + newPlotData.AreaNum)
         val subUnitInfo = Pair("林班", newPlotData.area_compart)
-        val plotNumInfo = Pair("樣區編號", newPlotData.PlotNum)
-        val plotNameInfo = Pair("樣區種類", newPlotData.PlotName)
+        val plotNumInfo = Pair("樣區編號", newPlotData.location_code)
+        val plotNameInfo = Pair("樣區種類", newPlotData.AreaKind)
         val plotAreaInfo = Pair("樣區面積(m2)", newPlotData.PlotArea.toString())
         val plotTypeInfo = Pair("樣區型態", newPlotData.PlotType)
         val TWD97_X = Pair("TWD97_X", newPlotData.TWD97_X)

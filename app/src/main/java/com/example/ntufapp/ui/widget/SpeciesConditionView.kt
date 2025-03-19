@@ -289,8 +289,7 @@ fun SpeciesConditionView(
                     val speciesList = remember {
                         mutableStateOf(newPlotData.speciesList.map { it.code_name })
                     }
-                    Log.d("species", "speciesList: ${newPlotData.speciesList.size}")
-                    Log.d("species", "speciesList: ${speciesList.value.size}")
+
                     TreeSpeciesWidget(
                         currentTree = currentTree.value,
                         onUpdateTreeSet = {

@@ -38,23 +38,19 @@ fun transformPlotInfoResponseToPlotData(
     val locationInfo = response.body.location_info
     val newestInvestigation = response.body.newest_investigation
     val newestLocation = response.body.newest_location
-    Log.d("location mid", response.location_mid)
 
     val surveyors = newestInvestigation.investigation_user_list.associate { it.user_id to it.user_name }
     val htSurveyor = Pair(newestInvestigation.investigation_treeHeight_user_list.user_id, newestInvestigation.investigation_treeHeight_user_list.user_name) // Assuming tree height surveyor is singular
-    val manageUnit = if (response.dept_name.contains("教學")) {
-        locationInfo.area_name
-    } else {
-        locationInfo.area_code
-    }
+
     val plotData = PlotData(
         Date = newestInvestigation.investigation_date,
         Year = newestInvestigation.investigation_year,
-        ManageUnit = manageUnit, // Assuming area_code represents the managing unit
+        ManageUnit = locationInfo.area_name,
         SubUnit = locationInfo.location_name,
+        location_code = locationInfo.location_code,
 
-        PlotName = locationInfo.area_kinds_name,
-        PlotNum = locationInfo.area_code,
+        AreaKind = locationInfo.area_kinds_name,
+        AreaNum = locationInfo.area_code,
         PlotType = locationInfo.location_type_name,
 
         PlotArea = 0.0,

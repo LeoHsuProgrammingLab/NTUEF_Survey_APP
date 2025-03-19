@@ -64,7 +64,7 @@ fun getFilenameWithFormat(plotData: PlotData, filename: String = "", toCSV: Bool
             return filename
         }
     } else {
-        val formattedFilename = plotData.ManageUnit + plotData.PlotName + "_" + plotData.PlotNum
+        val formattedFilename = plotData.ManageUnit + plotData.AreaKind + "_" + plotData.AreaNum
         if (toCSV) {
             return "$formattedFilename.csv"
         } else {
