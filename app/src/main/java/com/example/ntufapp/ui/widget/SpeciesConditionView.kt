@@ -93,7 +93,6 @@ fun SpeciesConditionView(
                         totalTreesNumList.add(it)
                         newPlotData.PlotTrees.add(Tree(SampleNum = it.toInt()))
                         currentTreeNum.value = it
-                        Log.d("SpeciesConditionView", "currentTreeNum?: ${currentTreeNum.value}")
                     },
                     modifier = Modifier
                         .height(75.dp)

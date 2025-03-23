@@ -126,60 +126,55 @@ fun transformPlotInfoResponseToPlotData(
 fun transformPlotDataToSurveyDataForUpload(plotData: PlotData): SurveyDataForUpload {
     val investigationRecordList = plotData.PlotTrees.flatMap { tree ->
         listOfNotNull(
-            plotData.getHeightCode()?.let {
-                InvestigationRecord(
-                    investigation_item_code = it,
-                    investigation_item_result = tree.MeasHeight.toString(),
-                    location_sid = tree.location_sid,
-                    location_wx = tree.location_wx,
-                    location_wy = tree.location_wy
-                )
-            },
-            plotData.getDBHCode()?.let {
-                InvestigationRecord(
-                    investigation_item_code = it,
-                    investigation_item_result = tree.DBH.toString(),
-                    location_sid = tree.location_sid,
-                    location_wx = tree.location_wx,
-                    location_wy = tree.location_wy
-                )
-            },
-            plotData.getStateCode()?.let {
-                InvestigationRecord(
-                    investigation_item_code = it,
-                    investigation_item_result = extractStateCodeFromStateString(tree.State),
-                    location_sid = tree.location_sid,
-                    location_wx = tree.location_wx,
-                    location_wy = tree.location_wy
-                )
-            },
-            plotData.getForkedHeightCode()?.let {
-                InvestigationRecord(
-                    investigation_item_code = it,
-                    investigation_item_result = tree.ForkHeight.toString(),
-                    location_sid = tree.location_sid,
-                    location_wx = tree.location_wx,
-                    location_wy = tree.location_wy
-                )
-            },
-            plotData.getBaseDiameterCode()?.let {
-                InvestigationRecord(
-                    investigation_item_code = it,
-                    investigation_item_result = "0",
-                    location_sid = tree.location_sid,
-                    location_wx = tree.location_wx,
-                    location_wy = tree.location_wy
-                )
-            },
-            plotData.getVisHeightCode()?.let {
-                InvestigationRecord(
-                    investigation_item_code = it,
-                    investigation_item_result = tree.VisHeight.toString(),
-                    location_sid = tree.location_sid,
-                    location_wx = tree.location_wx,
-                    location_wy = tree.location_wy
-                )
-            }
+            InvestigationRecord(
+                investigation_item_code = plotData.getHeightCode(),
+                investigation_item_result = tree.MeasHeight.toString(),
+                location_sid = tree.location_sid,
+                location_wx = tree.location_wx,
+                location_wy = tree.location_wy
+            ),
+            InvestigationRecord(
+                investigation_item_code = plotData.getDBHCode(),
+                investigation_item_result = tree.DBH.toString(),
+                location_sid = tree.location_sid,
+                location_wx = tree.location_wx,
+                location_wy = tree.location_wy
+            ),
+            InvestigationRecord(
+                investigation_item_code = plotData.getStateCode(),
+                investigation_item_result = extractStateCodeFromStateString(tree.State),
+                location_sid = tree.location_sid,
+                location_wx = tree.location_wx,
+                location_wy = tree.location_wy
+            ),
+            InvestigationRecord(
+                investigation_item_code = plotData.getForkedHeightCode(),
+                investigation_item_result = tree.ForkHeight.toString(),
+                location_sid = tree.location_sid,
+                location_wx = tree.location_wx,
+                location_wy = tree.location_wy
+            ),
+//            InvestigationRecord(
+//                investigation_item_code = plotData.getBaseDiameterCode(),
+//                investigation_item_result = "0",
+//                location_sid = tree.location_sid,
+//                location_wx = tree.location_wx,
+//                location_wy = tree.location_wy
+//            ),
+            InvestigationRecord(
+                investigation_item_code = plotData.getVisHeightCode(),
+                investigation_item_result = tree.VisHeight.toString(),
+                location_sid = tree.location_sid,
+                location_wx = tree.location_wx,
+                location_wy = tree.location_wy
+            ),
+            InvestigationRecord(
+                investigation_item_code = plotData.getTreeSpeciesCode(),
+                investigation_item_result = tree.Species,
+                location_sid = tree.location_sid,
+                location_wx = tree.location_wx,
+                location_wy = tree.location_wy
+            )
         )
     }
 

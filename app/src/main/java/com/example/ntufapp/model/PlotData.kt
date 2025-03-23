@@ -85,28 +85,32 @@ data class PlotData(
         PlotTrees.forEach { it.reset() }
     }
 
-    fun getDBHCode(): String? {
-        return area_investigation_setup_list["胸徑"]
+    fun getDBHCode(): String {
+        return area_investigation_setup_list["胸徑"]?:"10"
     }
 
-    fun getHeightCode(): String? {
-        return area_investigation_setup_list["樹高"]
+    fun getHeightCode(): String {
+        return area_investigation_setup_list["樹高"]?:"1"
     }
 
-    fun getStateCode(): String? {
-        return area_investigation_setup_list["生長狀態"]
+    fun getStateCode(): String {
+        return area_investigation_setup_list["生長狀態"]?:"8"
     }
 
-    fun getVisHeightCode(): String? {
-        return area_investigation_setup_list["目視樹高"]
+    fun getVisHeightCode(): String {
+        return area_investigation_setup_list["目視樹高"]?:"3"
     }
 
-    fun getForkedHeightCode(): String? {
-        return area_investigation_setup_list["分叉高"]
+    fun getForkedHeightCode(): String {
+        return area_investigation_setup_list["分叉高"]?:"4"
     }
 
-    fun getBaseDiameterCode(): String? {
-        return area_investigation_setup_list["基徑"]
+    fun getTreeSpeciesCode(): String {
+        return area_investigation_setup_list["調查樹種"]?:"17"
+    }
+
+    fun getBaseDiameterCode(): String {
+        return area_investigation_setup_list["基徑"]?:"5"
     }
 
     fun initPlotTrees(treeNumber: Int, location_sid_list: List<String>) {

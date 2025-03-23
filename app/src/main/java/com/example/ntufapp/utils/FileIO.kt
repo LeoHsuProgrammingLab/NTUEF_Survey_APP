@@ -44,12 +44,12 @@ fun parseJsonToSurveyDataForUpload(uri: Uri, context: Context): SurveyDataForUpl
     val inputStream = context.contentResolver.openInputStream(uri)
     val jsonString = inputStream?.bufferedReader()?.use(BufferedReader::readText)
 
-    try {
-        val surveyDataForUpload = Gson().fromJson(jsonString, SurveyDataForUpload::class.java)
-        return surveyDataForUpload
+    return try {
+        Gson().fromJson(jsonString, SurveyDataForUpload::class.java)
     } catch (e: Exception) {
         // Handle parsing errors here
-        return null
+        Log.d("parseJsonToSurveyDataForUpload", e.message.toString())
+        null
     } finally {
         // Close the InputStream after use
         inputStream?.close()
