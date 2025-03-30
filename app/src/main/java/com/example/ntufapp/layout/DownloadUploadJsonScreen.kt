@@ -276,7 +276,7 @@ suspend fun handleDownload(
             showMessage(context, "建立NTUEF_APP資料夾")
             notifyMediaScanner(context, outputDir)
         }
-        val file = File(outputDir, "$plotName.json")
+        val file = File(outputDir, plotName + "_下載資料.json")
         val gson = Gson()
         val myJson = gson.toJson(plotInfoRsp)
         writeToJson(context, file, myJson)

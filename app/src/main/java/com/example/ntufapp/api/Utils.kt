@@ -113,6 +113,15 @@ fun transformPlotInfoResponseToPlotData(
         }
     }
 
+    newestLocation.forEach { location ->
+        val tree = plotData.PlotTrees.find { it.location_sid == location.location_sid }
+        if (tree != null) {
+            tree.location_wx = formatWxWy(location.location_wx)
+            tree.location_wy = formatWxWy(location.location_wy)
+            tree.Species = location.location_breed_name
+        }
+    }
+
     // check if the data is intact
     if (plotData.checkPlotData(context)) {
         return plotData
