@@ -58,10 +58,12 @@ fun parseJsonToSurveyDataForUpload(uri: Uri, context: Context): SurveyDataForUpl
 
 fun getFilenameWithFormat(plotData: PlotData, filename: String = "", toCSV: Boolean = false): String {
     if (filename.isNotEmpty()) {
+        var fn = filename.substringBeforeLast(".")
+        fn += ("_" + "現場調查資料")
         if (toCSV) {
-            return filename.replaceAfter(".", "csv")
+            return "$fn.csv"
         } else {
-            return filename
+            return "$fn.json"
         }
     } else {
         val formattedFilename = plotData.ManageUnit + plotData.AreaKind + "_" + plotData.AreaNum + "_" + "現場調查資料"

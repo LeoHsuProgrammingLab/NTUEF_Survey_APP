@@ -166,7 +166,11 @@ suspend fun uploadPlotDataApi(coroutineScope: CoroutineScope, tag: String, surve
 
             if (response.isSuccessful) {
                 val uploadDataRsp = gson.fromJson(responseBody, uploadDataResponse::class.java)
-                Log.d(tag, "response: $uploadDataRsp")
+                Log.d(tag, "response: ${uploadDataRsp.body}")
+                Log.d(tag, "response msg: ${uploadDataRsp.message}")
+                Log.d(tag, "response rst: ${uploadDataRsp.result}")
+                Log.d(tag, "response code: ${uploadDataRsp.statusCode}")
+
                 return@async uploadDataRsp
             } else {
                 Log.d(tag, "Unsuccessful! response: ${response.body()?.string()}")

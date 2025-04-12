@@ -34,8 +34,16 @@ fun MetaDateView(newPlotData: PlotData) {
         val plotNameInfo = Pair("樣區種類", newPlotData.AreaKind)
         val plotAreaInfo = Pair("樣區面積(m2)", newPlotData.PlotArea.toString())
         val plotTypeInfo = Pair("樣區型態", newPlotData.PlotType)
-        val TWD97_X = Pair("TWD97_X", newPlotData.TWD97_X)
-        val TWD97_Y = Pair("TWD97_Y", newPlotData.TWD97_Y)
+        val TWD97_X = if (newPlotData.TWD97_X.isNotEmpty()) {
+            Pair("TWD97_X", newPlotData.TWD97_X)
+        } else {
+            Pair("TWD97_X", "X")
+        }
+        val TWD97_Y = if (newPlotData.TWD97_Y.isNotEmpty()) {
+            Pair("TWD97_X", newPlotData.TWD97_Y)
+        } else {
+            Pair("TWD97_Y", "X")
+        }
         val altitudeInfo = Pair("海拔(m)", newPlotData.Altitude.toString())
         val slopeInfo = Pair("坡度", newPlotData.Slope.toString())
         val aspectInfo = Pair("坡向", newPlotData.Aspect)

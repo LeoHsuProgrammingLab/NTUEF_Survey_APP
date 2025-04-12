@@ -210,8 +210,9 @@ fun transformPlotDataToSurveyDataForUpload(plotData: PlotData): SurveyDataForUpl
 }
 
 fun formatWxWy(w: String): String {
-    if (w.isEmpty()) {
-        return "X"
+//    Log.d("formatWxWy", "w: $w")
+    if (w.isEmpty() || w=="0") {
+        return ""
     }
     return String.format("%.0f", w.toDouble())
 }

@@ -69,7 +69,6 @@ fun SaveScreen(
                 val showOverwriteDialog = remember { mutableStateOf(false) }
                 val showBackDialog = remember { mutableStateOf(false) }
                 val validFilename = getFilenameWithFormat(newPlotData, outputFilename)
-                Log.d("saveFile", "validFilename: $validFilename")
                 val currentFilename = remember { mutableStateOf(validFilename) }
                 OutlinedButton(
                     modifier = modifier,
