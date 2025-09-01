@@ -47,7 +47,6 @@ fun GeneralConfirmDialog(
     Dialog(
         onDismissRequest = { onDismiss.invoke() }
     ) {
-        val text = remember { mutableStateOf("") }
         Surface(
             shape = Shapes.small
         ) {

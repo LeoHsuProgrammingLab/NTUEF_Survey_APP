@@ -1,7 +1,6 @@
 package com.example.ntufapp.layout
 
 import android.os.Build
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
@@ -23,7 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ntufapp.R
-import com.example.ntufapp.data.ntufappInfo.Companion.outputDir
+import com.example.ntufapp.data.NtufAppInfo.Companion.outputDir
 import com.example.ntufapp.model.PlotData
 import com.example.ntufapp.ui.widget.dialog.GeneralConfirmDialog
 import com.example.ntufapp.ui.theme.LayoutDivider
@@ -58,14 +57,10 @@ fun SaveScreen(
             modifier = modifier,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-//            val permissionGranted = remember { mutableStateOf(false) }
-//            ExternalStoragePermissionHandler { permissionGranted.value = true }
-
             Row(
                 modifier = modifier,
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                val showDialog = remember { mutableStateOf(false) }
                 val showOverwriteDialog = remember { mutableStateOf(false) }
                 val showBackDialog = remember { mutableStateOf(false) }
                 val validFilename = getFilenameWithFormat(newPlotData, outputFilename)
@@ -79,17 +74,6 @@ fun SaveScreen(
                 OutlinedButton(
                     modifier = modifier,
                     onClick = {
-//                        val lastIndexToKeep = newPlotData.PlotTrees.findLast {
-//                            it.State.isNotEmpty() &&
-//                            it.Species.isNotEmpty() &&
-//                            it.DBH != 0.0 &&
-//                            it.MeasHeight != 0.0 &&
-//                            it.VisHeight != 0.0 &&
-//                            it.ForkHeight != 0.0
-//                        }
-//                        if (lastIndexToKeep != null) {
-//                            newPlotData.PlotTrees = newPlotData.PlotTrees.subList(0, lastIndexToKeep.SampleNum)
-//                        }
                         showOverwriteDialog.value = checkIfFileExists(context, validFilename)
 
                         if (!showOverwriteDialog.value) {
@@ -128,16 +112,6 @@ fun SaveScreen(
                         onCancelClick = { showBackDialog.value = false }
                     )
                 }
-//                if (showDialog.value) {
-//                    SaveJsonDialog(
-//                        onDismiss = {},
-//                        onSaveClick = {
-//                            showDialog.value = false
-//                            saveJsonFile(context, newPlotData, toCSV = true)
-//                        },
-//                        onCancelClick = { showDialog.value = false }
-//                    )
-//                }
             }
         }
     }

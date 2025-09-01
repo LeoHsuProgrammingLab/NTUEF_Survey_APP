@@ -8,14 +8,12 @@ import android.os.Build
 import android.os.Environment
 import android.provider.OpenableColumns
 import android.provider.Settings
-import android.util.Log
 import androidx.annotation.RequiresApi
 import com.example.ntufapp.api.dataType.plotInfoResponse.PlotInfoResponse
 import com.example.ntufapp.api.dataType.surveyDataForUpload.SurveyDataForUpload
-import com.example.ntufapp.api.getTodayDate
 import com.example.ntufapp.api.transformPlotDataToSurveyDataForUpload
 import com.example.ntufapp.api.transformPlotInfoResponseToPlotData
-import com.example.ntufapp.data.ntufappInfo.Companion.outputDir
+import com.example.ntufapp.data.NtufAppInfo.Companion.outputDir
 import com.example.ntufapp.model.PlotData
 import com.google.gson.Gson
 import java.io.BufferedReader
@@ -48,7 +46,6 @@ fun parseJsonToSurveyDataForUpload(uri: Uri, context: Context): SurveyDataForUpl
         Gson().fromJson(jsonString, SurveyDataForUpload::class.java)
     } catch (e: Exception) {
         // Handle parsing errors here
-        Log.d("parseJsonToSurveyDataForUpload", e.message.toString())
         null
     } finally {
         // Close the InputStream after use
@@ -119,10 +116,8 @@ fun writeToCSV(outputFile: File, flattenedPlotData: List<List<String>>) {
 
     if (!outputFile.exists()) {
         outputFile.createNewFile()
-        Log.d("saveFile", "outputFile does not exist")
     } else {
         outputFile.delete()
-        Log.d("saveFile", "outputFile exists")
     }
 
     val fileOutputStream = FileOutputStream(outputFile)
@@ -132,7 +127,6 @@ fun writeToCSV(outputFile: File, flattenedPlotData: List<List<String>>) {
         bufferedWriter.write(row.joinToString(","))
         bufferedWriter.newLine()
     }
-    Log.d("saveFile", "outputFile: ${outputFile.absolutePath}")
 
     bufferedWriter.close()
     fileOutputStream.close()
@@ -167,7 +161,6 @@ fun getFileName(context: Context, uri: Uri?): String {
 fun generateUniqueFilename(context: Context, baseFilename: String, format: String = ".json"): String {
     var version = 0
     var uniqueFilename = baseFilename + format
-    Log.d("saveFile", "unique: $uniqueFilename")
 
     while (checkIfFileExists(context, uniqueFilename)) {
         version++

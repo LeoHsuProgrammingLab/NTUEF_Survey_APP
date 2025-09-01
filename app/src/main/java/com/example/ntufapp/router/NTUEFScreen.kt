@@ -1,7 +1,6 @@
 package com.example.ntufapp.router
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -39,7 +38,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.ntufapp.R
-import com.example.ntufapp.data.ntufappInfo.Companion.dTag
 import com.example.ntufapp.layout.DownloadUploadJsonScreen
 import com.example.ntufapp.layout.NewSurveyScreen
 import com.example.ntufapp.layout.ResultDisplayScreen

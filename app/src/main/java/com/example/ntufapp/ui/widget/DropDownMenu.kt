@@ -1,14 +1,9 @@
 package com.example.ntufapp.ui.widget
 
-import android.app.DownloadManager.Query
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,7 +18,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,7 +29,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ntufapp.api.extractNumber
 import com.example.ntufapp.ui.theme.DropdownDivider
 import com.example.ntufapp.ui.theme.dropDownItemModifier
 import com.example.ntufapp.ui.theme.dropDownMenuModifier
@@ -125,7 +118,7 @@ fun PlotSelectionDropDownMenu(
 
             LaunchedEffect(expanded) {
                 if (expanded && selectedIndex.intValue != -1) {
-                    listState.animateScrollToItem(selectedIndex.value)
+                    listState.animateScrollToItem(selectedIndex.intValue)
                 }
             }
 
@@ -192,7 +185,7 @@ fun PlotSelectionDropDownMenu(
             onExpandChange = { deptNameDropdownExpanded.value = it },
             currentValue = deptName.value,
             itemList = deptNameList,
-            onItemsChange = { it ->
+            onItemsChange = {
                 deptName.value = it
                 compartList.value = listOf("請選擇林班地") + (allPlotsInfo[it]?.keys?.sortedBy{ s -> s.toInt() } ?: emptyList())
                 compart.value = compartList.value.first()

@@ -1,10 +1,7 @@
 package com.example.ntufapp.ui.widget
 
-import android.util.Log
-import android.view.View.OnFocusChangeListener
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,13 +35,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -86,7 +81,6 @@ fun HtDBHView(
 
     val coroutineScope = rememberCoroutineScope()
     val lazyListState = rememberLazyListState()
-    Log.i("HtDBHView", "newPlotData.getPlotTreesSize(): ${newPlotData.PlotTrees.size}")
 
     val curItemId = remember { mutableStateOf("1") }
 
@@ -114,9 +108,9 @@ fun HtDBHView(
                     value = curItemId.value,
                     onValueChange = {
                         curItemId.value = it
-                        targetId.value = it.toIntOrNull()?: 1
+                        targetId.intValue = it.toIntOrNull()?: 1
                         coroutineScope.launch {
-                            lazyListState.scrollToItem(targetId.value - 1)
+                            lazyListState.scrollToItem(targetId.intValue - 1)
                         }
                     },
                     label = {
@@ -144,9 +138,9 @@ fun HtDBHView(
                     widthType = "medium",
                     modifier = Modifier,
                     onChoose = {
-                        targetId.value = it.toInt()
+                        targetId.intValue = it.toInt()
                         coroutineScope.launch {
-                            lazyListState.scrollToItem(targetId.value - 1)
+                            lazyListState.scrollToItem(targetId.intValue - 1)
                         }
                     }
                 )
@@ -157,9 +151,9 @@ fun HtDBHView(
                     widthType = "medium",
                     modifier = Modifier,
                     onChoose = {
-                        targetId.value = it.toInt()
+                        targetId.intValue = it.toInt()
                         coroutineScope.launch {
-                            lazyListState.scrollToItem(targetId.value - 1)
+                            lazyListState.scrollToItem(targetId.intValue - 1)
                         }
                     }
                 )
@@ -170,9 +164,9 @@ fun HtDBHView(
                     widthType = "large",
                     modifier = Modifier,
                     onChoose = {
-                        targetId.value = it.toInt()
+                        targetId.intValue = it.toInt()
                         coroutineScope.launch {
-                            lazyListState.scrollToItem(targetId.value - 1)
+                            lazyListState.scrollToItem(targetId.intValue - 1)
                         }
                     }
                 )
@@ -183,9 +177,9 @@ fun HtDBHView(
                     widthType = "large",
                     modifier = Modifier,
                     onChoose = {
-                        targetId.value = it.toInt()
+                        targetId.intValue = it.toInt()
                         coroutineScope.launch {
-                            lazyListState.scrollToItem(targetId.value - 1)
+                            lazyListState.scrollToItem(targetId.intValue - 1)
                         }
                     }
                 )
@@ -203,7 +197,7 @@ fun HtDBHView(
                         shape = LowerShapes.medium
                     )
             ) {
-                itemsIndexed(newPlotData.PlotTrees) { idx, tree ->
+                itemsIndexed(newPlotData.PlotTrees) { _, tree ->
                     Row(
                         modifier = Modifier.padding(10.dp),
                         horizontalArrangement = Arrangement.SpaceEvenly
@@ -211,7 +205,6 @@ fun HtDBHView(
                         ListItem(
                             modifier = circleThreeDigitsModifier,
                             headlineContent = {
-                                // https://stackoverflow.com/questions/63719072/jetpack-compose-centering-text
                                 Text(
                                     text = String.format("%03d", tree.SampleNum),
                                     textAlign = TextAlign.Center,
@@ -275,7 +268,6 @@ fun LazyColumnInputTextField(
     if (textContent.value == "0.0") {
         textContent.value = ""
     }
-//    Log.d("LazyColumnInputTextField", "tree.SampleNum: ${tree.SampleNum}, ${textContent.value}")
 
     fun updateTree(newValue: Double?) {
         if (newValue != null) {
@@ -304,8 +296,6 @@ fun LazyColumnInputTextField(
             if (cleanedInput.isNotEmpty()) {
                 textContent.value = cleanedInput
                 updateTree(cleanedInput.toDoubleOrNull())
-            } else {
-                Log.d("LazyColumnInputTextField", "it is empty")
             }
             textContent.value = cleanedInput
             updateTree(cleanedInput.toDoubleOrNull())
@@ -348,7 +338,6 @@ fun ExposedUnaddressedTreeList(
         OutlinedTextField(
             value = treeSet.value.size.toString(),
             onValueChange = {},
-//            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.None),
             readOnly = true,
             label = {
                 Text(
@@ -381,9 +370,7 @@ fun ExposedUnaddressedTreeList(
             onDismissRequest = { dropdownExpanded.value = false },
             modifier = dropDownMenuModifier
         ) {
-            treeSet.value.sortedWith(
-                Comparator { str1, str2 -> str1.toInt() - str2.toInt() }
-            ).forEach { option ->
+            treeSet.value.sortedWith { str1, str2 -> str1.toInt() - str2.toInt() }.forEach { option ->
                 DropdownMenuItem(
                     text = {
                         Text(option)

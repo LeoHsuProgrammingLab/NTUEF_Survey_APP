@@ -1,6 +1,5 @@
 package com.example.ntufapp.ui.widget
 
-import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -51,7 +50,6 @@ fun SpeciesConditionView(
     speciesTreeSet: MutableState<MutableSet<String>>,
     conditionTreeSet: MutableState<MutableSet<String>>,
     newPlotData: PlotData,
-    surveyType: String = "NewSurvey"
 ) {
     val coroutineScope = rememberCoroutineScope()
 
@@ -145,7 +143,6 @@ fun SpeciesConditionView(
                 modifier = modifier
             ) {
                 // the below log.d is a fun topic related to recomposition and infinite loop
-                // Log.d("TreeConditionChips", "curTree: ${selectedItems.joinToString() }")
                 IntervalDivider()
                 Row(
                     modifier = modifier
@@ -163,7 +160,7 @@ fun SpeciesConditionView(
                 }
 
                 LazyRow( modifier = modifier){
-                    itemsIndexed(singleItemList) { id, item ->
+                    itemsIndexed(singleItemList) { _, item ->
                         FilterChip(
                             modifier = Modifier.padding(horizontal = 5.dp), // gap between items
                             selected = selectedItems.contains(item),
@@ -219,7 +216,7 @@ fun SpeciesConditionView(
                     val secondHalf = multiItemList.subList(halfSize, multiItemList.size)
 
                     LazyRow(modifier = modifier) {
-                        itemsIndexed(firstHalf) { id, item ->
+                        itemsIndexed(firstHalf) { _, item ->
                             FilterChip(
                                 modifier = Modifier.padding(horizontal = 6.dp), // gap between items
                                 selected = selectedItems.contains(item),
@@ -244,7 +241,7 @@ fun SpeciesConditionView(
                     }
 
                     LazyRow(modifier = modifier) {
-                        itemsIndexed(secondHalf) { id, item ->
+                        itemsIndexed(secondHalf) { _, item ->
                             FilterChip(
                                 modifier = Modifier.padding(horizontal = 6.dp), // gap between items
                                 selected = selectedItems.contains(item),

@@ -1,6 +1,5 @@
 package com.example.ntufapp.api
 
-import android.util.Log
 import com.example.ntufapp.BuildConfig
 import com.example.ntufapp.api.dataType.plotInfoResponse.PlotInfoResponse
 import com.example.ntufapp.api.dataType.plotsCatalogueResponse.PlotsCatalogueResponse
@@ -61,35 +60,30 @@ object RetrofitInstance {
     }
 }
 
-fun catalogueApi(coroutineScope: CoroutineScope, tag: String, callback: (PlotsCatalogueResponse?, String) -> Unit) {
+fun catalogueApi(coroutineScope: CoroutineScope, callback: (PlotsCatalogueResponse?, String) -> Unit) {
     coroutineScope.launch {
         val requestBody = createRequestBody(listOf("token" to BuildConfig.API_PARAMS_TOKEN))
 
-        Log.d(tag, "requestBody: $requestBody")
         try {
             val response = RetrofitInstance.catalogueApiService.getCatalogue(requestBody)
             if (response.isSuccessful) {
                 val gson = Gson()
                 val catalogueRsp = gson.fromJson(response.body()?.string(), PlotsCatalogueResponse::class.java)
                 callback(catalogueRsp, "")
-                Log.d(tag, "response: ${catalogueRsp.body}")
             } else {
                 callback(null, "資料庫回應錯誤")
-                Log.d(tag, "Unsuccessful! response: $response")
             }
         } catch (e: IOException) {
-            Log.d(tag, "IOException: ${e.message}, you might not have internet connection, you gotta check it")
             callback(null, "網路連線錯誤")
             return@launch
         } catch (e: HttpException) {
-            Log.d(tag, "HttpException: ${e.message}, unexpected http response")
             callback(null, "網路協定錯誤")
             return@launch
         }
     }
 }
 
-suspend fun plotApi(coroutineScope: CoroutineScope, tag: String, locationMid: String): PlotInfoResponse? {
+suspend fun plotApi(coroutineScope: CoroutineScope, locationMid: String): PlotInfoResponse? {
     return coroutineScope.async {
         val requestBody = createRequestBody(listOf("token" to BuildConfig.API_PARAMS_TOKEN, "location_mid" to locationMid))
 
@@ -97,7 +91,6 @@ suspend fun plotApi(coroutineScope: CoroutineScope, tag: String, locationMid: St
             val response = withContext(Dispatchers.Default) {
                 RetrofitInstance.plotApiService.getPlotInfo(requestBody)
             }
-//            Log.d(tag, "response: $response")
             val responseBody = response.body()?.string()
 
             if (response.isSuccessful) {
@@ -106,23 +99,19 @@ suspend fun plotApi(coroutineScope: CoroutineScope, tag: String, locationMid: St
                 plotInfoRsp.location_mid = locationMid
                 return@async plotInfoRsp
             } else {
-                Log.d(tag, "Unsuccessful! response: $responseBody")
                 return@async null
             }
         } catch (e: SocketTimeoutException) {
-            Log.e(tag, "SocketTimeoutException: ${e.message}, timeout")
             return@async null
         } catch (e: IOException) {
-            Log.e(tag, "IOException: ${e.message}, you might not have internet connection, you gotta check it")
             return@async null
         } catch (e: HttpException) {
-            Log.e(tag, "HttpException: ${e.message}, unexpected http response")
             return@async null
         }
     }.await()
 }
 
-suspend fun userAndConditionCodeApi(coroutineScope: CoroutineScope, tag: String): UserAndConditionCodeResponse? {
+suspend fun userAndConditionCodeApi(coroutineScope: CoroutineScope): UserAndConditionCodeResponse? {
     return coroutineScope.async {
         val requestBody = createRequestBody(listOf("token" to BuildConfig.API_PARAMS_TOKEN))
         try {
@@ -138,20 +127,17 @@ suspend fun userAndConditionCodeApi(coroutineScope: CoroutineScope, tag: String)
                     UserAndConditionCodeResponse::class.java
                 )
             } else {
-                Log.d(tag, "Unsuccessful! response: $responseBody")
                 return@async null
             }
         } catch (e: IOException) {
-            Log.e(tag, "IOException: ${e.message}, you might not have internet connection, you gotta check it")
             return@async null
         } catch (e: HttpException) {
-            Log.e(tag, "HttpException: ${e.message}, unexpected http response")
             return@async null
         }
     }.await()
 }
 
-suspend fun uploadPlotDataApi(coroutineScope: CoroutineScope, tag: String, surveyData: SurveyDataForUpload): uploadDataResponse? {
+suspend fun uploadPlotDataApi(coroutineScope: CoroutineScope, surveyData: SurveyDataForUpload): uploadDataResponse? {
     return coroutineScope.async {
         surveyData.token = BuildConfig.API_PARAMS_TOKEN
         val gson = Gson()
@@ -166,21 +152,13 @@ suspend fun uploadPlotDataApi(coroutineScope: CoroutineScope, tag: String, surve
 
             if (response.isSuccessful) {
                 val uploadDataRsp = gson.fromJson(responseBody, uploadDataResponse::class.java)
-                Log.d(tag, "response: ${uploadDataRsp.body}")
-                Log.d(tag, "response msg: ${uploadDataRsp.message}")
-                Log.d(tag, "response rst: ${uploadDataRsp.result}")
-                Log.d(tag, "response code: ${uploadDataRsp.statusCode}")
-
                 return@async uploadDataRsp
             } else {
-                Log.d(tag, "Unsuccessful! response: ${response.body()?.string()}")
                 return@async null
             }
         } catch (e: IOException) {
-            Log.e(tag, "IOException: ${e.message}, you might not have internet connection, you gotta check it")
             return@async null
         } catch (e: HttpException) {
-            Log.e(tag, "HttpException: ${e.message}, unexpected http response")
             return@async null
         }
     }.await()

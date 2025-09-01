@@ -2,7 +2,6 @@ package com.example.ntufapp.layout
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -40,9 +39,7 @@ import com.example.ntufapp.utils.showMessage
 fun PlotOptionsScreen(
     onNextButtonClick: (PlotData, String, String) -> Unit
 ) {
-//    DisableBackButtonHandler(from = "PlotOptionsScreen")
     BackHandler(enabled = true) {}
-    val tag = "PlotOptions"
     val context = LocalContext.current
     val selectedFileUri = remember { mutableStateOf<Uri?>(null) }
     val buttonText = remember { mutableStateOf("請選擇JSON檔案") }
@@ -52,10 +49,6 @@ fun PlotOptionsScreen(
 
     val showOldPlotUpload = remember { mutableStateOf(false) }
     val showOldUploadData = remember { mutableStateOf(false) }
-    val showNewPlotUploadChoices = remember { mutableStateOf(false) }
-    val showNewPlotUpload = remember { mutableStateOf(false) }
-    val showNewUploadData = remember { mutableStateOf(false) }
-    val showNewPlotManualInput = remember { mutableStateOf(false) }
 
     val filePickerLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
@@ -71,12 +64,10 @@ fun PlotOptionsScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-//                Spacer(Modifier.padding(40.dp))
         val image = painterResource(id = R.drawable.forest_mountain_svgrepo_com)
         Image(painter = image,
             contentDescription = "forest start screen",
             modifier = Modifier.size(200.dp, 200.dp)
-//                        .border(2.dp, Color.Black, CircleShape)
         )
         LayoutDivider()
         Row {
@@ -104,7 +95,6 @@ fun PlotOptionsScreen(
                     filePicker = filePickerLauncher,
                 )
             }
-            Log.d(tag, "size: ${plotData.value.speciesList.size}")
 
             if(showOldUploadData.value) {
                 val confirmHeader = "您已匯入 ${plotData.value.ManageUnit}${plotData.value.SubUnit} 的資料\n樣區種類：${plotData.value.AreaKind}\n調查區編號：${plotData.value.AreaNum}\n該樣區有${plotData.value.PlotTrees.size}棵樣樹"
@@ -121,78 +111,6 @@ fun PlotOptionsScreen(
                     }
                 )
             }
-
-//            // New Plot
-//            Button(
-//                onClick = { showNewPlotUploadChoices.value = true }
-//            ) {
-//                Text("新增樣區", fontSize = 20.sp)
-//            }
-
-//            if (showNewPlotUploadChoices.value) {
-//                NewSurveyUploadChoiceDialog(
-//                    onDismiss = { showNewPlotUploadChoices.value = false },
-//                    onUploadTypeClick = {uploadType ->
-//                        if (uploadType == "JSON") {
-//                            showNewPlotUpload.value = true
-//                        } else {
-//                            showNewPlotManualInput.value = true
-//                        }
-//                        showNewPlotUploadChoices.value = false
-//                        surveyType.value = "NewSurvey"
-//                    },
-//                )
-//            }
-            // Upload New Plot by JSON
-//            if (showNewPlotUpload.value) {
-//                UploadFileDialog(
-//                    header = "請匯入樣區資料",
-//                    mainButtonText = buttonText.value,
-//                    nextButtonText = "匯入",
-//                    onDismiss = {},
-//                    onSendClick = {
-//                        if(selectedFileUri.value != null) {
-//                            try {
-//                                plotData.value  = parseJsonToMetaData(selectedFileUri.value!!, context)!!
-//
-//                                if(plotData.value.ManageUnit == "") {
-//                                    showMessage(context, "你匯入了錯誤的檔案(.json)！")
-//                                } else {
-//                                    showNewUploadData.value = true
-//                                    outputFilename.value = getFileName(context, selectedFileUri.value!!)
-//                                }
-//                            } catch (e: Exception) {
-//                                Log.d(tag, "exError: ${e.message}")
-//                                showMessage(context, "檔案解析時發生錯誤！")
-//                            }
-//                        } else {
-//                            showMessage(context, "請選擇JSON檔案")
-//                        }
-//                        dismissDialog(true)
-//                    },
-//                    onCancelClick = { dismissDialog(true) },
-//                    filePicker = filePickerLauncher
-//                )
-//            }
-//
-//
-//            if (showNewUploadData.value) {
-//                GeneralConfirmDialog(
-//                    reminder = confirmHeader,
-//                    confirmText = stringResource(id = R.string.next),
-//                    onDismiss = {},
-//                    onCancelClick = { showNewUploadData.value = false },
-//                    onConfirmClick = { onNextButtonClick(plotData.value, surveyType.value, outputFilename.value) }
-//                )
-//            }
-
-//            // Manual Input New Plot
-//            if (showNewPlotManualInput.value) {
-//                ManualInputNewPlotDialog(
-//                    onDismiss = { showNewPlotManualInput.value = false },
-//                    onSendClick = { onNextButtonClick(it, surveyType.value, "") }
-//                )
-//            }
         }
     }
 }
@@ -227,7 +145,6 @@ fun handleFileInput(
             val fileNameParts = getFileName(context, selectedFileUri.value).split("_")
             outputFilename.value = fileNameParts.dropLast(2).joinToString("_") + "_" + getTodayDate() + ".json"
         } catch (e: Exception) {
-            Log.d("PlotOptions", "exError: $e")
             showMessage(context, "檔案解析時發生錯誤！\n資料不齊全！")
         }
     } else {

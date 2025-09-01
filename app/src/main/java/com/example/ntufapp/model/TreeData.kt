@@ -1,6 +1,5 @@
 package com.example.ntufapp.model
 
-import androidx.compose.runtime.MutableState
 
 data class Tree(
     var SampleNum: Int = -1,

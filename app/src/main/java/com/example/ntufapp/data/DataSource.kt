@@ -1,7 +1,5 @@
 package com.example.ntufapp.data
 
-import com.example.ntufapp.api.dataType.userAndConditionCodeResponse.User
-
 object DataSource {
     val columnName = listOf(
         "樣樹編號",
@@ -27,24 +25,6 @@ object DataSource {
         "樹高調查人員"
     )
 
-//    val SpeciesList = listOf(
-//        "柳杉",
-//        "台灣杉",
-//        "香杉",
-//        "紅豆杉",
-//        "杉木",
-//        "紅檜",
-//        "扁柏",
-//        "二葉松",
-//        "櫸木",
-//        "烏心石",
-//        "樟樹",
-//        "光臘樹",
-//        "楓香",
-//        "榔榆",
-//        "墨點櫻桃"
-//    )
-
     val TreeMultiConditionList = listOf(
         "風折",
         "中空",
@@ -63,9 +43,6 @@ object DataSource {
         "風倒", // single
         "枯立", // single
     )
-
-//    val SquirrelConditionList = listOf(
-//    )
 
     val GrowthCodeList = listOf(
         GrowthCode(code = "0", code_name = "正常", sort = 1, enabled = true),

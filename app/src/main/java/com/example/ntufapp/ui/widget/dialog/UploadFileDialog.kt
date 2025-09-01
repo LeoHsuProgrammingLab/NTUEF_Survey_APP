@@ -19,7 +19,6 @@ import androidx.compose.ui.window.Dialog
 import com.example.ntufapp.R
 import com.example.ntufapp.ui.theme.Shapes
 import com.example.ntufapp.ui.theme.basicModifier
-import com.example.ntufapp.utils.showMessage
 
 @Composable
 fun UploadFileDialog( // Plot Options Screen
@@ -59,7 +58,6 @@ fun UploadFileDialog( // Plot Options Screen
                 Row(
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    val context = LocalContext.current
                     Button(
                         modifier = basicModifier,
                         onClick = onCancelClick,

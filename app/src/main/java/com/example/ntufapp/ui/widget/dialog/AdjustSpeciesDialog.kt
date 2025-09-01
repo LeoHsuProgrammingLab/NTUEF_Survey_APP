@@ -16,7 +16,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.Dialog
 import com.example.ntufapp.R
-import com.example.ntufapp.data.DataSource
 import com.example.ntufapp.ui.theme.Shapes
 import com.example.ntufapp.ui.theme.basicModifier
 import com.example.ntufapp.ui.widget.SearchableChooseMenu

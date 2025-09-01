@@ -4,15 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-
-fun getCustomedBasicModifier(width: Int, height: Int): Modifier {
-    return basicModifier.size(width.dp, height.dp)
-}
 
 val basicModifier = Modifier.padding(10.dp)
 

@@ -1,6 +1,5 @@
 package com.example.ntufapp.ui.widget
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Column
@@ -28,7 +27,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -45,7 +43,7 @@ import com.example.ntufapp.ui.theme.dropDownMenuModifier
 import com.example.ntufapp.ui.widget.dialog.AddDialog
 import com.example.ntufapp.utils.showMessage
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 // Can add new choices to the list
 // Searchable with texts and use the dropdown menu to show the filtered options
@@ -194,7 +192,7 @@ fun SearchableAddMenu(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchableChooseMenu(
     totalItemsList: MutableList<String>,
@@ -278,7 +276,7 @@ fun SearchableChooseMenu(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchableChooseCheckMenu(
     totalItemsList: List<String>,

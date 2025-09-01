@@ -2,7 +2,6 @@ package com.example.ntufapp.layout
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -31,11 +30,10 @@ import com.example.ntufapp.api.dataType.plotsCatalogueResponse.PlotsCatalogueRes
 import com.example.ntufapp.api.dataType.userAndConditionCodeResponse.ForestDept
 import com.example.ntufapp.api.dataType.userAndConditionCodeResponse.User
 import com.example.ntufapp.api.dataType.userAndConditionCodeResponse.UserCode
-import com.example.ntufapp.api.getTodayDate
 import com.example.ntufapp.api.plotApi
 import com.example.ntufapp.api.uploadPlotDataApi
 import com.example.ntufapp.api.userAndConditionCodeApi
-import com.example.ntufapp.data.ntufappInfo.Companion.outputDir
+import com.example.ntufapp.data.NtufAppInfo.Companion.outputDir
 import com.example.ntufapp.ui.theme.LayoutDivider
 import com.example.ntufapp.ui.widget.dialog.ChoosePlotToDownloadDialog
 import com.example.ntufapp.ui.widget.dialog.UploadFileDialog
@@ -53,7 +51,6 @@ import java.io.File
 fun DownloadUploadJsonScreen () {
     val coroutineScope = rememberCoroutineScope()
     BackHandler(enabled = true) {}
-    val tag = "LoadJsonScreen"
 
     Column(
         modifier = Modifier
@@ -90,11 +87,7 @@ fun DownloadUploadJsonScreen () {
             )
 
             UploadButton(
-                context = context,
                 showUploadDialog = showUploadDialog,
-                selectedFileUri = selectedFileUri,
-                buttonText = buttonText,
-                coroutineScope = coroutineScope
             )
 
             if (showDownloadDialog.value) {
@@ -152,12 +145,10 @@ fun DownloadButton(
     showDownloadDialog: MutableState<Boolean>,
     listOfPlots: MutableState<Map<String, Map<String, List<Map<String, List<Pair<String, String>>>>>>>
 ) {
-    val tag = "LoadJsonScreen"
     Button(
         modifier = Modifier.padding(5.dp),
         onClick = {
-//            Log.d(tag, "Download Info Button clicked")
-            catalogueApi(coroutineScope, tag) { response: PlotsCatalogueResponse?, log: String ->
+            catalogueApi(coroutineScope) { response: PlotsCatalogueResponse?, log: String ->
                 if (response != null) {
                     val structuredMap = response.body.data_list
                         .filter { data ->
@@ -166,7 +157,7 @@ fun DownloadButton(
                         .groupBy { it.dept_name }
                         .mapValues { (dept, dataList) ->
                             dataList.groupBy { it.area_compart.toString() }
-                                .mapValues { (compartNo, compartDataList) ->
+                                .mapValues { (_, compartDataList) ->
                                     compartDataList.map {data ->
                                         val areaName = "${data.area_name} (${data.area_kinds_name})"
                                         val area_code = data.area_code
@@ -184,29 +175,10 @@ fun DownloadButton(
                                         areaOrCode2LocationList
                                     }
                                 }
-
-//                            dataList.associate { data ->
-//                                val compartNo = data.area_compart.toString()
-//                                val areaName = "${data.area_name} (${data.area_kinds_name})"
-//                                val area_code = data.area_code
-//                                // area is for 教研組, code is for 企劃組 and 作業組
-//                                val areaOrCode2LocationList = mapOf(
-//                                (if (dept.contains("教學")) areaName else area_code) to
-//                                        data.location_list
-//                                            .map { location ->
-//                                                Pair(location.location_name, location.location_mid)
-//                                            }
-//                                            .sortedBy { pair ->
-//                                                // Extract the numeric part from location_name using a regex
-//                                                Regex("\\d+").find(pair.first)?.value?.toIntOrNull() ?: Int.MAX_VALUE
-//                                            }
-//                                )
-//                                compartNo to areaOrCode2LocationList
                             }
                     listOfPlots.value = structuredMap
                     showDownloadDialog.value = true
                 } else {
-//                    Log.d(tag, log)
                     showMessage(context, log)
                 }
             }
@@ -217,11 +189,7 @@ fun DownloadButton(
 }
 @Composable
 fun UploadButton(
-    context: Context,
     showUploadDialog: MutableState<Boolean>,
-    selectedFileUri: MutableState<Uri?>,
-    buttonText: MutableState<String>,
-    coroutineScope: CoroutineScope
 ) {
     Button(
         modifier = Modifier.padding(5.dp),
@@ -239,10 +207,8 @@ suspend fun handleDownload(
     location_mid: String,
     dept_name: String
 ) {
-    val tag = "LoadJsonScreen"
-    val userAndConditionCodeResponse = userAndConditionCodeApi(coroutineScope, tag)
-    val plotInfoRsp = plotApi(coroutineScope, tag, location_mid)
-    val today = getTodayDate()
+    val userAndConditionCodeResponse = userAndConditionCodeApi(coroutineScope)
+    val plotInfoRsp = plotApi(coroutineScope, location_mid)
     var plotName = if (dept_name.contains("教學")) {
         "教研-"
     } else if(dept_name.contains("企劃")) {
@@ -293,21 +259,16 @@ suspend fun handleUpload(
     selectedFileUri: MutableState<Uri?>,
     showUploadDialog: MutableState<Boolean>
 ) {
-    val tag = "LoadJsonScreen"
     if (selectedFileUri.value != null) {
         try {
             val surveyDataForUpload = parseJsonToSurveyDataForUpload(selectedFileUri.value!!, context)
-            Log.d(tag, "surveyDataForUpload: ${surveyDataForUpload?.investigation_treeHeight_user}, ${surveyDataForUpload?.update_user}")
-            Log.d(tag, "surveyDataForUpload: ${surveyDataForUpload?.investigation_user}, ${surveyDataForUpload?.location_mid}, ${surveyDataForUpload?.investigation_record_list?.size}")
-            val uploadResponse = uploadPlotDataApi(coroutineScope, tag, surveyDataForUpload!!)
-            Log.d(tag, "uploadResponse: $uploadResponse")
+            val uploadResponse = uploadPlotDataApi(coroutineScope, surveyDataForUpload!!)
             if (uploadResponse!!.result) {
                 showMessage(context, "檔案上傳成功！")
             } else {
                 showMessage(context, "檔案上傳失敗！ ${uploadResponse.body}")
             }
         } catch (e: Exception) {
-            Log.i(tag, "exError: $e")
             showMessage(context, "檔案解析時發生錯誤！")
         }
     } else {
@@ -330,6 +291,5 @@ fun extractAreaCompartName(
     areaCompartNo: Int
 ): String {
     val targetDept = forestDeptList.find { it.forest_dept_name == TargetDeptName }
-    Log.d("LoadJsonScreen", "targetDept: $targetDept")
     return targetDept?.area_compart_list?.find { it.area_compart_code == areaCompartNo }?.area_compart_name ?: ""
 }

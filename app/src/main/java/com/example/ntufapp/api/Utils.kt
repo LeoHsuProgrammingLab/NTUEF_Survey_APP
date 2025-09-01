@@ -3,20 +3,13 @@ package com.example.ntufapp.api
 import android.content.Context
 import com.example.ntufapp.api.dataType.plotInfoResponse.PlotInfoResponse
 import com.example.ntufapp.api.dataType.surveyDataForUpload.InvestigationRecord
-import com.example.ntufapp.api.dataType.surveyDataForUpload.Photo
 import com.example.ntufapp.api.dataType.surveyDataForUpload.SurveyDataForUpload
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
-import android.util.Base64
-import android.util.Log
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import com.example.ntufapp.data.DataSource
 import com.example.ntufapp.model.PlotData
-import java.io.File
-import java.io.FileInputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -38,10 +31,6 @@ fun transformPlotInfoResponseToPlotData(
     val locationInfo = response.body.location_info
     val newestInvestigation = response.body.newest_investigation
     val newestLocation = response.body.newest_location
-
-    val surveyors = newestInvestigation.investigation_user_list.associate { it.user_id to it.user_name }
-    val htSurveyor = Pair(newestInvestigation.investigation_treeHeight_user_list.user_id, newestInvestigation.investigation_treeHeight_user_list.user_name) // Assuming tree height surveyor is singular
-
     val plotData = PlotData(
         Date = newestInvestigation.investigation_date,
         Year = newestInvestigation.investigation_year,
@@ -61,8 +50,6 @@ fun transformPlotInfoResponseToPlotData(
         Slope = locationInfo.area_slope.toDoubleOrNull() ?: 0.0,
         Aspect = locationInfo.area_aspect,
 
-        // Surveyor doesn't need to be assigned
-        // HtSurveyor = htSurveyor,
         PlotTrees = mutableListOf(), // Additional logic needed to populate trees if applicable
 
         userList = response.userList,
@@ -86,12 +73,6 @@ fun transformPlotInfoResponseToPlotData(
     val investigationStateCode = locationInfo.area_investigation_setup_list
         .firstOrNull { it.investigation_item_name == "生長狀態" }
         ?.investigation_item_code
-//    val investigationForkedHeightCode = locationInfo.area_investigation_setup_list
-//        .firstOrNull { it.investigation_item_name == "分岔樹高" }
-//        ?.investigation_item_code
-//    val investigationBaseDiameterCode = locationInfo.area_investigation_setup_list
-//        .firstOrNull { it.investigation_item_name == "基徑" }
-//        ?.investigation_item_code
 
     // get data from newest investigation record by the corresponding investigation item code
     // Step 1: Create a map of location_sid to Tree objects
@@ -128,8 +109,6 @@ fun transformPlotInfoResponseToPlotData(
     } else {
         return null
     }
-
-
 }
 
 fun transformPlotDataToSurveyDataForUpload(plotData: PlotData): SurveyDataForUpload {
@@ -163,13 +142,6 @@ fun transformPlotDataToSurveyDataForUpload(plotData: PlotData): SurveyDataForUpl
                 location_wx = tree.location_wx,
                 location_wy = tree.location_wy
             ),
-//            InvestigationRecord(
-//                investigation_item_code = plotData.getBaseDiameterCode(),
-//                investigation_item_result = "0",
-//                location_sid = tree.location_sid,
-//                location_wx = tree.location_wx,
-//                location_wy = tree.location_wy
-//            ),
             InvestigationRecord(
                 investigation_item_code = plotData.getVisHeightCode(),
                 investigation_item_result = tree.VisHeight.toString(),
@@ -210,37 +182,15 @@ fun transformPlotDataToSurveyDataForUpload(plotData: PlotData): SurveyDataForUpl
 }
 
 fun formatWxWy(w: String): String {
-//    Log.d("formatWxWy", "w: $w")
     if (w.isEmpty() || w=="0") {
         return ""
     }
     return String.format("%.0f", w.toDouble())
 }
 
-fun encodeImageToBase64(imagePath: String): String {
-    val file = File(imagePath)
-    val bytes = FileInputStream(file).use { it.readBytes() }
-    return Base64.encodeToString(bytes, Base64.DEFAULT)
-}
-
-fun createPhotoObject(areaCode: String, areaName: String, file: File): Photo {
-    val dateFormat = SimpleDateFormat("yyyyMM", Locale.getDefault())
-    val datePart = dateFormat.format(Date())
-    val serial = "001" // This should be dynamically generated or tracked
-    val fileName = "${areaCode}_${areaName}_${datePart}_$serial.jpg"
-    val fileData = encodeImageToBase64(file.path)
-
-    return Photo(file_name = fileName, file_data = fileData)
-}
-
 fun getTodayDate(): String {
     val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     return dateFormat.format(Date())
-}
-
-fun extractNumber(s: String): Int {
-    val regex = "\\d+".toRegex()
-    return regex.find(s)?.value?.toInt() ?: 0
 }
 
 fun extractStateCodeFromStateString(stateList: MutableList<String>): String {

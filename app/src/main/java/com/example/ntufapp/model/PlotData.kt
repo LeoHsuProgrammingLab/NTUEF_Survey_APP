@@ -1,9 +1,6 @@
 package com.example.ntufapp.model
 
 import android.content.Context
-import android.util.Log
-import androidx.compose.ui.platform.LocalContext
-import com.example.ntufapp.api.dataType.plotInfoResponse.NewestLocation
 import com.example.ntufapp.api.dataType.userAndConditionCodeResponse.SpeciesItem
 import com.example.ntufapp.api.dataType.userAndConditionCodeResponse.User
 import com.example.ntufapp.utils.showMessage
@@ -159,7 +156,6 @@ fun createTreeQuotaPair(invalidSet: MutableSet<Tree>): MutableMap<Int, Int> {
 }
 
 fun checkThreshold(old: Double, new: Double, threshold: Double): Boolean {
-    Log.d("compare", "old: $old, new: $new, threshold: $threshold, result:${abs(old - new) > threshold * old || new == 0.0}")
     return abs(old - new) >= threshold * old || new == 0.0
 }
 
