@@ -106,7 +106,7 @@ data class PlotData(
     }
 
     fun getTreeSpeciesCode(): String {
-        return area_investigation_setup_list["調查樹種"]?:"17"
+        return area_investigation_setup_list["調查樹種"]?:"16"
     }
 
     fun getBaseDiameterCode(): String {

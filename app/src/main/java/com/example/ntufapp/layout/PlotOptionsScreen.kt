@@ -224,7 +224,8 @@ fun handleFileInput(
         try {
             plotData.value = parseJsonToPlotData(selectedFileUri.value!!, context)!!
             showOldUploadData.value = true
-            outputFilename.value = getFileName(context, selectedFileUri.value).split("_")[0] + "_" + getTodayDate() + ".json"
+            val fileNameParts = getFileName(context, selectedFileUri.value).split("_")
+            outputFilename.value = fileNameParts.dropLast(2).joinToString("_") + "_" + getTodayDate() + ".json"
         } catch (e: Exception) {
             Log.d("PlotOptions", "exError: $e")
             showMessage(context, "檔案解析時發生錯誤！\n資料不齊全！")
