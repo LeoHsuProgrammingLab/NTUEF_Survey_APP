@@ -47,7 +47,7 @@ fun TreeConditionChips(//https://semicolonspace.com/jetpack-compose-filterchip/
 
     val singleItemList = DataSource.TreeSingleConditionList // only one item can be selected
     val multiItemList = DataSource.TreeMultiConditionList // multiple items can be selected
-    val squirrelItemList = DataSource.SquirrelConditionList // multiple items can be selected
+//    val squirrelItemList = DataSource.SquirrelConditionList // multiple items can be selected
 
     val treeCondition = remember { mutableStateOf("") }
     treeCondition.value = currentTree.State.joinToString()
@@ -88,31 +88,31 @@ fun TreeConditionChips(//https://semicolonspace.com/jetpack-compose-filterchip/
             }
         }
 
-        LazyRow( modifier = modifier) {
-            itemsIndexed(squirrelItemList) {id, item ->
-                FilterChip(
-                    modifier = Modifier.padding(horizontal = 6.dp), // gap between items
-                    selected = selectedItems.contains(item),
-                    onClick = {
-                        if (selectedItems.contains(item)) {
-                            selectedItems.remove(item)
-                        } else {
-                            selectedItems.removeAll(squirrelItemList)
-                            selectedItems.removeAll(singleItemList)
-                            selectedItems.add(item)
-                        }
-                    },
-                    label = {
-                        Text(
-                            text = item,
-                            style = TextStyle(
-                                fontSize = 18.sp
-                            )
-                        )
-                    }
-                )
-            }
-        }
+//        LazyRow( modifier = modifier) {
+//            itemsIndexed(squirrelItemList) {id, item ->
+//                FilterChip(
+//                    modifier = Modifier.padding(horizontal = 6.dp), // gap between items
+//                    selected = selectedItems.contains(item),
+//                    onClick = {
+//                        if (selectedItems.contains(item)) {
+//                            selectedItems.remove(item)
+//                        } else {
+//                            selectedItems.removeAll(squirrelItemList)
+//                            selectedItems.removeAll(singleItemList)
+//                            selectedItems.add(item)
+//                        }
+//                    },
+//                    label = {
+//                        Text(
+//                            text = item,
+//                            style = TextStyle(
+//                                fontSize = 18.sp
+//                            )
+//                        )
+//                    }
+//                )
+//            }
+//        }
 
         LazyRow( modifier = modifier) {
             itemsIndexed(multiItemList) { id, item ->

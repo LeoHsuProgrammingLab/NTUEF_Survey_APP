@@ -1,6 +1,9 @@
 package com.example.ntufapp.model
 
+import android.content.Context
 import android.util.Log
+import androidx.compose.ui.platform.LocalContext
+import com.example.ntufapp.api.dataType.plotInfoResponse.NewestLocation
 import com.example.ntufapp.api.dataType.userAndConditionCodeResponse.SpeciesItem
 import com.example.ntufapp.api.dataType.userAndConditionCodeResponse.User
 import com.example.ntufapp.utils.showMessage
@@ -12,9 +15,10 @@ data class PlotData(
     var Year: String = "",
     var ManageUnit: String = "",
     var SubUnit: String = "", //1-55
+    var location_code: String = "",
 
-    var PlotName: String = "",
-    var PlotNum: String = "0",
+    var AreaKind: String = "",
+    var AreaNum: String = "0",
     var PlotType: String = "",
 
     var PlotArea: Double = 0.0,
@@ -53,8 +57,8 @@ data class PlotData(
             Year = Year,
             ManageUnit = ManageUnit,
             SubUnit = SubUnit,
-            PlotName = PlotName,
-            PlotNum = PlotNum,
+            AreaKind = AreaKind,
+            AreaNum = AreaNum,
             PlotType = PlotType,
             PlotArea = PlotArea,
             TWD97_X = TWD97_X,
@@ -72,7 +76,8 @@ data class PlotData(
             investigation_user_map = investigation_user_map.toMutableMap(), // Deep copy of map
             userList = userList.toMutableList(),
             area_compart = area_compart,
-            speciesList = speciesList.map { it.copy() } // Deep copy for species list
+            speciesList = speciesList.map { it.copy() }, // Deep copy for species list
+            location_code = location_code
         )
     }
 
@@ -80,25 +85,48 @@ data class PlotData(
         PlotTrees.forEach { it.reset() }
     }
 
-    fun getDBHCode(): String? {
-        return area_investigation_setup_list["基徑"]
+    fun getDBHCode(): String {
+        return area_investigation_setup_list["胸徑"]?:"10"
     }
 
-    fun getHeightCode(): String? {
-        return area_investigation_setup_list["樹高"]
+    fun getHeightCode(): String {
+        return area_investigation_setup_list["樹高"]?:"1"
     }
 
-    fun getStateCode(): String? {
-        return area_investigation_setup_list["生長狀態"]
+    fun getStateCode(): String {
+        return area_investigation_setup_list["生長狀態"]?:"8"
     }
 
-    fun getForkedHeightCode(): String? {
-        return area_investigation_setup_list["分叉高"]
+    fun getVisHeightCode(): String {
+        return area_investigation_setup_list["目視樹高"]?:"3"
     }
 
-    fun initPlotTrees(treeNumber: Int) {
+    fun getForkedHeightCode(): String {
+        return area_investigation_setup_list["分叉高"]?:"4"
+    }
+
+    fun getTreeSpeciesCode(): String {
+        return area_investigation_setup_list["調查樹種"]?:"16"
+    }
+
+    fun getBaseDiameterCode(): String {
+        return area_investigation_setup_list["基徑"]?:"5"
+    }
+
+    fun initPlotTrees(treeNumber: Int, location_sid_list: List<String>) {
         PlotTrees.clear()
         PlotTrees.addAll((1..treeNumber).map { Tree(SampleNum = it) })
+        PlotTrees.forEachIndexed { index, tree ->
+            tree.location_sid = location_sid_list[index]
+        }
+    }
+
+    fun checkPlotData(context: Context): Boolean {
+        if (PlotTrees.isEmpty()) {
+            showMessage(context, "樣區樹木數量為0")
+            return false
+        }
+        return true
     }
 }
 
@@ -132,7 +160,7 @@ fun createTreeQuotaPair(invalidSet: MutableSet<Tree>): MutableMap<Int, Int> {
 
 fun checkThreshold(old: Double, new: Double, threshold: Double): Boolean {
     Log.d("compare", "old: $old, new: $new, threshold: $threshold, result:${abs(old - new) > threshold * old || new == 0.0}")
-    return abs(old - new) > threshold * old || new == 0.0
+    return abs(old - new) >= threshold * old || new == 0.0
 }
 
 fun checkThresholdByInterval(old: Double, new: Double, threshold: Double): Boolean {

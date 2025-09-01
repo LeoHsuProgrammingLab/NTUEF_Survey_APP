@@ -299,14 +299,16 @@ fun LazyColumnInputTextField(
     TextField(
         value = textContent.value,
         onValueChange = {
-            if (it.isNotEmpty()) {
-                textContent.value = it
-                updateTree(it.toDoubleOrNull())
+            val cleanedInput = it.trim().replace("\n", "")
+
+            if (cleanedInput.isNotEmpty()) {
+                textContent.value = cleanedInput
+                updateTree(cleanedInput.toDoubleOrNull())
             } else {
                 Log.d("LazyColumnInputTextField", "it is empty")
             }
-            textContent.value = it
-            updateTree(it.toDoubleOrNull())
+            textContent.value = cleanedInput
+            updateTree(cleanedInput.toDoubleOrNull())
         },
         label = {
             Text(

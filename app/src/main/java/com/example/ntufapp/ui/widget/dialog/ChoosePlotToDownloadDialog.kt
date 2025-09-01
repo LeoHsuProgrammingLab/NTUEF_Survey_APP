@@ -21,7 +21,7 @@ import com.example.ntufapp.utils.showMessage
 
 @Composable
 fun ChoosePlotToDownloadDialog(
-    allPlotsInfo: Map<String, Map<String, Map<String, List<Pair<String, String>>>>>,
+    allPlotsInfo: Map<String, Map<String, List<Map<String, List<Pair<String, String>>>>>>,
     onDownload: (String, String) -> Unit,
     onDismiss: () -> Unit,
     onCancelClick: () -> Unit

@@ -28,14 +28,22 @@ fun MetaDateView(newPlotData: PlotData) {
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         val dateInfo = Pair("調查日期", newPlotData.Date)
-        val mangeUnitInfo = Pair("試驗地", newPlotData.ManageUnit)
+        val mangeUnitInfo = Pair("試驗地", newPlotData.ManageUnit + " " + newPlotData.AreaNum)
         val subUnitInfo = Pair("林班", newPlotData.area_compart)
-        val plotNumInfo = Pair("樣區編號", newPlotData.PlotNum)
-        val plotNameInfo = Pair("樣區種類", newPlotData.PlotName)
+        val plotNumInfo = Pair("樣區編號", newPlotData.location_code)
+        val plotNameInfo = Pair("樣區種類", newPlotData.AreaKind)
         val plotAreaInfo = Pair("樣區面積(m2)", newPlotData.PlotArea.toString())
         val plotTypeInfo = Pair("樣區型態", newPlotData.PlotType)
-        val TWD97_X = Pair("TWD97_X", newPlotData.TWD97_X)
-        val TWD97_Y = Pair("TWD97_Y", newPlotData.TWD97_Y)
+        val TWD97_X = if (newPlotData.TWD97_X.isNotEmpty()) {
+            Pair("TWD97_X", newPlotData.TWD97_X)
+        } else {
+            Pair("TWD97_X", "X")
+        }
+        val TWD97_Y = if (newPlotData.TWD97_Y.isNotEmpty()) {
+            Pair("TWD97_X", newPlotData.TWD97_Y)
+        } else {
+            Pair("TWD97_Y", "X")
+        }
         val altitudeInfo = Pair("海拔(m)", newPlotData.Altitude.toString())
         val slopeInfo = Pair("坡度", newPlotData.Slope.toString())
         val aspectInfo = Pair("坡向", newPlotData.Aspect)

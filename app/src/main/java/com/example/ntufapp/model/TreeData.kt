@@ -22,7 +22,10 @@ data class Tree(
             DBH = DBH,
             VisHeight = VisHeight,
             MeasHeight = MeasHeight,
-            ForkHeight = ForkHeight
+            ForkHeight = ForkHeight,
+            location_sid = location_sid,
+            location_wx = location_wx,
+            location_wy = location_wy,
         )
     }
     fun reset() {

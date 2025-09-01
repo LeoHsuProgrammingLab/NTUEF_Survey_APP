@@ -30,7 +30,7 @@ fun parseJsonToPlotData(uri: Uri, context: Context): PlotData? {
 
     try {
         val plotInfoResponse = Gson().fromJson(jsonString, PlotInfoResponse::class.java)
-        return transformPlotInfoResponseToPlotData(plotInfoResponse)
+        return transformPlotInfoResponseToPlotData(plotInfoResponse, context)
     } catch (e: Exception) {
         // Handle parsing errors here
         return null
@@ -44,12 +44,12 @@ fun parseJsonToSurveyDataForUpload(uri: Uri, context: Context): SurveyDataForUpl
     val inputStream = context.contentResolver.openInputStream(uri)
     val jsonString = inputStream?.bufferedReader()?.use(BufferedReader::readText)
 
-    try {
-        val surveyDataForUpload = Gson().fromJson(jsonString, SurveyDataForUpload::class.java)
-        return surveyDataForUpload
+    return try {
+        Gson().fromJson(jsonString, SurveyDataForUpload::class.java)
     } catch (e: Exception) {
         // Handle parsing errors here
-        return null
+        Log.d("parseJsonToSurveyDataForUpload", e.message.toString())
+        null
     } finally {
         // Close the InputStream after use
         inputStream?.close()
@@ -58,13 +58,15 @@ fun parseJsonToSurveyDataForUpload(uri: Uri, context: Context): SurveyDataForUpl
 
 fun getFilenameWithFormat(plotData: PlotData, filename: String = "", toCSV: Boolean = false): String {
     if (filename.isNotEmpty()) {
+        var fn = filename.substringBeforeLast(".")
+        fn += ("_" + "現場調查資料")
         if (toCSV) {
-            return filename.replaceAfter(".", "csv")
+            return "$fn.csv"
         } else {
-            return filename
+            return "$fn.json"
         }
     } else {
-        val formattedFilename = plotData.ManageUnit + plotData.PlotName + "_" + plotData.PlotNum
+        val formattedFilename = plotData.ManageUnit + plotData.AreaKind + "_" + plotData.AreaNum + "_" + "現場調查資料"
         if (toCSV) {
             return "$formattedFilename.csv"
         } else {

@@ -308,8 +308,9 @@ fun TabbedValidationResult(
             when (tabSelected.value) {
                 0 -> {
                     ValidationLazyColumn(
-                        inValidTreeQuotaMap = invalidDBHQuota,
+                        inValidTreeQuotaMap = invalidMeasHtQuota,
                         inValidTreeList = invalidMeasHtSet,
+                        newPlotData = newPlotData,
                         oldPlotData = oldPlotData,
                         type = stringList[0],
                         threshold = htThreshold
@@ -335,8 +336,9 @@ fun TabbedValidationResult(
 //                }
                 1 -> {
                     ValidationLazyColumn(
-                        inValidTreeQuotaMap = invalidMeasHtQuota,
+                        inValidTreeQuotaMap = invalidDBHQuota,
                         inValidTreeList = invalidDBHSet,
+                        newPlotData = newPlotData,
                         oldPlotData = oldPlotData,
                         type = stringList[3],
                         threshold = dbhThreshold
@@ -351,6 +353,7 @@ fun TabbedValidationResult(
 fun ValidationLazyColumn(
     inValidTreeQuotaMap: MutableState<MutableMap<Int, Int>>,
     inValidTreeList: MutableState<MutableSet<Tree>>,
+    newPlotData: PlotData,
     oldPlotData: PlotData,
     type: String,
     threshold: Double,
@@ -415,18 +418,28 @@ fun ValidationLazyColumn(
 
                         if(newValue != null) {
                             // Update by the new value
+                            val targetTree = newPlotData.getTreeBySampleNum(tree.SampleNum)!!
                             when(type) {
-                                "DBH" -> tree.DBH = newValue
-                                "Vis" -> tree.VisHeight = newValue
-                                "Meas" -> tree.MeasHeight = newValue
-                                else -> tree.ForkHeight = newValue
+                                "DBH" -> {
+                                    tree.DBH = newValue
+                                    targetTree.DBH = newValue
+                                }
+                                "Vis" -> {
+                                    tree.VisHeight = newValue
+                                    targetTree.VisHeight = newValue
+                                }
+                                "Meas" -> {
+                                    tree.MeasHeight = newValue
+                                    targetTree.MeasHeight = newValue
+                                }
                             }
                             // Get the old value
+                            val oldTargetTree = oldPlotData.getTreeBySampleNum(tree.SampleNum)!!
                             val oldValue = when(type) {
-                                "DBH" -> oldPlotData.getTreeBySampleNum(tree.SampleNum)!!.DBH
-                                "Vis" -> oldPlotData.getTreeBySampleNum(tree.SampleNum)!!.VisHeight
-                                "Meas" -> oldPlotData.getTreeBySampleNum(tree.SampleNum)!!.MeasHeight
-                                else -> oldPlotData.getTreeBySampleNum(tree.SampleNum)!!.ForkHeight
+                                "DBH" -> oldTargetTree.DBH
+                                "Vis" -> oldTargetTree.VisHeight
+                                "Meas" -> oldTargetTree.MeasHeight
+                                else -> oldTargetTree.ForkHeight
                             }
 
                             // Update the quota
@@ -442,7 +455,7 @@ fun ValidationLazyColumn(
                                 }
                             }
                         } else {
-                            showMessage(context, "請輸入欲修改之數字")
+                            showMessage(context, "格式不正確，請輸入欲修改之數字")
                         }
                     }
                 ) {
@@ -462,7 +475,10 @@ fun ValidationLazyColumnInputTextField(
     TextField(
         value = textContent.value,
         readOnly = (changeQuota == 0),
-        onValueChange = { textContent.value = it },
+        onValueChange = {
+            val cleanedInput = it.replace("\n", "")
+            textContent.value = cleanedInput
+        },
         modifier = modifier,
         label = {
             Text("本次調查", fontSize = 16.sp)

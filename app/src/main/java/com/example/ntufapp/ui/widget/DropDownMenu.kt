@@ -46,7 +46,7 @@ import com.example.ntufapp.ui.theme.dropDownMenuModifier
 @Composable
 fun PlotSelectionDropDownMenu(
     label: String,
-    allPlotsInfo: Map<String, Map<String, Map<String, List<Pair<String, String>>>>>, // dept_name to (area_name to Pair<location_name, location_mid>)
+    allPlotsInfo: Map<String, Map<String, List<Map<String, List<Pair<String, String>>>>>>, // dept_name to (area_name to Pair<location_name, location_mid>)
     onChoose: (String, String) -> Unit,
     widthType: String = "large",
 ) {
@@ -61,20 +61,38 @@ fun PlotSelectionDropDownMenu(
 
     // 林班地 compartment
     val compartList = remember {
-        mutableStateOf(allPlotsInfo[deptName.value]?.keys?.toList()?.sortedBy { it.toInt() } ?: emptyList())
+        mutableStateOf(
+        allPlotsInfo[deptName.value]
+            ?.keys
+            ?.toList()
+            ?.sortedBy { it.toInt() }
+            ?: emptyList()
+        )
     }
     val compart = remember { mutableStateOf("請選擇林班地") }
 
 
     // areaNameList contains all the area_name in the selected dept
     val areaNameList = remember {
-        mutableStateOf( allPlotsInfo[deptName.value]?.get(compart.value)?.keys?.toList() ?: emptyList())
+        mutableStateOf(
+        allPlotsInfo[deptName.value]
+            ?.get(compart.value)
+            ?.flatMap { it.keys }
+            ?: emptyList()
+        )
     }
     val areaName = remember { mutableStateOf("請選擇試驗地") }
 
     // locationList contains all the location_name in the selected area
     val locationList = remember { // List of location_name
-        mutableStateOf((allPlotsInfo[deptName.value]?.get(compart.value)?.get(areaName.value)?.map { it.first } ?: emptyList()))
+        mutableStateOf(
+        allPlotsInfo[deptName.value]
+            ?.get(compart.value)
+            ?.find { it.containsKey(areaName.value) }
+            ?.get(areaName.value)
+            ?.map {it.first}
+            ?: emptyList()
+        )
     }
     val location = remember { mutableStateOf("請選擇樣區") }
 
@@ -188,7 +206,7 @@ fun PlotSelectionDropDownMenu(
             itemList = compartList.value,
             onItemsChange = {
                 compart.value = it
-                areaNameList.value = listOf("請選擇試驗地") + (allPlotsInfo[deptName.value]?.get(it)?.keys?.sorted() ?: emptyList())
+                areaNameList.value = listOf("請選擇試驗地") + (allPlotsInfo[deptName.value]?.get(it)?.flatMap { list -> list.keys }?.sorted() ?: emptyList())
                 areaName.value = areaNameList.value.first()
             }
         )
@@ -200,7 +218,7 @@ fun PlotSelectionDropDownMenu(
             itemList = areaNameList.value,
             onItemsChange = { it ->
                 areaName.value = it
-                locationList.value = listOf("請選擇樣區") + (allPlotsInfo[deptName.value]?.get(compart.value)?.get(it)?.map { it.first } ?: emptyList())
+                locationList.value = listOf("請選擇樣區") + (allPlotsInfo[deptName.value]?.get(compart.value)?.find { listKeys -> listKeys.containsKey(it) }?.get(it)?.map { it.first } ?: emptyList())
                 location.value = locationList.value.firstOrNull() ?: "尚無"
             }
         )
@@ -213,7 +231,7 @@ fun PlotSelectionDropDownMenu(
             onItemsChange = {
                 location.value = it
                 onChoose(
-                    allPlotsInfo[deptName.value]?.get(compart.value)?.get(areaName.value)?.find { pair -> pair.first == it }?.second ?: "",
+                    allPlotsInfo[deptName.value]?.get(compart.value)?.find {listKeys -> listKeys.containsKey(areaName.value) }?.get(areaName.value)?.find { pair -> pair.first == it }?.second ?: "",
                     deptName.value
                 )
             }

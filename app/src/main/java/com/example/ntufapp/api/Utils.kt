@@ -1,5 +1,6 @@
 package com.example.ntufapp.api
 
+import android.content.Context
 import com.example.ntufapp.api.dataType.plotInfoResponse.PlotInfoResponse
 import com.example.ntufapp.api.dataType.surveyDataForUpload.InvestigationRecord
 import com.example.ntufapp.api.dataType.surveyDataForUpload.Photo
@@ -10,6 +11,8 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import android.util.Base64
 import android.util.Log
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import com.example.ntufapp.data.DataSource
 import com.example.ntufapp.model.PlotData
 import java.io.File
@@ -28,21 +31,26 @@ fun createRequestBody(jsonContent: List<Pair<String, String>>): RequestBody {
     return jsonString.toRequestBody("application/json".toMediaTypeOrNull())
 }
 
-fun transformPlotInfoResponseToPlotData(response: PlotInfoResponse): PlotData {
+fun transformPlotInfoResponseToPlotData(
+    response: PlotInfoResponse,
+    context: Context
+): PlotData? {
     val locationInfo = response.body.location_info
     val newestInvestigation = response.body.newest_investigation
-    Log.d("location mid", response.location_mid)
+    val newestLocation = response.body.newest_location
 
     val surveyors = newestInvestigation.investigation_user_list.associate { it.user_id to it.user_name }
     val htSurveyor = Pair(newestInvestigation.investigation_treeHeight_user_list.user_id, newestInvestigation.investigation_treeHeight_user_list.user_name) // Assuming tree height surveyor is singular
+
     val plotData = PlotData(
         Date = newestInvestigation.investigation_date,
         Year = newestInvestigation.investigation_year,
-        ManageUnit = locationInfo.area_name, // Assuming area_code represents the managing unit
+        ManageUnit = locationInfo.area_name,
         SubUnit = locationInfo.location_name,
+        location_code = locationInfo.location_code,
 
-        PlotName = locationInfo.area_kinds_name,
-        PlotNum = locationInfo.area_code,
+        AreaKind = locationInfo.area_kinds_name,
+        AreaNum = locationInfo.area_code,
         PlotType = locationInfo.location_type_name,
 
         PlotArea = 0.0,
@@ -66,9 +74,9 @@ fun transformPlotInfoResponseToPlotData(response: PlotInfoResponse): PlotData {
         area_compart = locationInfo.area_compart.toString(),
         speciesList = response.species_list
     )
-
+    // init tree data
+    plotData.initPlotTrees(response.body.newest_location_count, newestLocation.map { it.location_sid })
     // find corresponding investigation item code
-    plotData.initPlotTrees(response.body.newest_location_count)
     val investigationDBHCode = locationInfo.area_investigation_setup_list
         .firstOrNull { it.investigation_item_name == "胸徑" }
         ?.investigation_item_code
@@ -78,60 +86,104 @@ fun transformPlotInfoResponseToPlotData(response: PlotInfoResponse): PlotData {
     val investigationStateCode = locationInfo.area_investigation_setup_list
         .firstOrNull { it.investigation_item_name == "生長狀態" }
         ?.investigation_item_code
+//    val investigationForkedHeightCode = locationInfo.area_investigation_setup_list
+//        .firstOrNull { it.investigation_item_name == "分岔樹高" }
+//        ?.investigation_item_code
+//    val investigationBaseDiameterCode = locationInfo.area_investigation_setup_list
+//        .firstOrNull { it.investigation_item_name == "基徑" }
+//        ?.investigation_item_code
 
     // get data from newest investigation record by the corresponding investigation item code
-    for (i in plotData.PlotTrees.indices) {
-        plotData.PlotTrees[i].location_sid = newestInvestigation.investigation_record_list[i].location_sid
-        plotData.PlotTrees[i].DBH =
-            newestInvestigation.investigation_record_list[i].investigation_result_list.firstOrNull { it.investigation_item_code == investigationDBHCode }?.investigation_result?.toDoubleOrNull() ?: 0.0
-        plotData.PlotTrees[i].MeasHeight =
-            newestInvestigation.investigation_record_list[i].investigation_result_list.firstOrNull { it.investigation_item_code == investigationHeightCode }?.investigation_result?.toDoubleOrNull() ?: 0.0
-        val growthStateCodeList = newestInvestigation.investigation_record_list[i].investigation_result_list.firstOrNull { it.investigation_item_code == investigationStateCode }?.investigation_result?.split(",") ?: emptyList()
-        plotData.PlotTrees[i].State = DataSource.GrowthCodeList.filter { it.code in growthStateCodeList }.map { it.code_name }.toMutableList()
+    // Step 1: Create a map of location_sid to Tree objects
+    val locationSidToTreeMap = plotData.PlotTrees.associateBy { it.location_sid }
+
+    // Step 2: Iterate through newestInvestigation.investigation_record_list and find the corresponding Tree object
+    newestInvestigation.investigation_record_list.forEach { record ->
+        val tree = locationSidToTreeMap[record.location_sid]
+        if (tree != null) {
+            // Step 3: Assign the DBH, MeasHeight, and State values to the found Tree object
+            tree.DBH = record.investigation_result_list
+                .firstOrNull { it.investigation_item_code == investigationDBHCode }?.investigation_result?.toDoubleOrNull() ?: 0.0
+            tree.MeasHeight = record.investigation_result_list
+                .firstOrNull { it.investigation_item_code == investigationHeightCode }?.investigation_result?.toDoubleOrNull() ?: 0.0
+
+            val growthStateCodeList = record.investigation_result_list
+                .firstOrNull { it.investigation_item_code == investigationStateCode }?.investigation_result?.split(",") ?: emptyList()
+            tree.State = DataSource.GrowthCodeList.filter { it.code in growthStateCodeList }.map { it.code_name }.toMutableList()
+        }
     }
 
-    return plotData
+    newestLocation.forEach { location ->
+        val tree = plotData.PlotTrees.find { it.location_sid == location.location_sid }
+        if (tree != null) {
+            tree.location_wx = formatWxWy(location.location_wx)
+            tree.location_wy = formatWxWy(location.location_wy)
+            tree.Species = location.location_breed_name
+        }
+    }
+
+    // check if the data is intact
+    if (plotData.checkPlotData(context)) {
+        return plotData
+    } else {
+        return null
+    }
+
+
 }
 
 fun transformPlotDataToSurveyDataForUpload(plotData: PlotData): SurveyDataForUpload {
     val investigationRecordList = plotData.PlotTrees.flatMap { tree ->
-        listOf(
-            plotData.getHeightCode()?.let {
-                InvestigationRecord(
-                    investigation_item_code = it,
-                    investigation_item_result = tree.MeasHeight.toString(),
-                    location_sid = tree.location_sid,
-                    location_wx = tree.location_wx,
-                    location_wy = tree.location_wy
-                )
-            },
-            plotData.getDBHCode()?.let {
-                InvestigationRecord(
-                    investigation_item_code = it,
-                    investigation_item_result = tree.DBH.toString(),
-                    location_sid = tree.location_sid,
-                    location_wx = tree.location_wx,
-                    location_wy = tree.location_wy
-                )
-            },
-            plotData.getStateCode()?.let {
-                InvestigationRecord(
-                    investigation_item_code = it,
-                    investigation_item_result = extractStateCodeFromStateString(tree.State),
-                    location_sid = tree.location_sid,
-                    location_wx = tree.location_wx,
-                    location_wy = tree.location_wy
-                )
-            },
-//            plotData.getForkedHeightCode()?.let {
-//                InvestigationRecord(
-//                    investigation_item_code = it,
-//                    investigation_item_result = tree.ForkHeight.toString(),
-//                    location_sid = tree.location_sid,
-//                    location_wx = tree.location_wx,
-//                    location_wy = tree.location_wy
-//                )
-//            }
+        listOfNotNull(
+            InvestigationRecord(
+                investigation_item_code = plotData.getHeightCode(),
+                investigation_item_result = tree.MeasHeight.toString(),
+                location_sid = tree.location_sid,
+                location_wx = tree.location_wx,
+                location_wy = tree.location_wy
+            ),
+            InvestigationRecord(
+                investigation_item_code = plotData.getDBHCode(),
+                investigation_item_result = tree.DBH.toString(),
+                location_sid = tree.location_sid,
+                location_wx = tree.location_wx,
+                location_wy = tree.location_wy
+            ),
+            InvestigationRecord(
+                investigation_item_code = plotData.getStateCode(),
+                investigation_item_result = extractStateCodeFromStateString(tree.State),
+                location_sid = tree.location_sid,
+                location_wx = tree.location_wx,
+                location_wy = tree.location_wy
+            ),
+            InvestigationRecord(
+                investigation_item_code = plotData.getForkedHeightCode(),
+                investigation_item_result = tree.ForkHeight.toString(),
+                location_sid = tree.location_sid,
+                location_wx = tree.location_wx,
+                location_wy = tree.location_wy
+            ),
+//            InvestigationRecord(
+//                investigation_item_code = plotData.getBaseDiameterCode(),
+//                investigation_item_result = "0",
+//                location_sid = tree.location_sid,
+//                location_wx = tree.location_wx,
+//                location_wy = tree.location_wy
+//            ),
+            InvestigationRecord(
+                investigation_item_code = plotData.getVisHeightCode(),
+                investigation_item_result = tree.VisHeight.toString(),
+                location_sid = tree.location_sid,
+                location_wx = tree.location_wx,
+                location_wy = tree.location_wy
+            ),
+            InvestigationRecord(
+                investigation_item_code = plotData.getTreeSpeciesCode(),
+                investigation_item_result = tree.Species,
+                location_sid = tree.location_sid,
+                location_wx = tree.location_wx,
+                location_wy = tree.location_wy
+            )
         )
     }
 
@@ -158,6 +210,10 @@ fun transformPlotDataToSurveyDataForUpload(plotData: PlotData): SurveyDataForUpl
 }
 
 fun formatWxWy(w: String): String {
+//    Log.d("formatWxWy", "w: $w")
+    if (w.isEmpty() || w=="0") {
+        return ""
+    }
     return String.format("%.0f", w.toDouble())
 }
 
